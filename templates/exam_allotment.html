@@ -482,28 +482,34 @@ $(document).ready(function() {
 
         // Build header rows, expanding HTML colspans so columns align in Excel
         const FIXED_COLS = 7; // Name..Total Allotments
+        const baseHeaderIndices = [0,1,2,3,4,5];
         const headerRow1 = [];
-        // First 7 fixed headers as-is
-        $('#tableHeader th').each(function(index){
-            if (index < FIXED_COLS) headerRow1.push($(this).text().trim());
+        const headerRow2 = [];
+        const dateLabelsPerSession = [];
+        const sessionLabels = [];
+
+        baseHeaderIndices.forEach(function(idx) {
+            const headerText = ($('#tableHeader th').eq(idx).text() || '').trim();
+            headerRow1.push(headerText);
+            headerRow2.push('');
         });
-        // For each date header (with colspan=2 in HTML), duplicate the label twice (AM, PM)
-        $('#tableHeader th').each(function(index){
+
+        $('#tableHeader th').each(function(index) {
             if (index >= FIXED_COLS) {
                 const label = $(this).text().trim();
-                headerRow1.push(label);
-                headerRow1.push(label);
+                const span = parseInt($(this).attr('colspan') || '1', 10);
+                for (let i = 0; i < span; i++) {
+                    headerRow1.push(label);
+                    dateLabelsPerSession.push(label);
+                }
             }
         });
 
-        const headerRow2 = [];
-        // First row of sessions needs 7 blanks to align under fixed columns
-        for (let i = 0; i < FIXED_COLS; i++) headerRow2.push('');
-        // Then AM/PM for each date
-        $('#sessionHeader th').each(function(index){
-            if (index === 0) return; // skip the first th that is colspan=7 placeholder
+        $('#sessionHeader th').each(function(index) {
+            if (index === 0) return; // skip the first colspan placeholder
             const txt = $(this).text().trim();
             headerRow2.push(txt);
+            sessionLabels.push(txt);
         });
 
         const wb = XLSX.utils.book_new();
@@ -529,12 +535,14 @@ $(document).ready(function() {
                 if (rowDept !== dept) return;
 
                 const rowData = [];
-                // Fixed columns: Name..Total Allotments (first 7 cells)
-                for (let i = 0; i < Math.min(7, $cells.length); i++) {
-                    rowData.push(($cells.eq(i).text() || '').trim());
-                }
+                // Fixed columns: Name..Email (skip Total Allotments)
+                baseHeaderIndices.forEach(function(idx) {
+                    if (idx < $cells.length) {
+                        rowData.push(($cells.eq(idx).text() || '').trim());
+                    }
+                });
                 // Remaining cells: convert checkboxes to 1/blank
-                for (let i = 7; i < $cells.length; i++) {
+                for (let i = FIXED_COLS, sessionCounter = 0; i < $cells.length; i++, sessionCounter++) {
                     const $cell = $cells.eq(i);
                     const $checkbox = $cell.find('input[type="checkbox"]');
                     if ($checkbox.length) {
@@ -589,22 +597,34 @@ $(document).ready(function() {
         const end = $('#examEndDate').val() || '';
         // Build aligned headers (same logic as export fix)
         const FIXED_COLS = 7; // Name..Total Allotments
+        const baseHeaderIndices = [0,1,2,3,4,5];
         const headerRow1 = [];
-        $('#tableHeader th').each(function(index){
-            if (index < FIXED_COLS) headerRow1.push($(this).text().trim());
+        const headerRow2 = [];
+        const dateLabelsPerSession = [];
+        const sessionLabels = [];
+
+        baseHeaderIndices.forEach(function(idx) {
+            const headerText = ($('#tableHeader th').eq(idx).text() || '').trim();
+            headerRow1.push(headerText);
+            headerRow2.push('');
         });
-        $('#tableHeader th').each(function(index){
+
+        $('#tableHeader th').each(function(index) {
             if (index >= FIXED_COLS) {
                 const label = $(this).text().trim();
-                headerRow1.push(label);
-                headerRow1.push(label);
+                const span = parseInt($(this).attr('colspan') || '1', 10);
+                for (let i = 0; i < span; i++) {
+                    headerRow1.push(label);
+                    dateLabelsPerSession.push(label);
+                }
             }
         });
-        const headerRow2 = [];
-        for (let i = 0; i < FIXED_COLS; i++) headerRow2.push('');
-        $('#sessionHeader th').each(function(index){
+
+        $('#sessionHeader th').each(function(index) {
             if (index === 0) return; // skip the first colspan placeholder
-            headerRow2.push($(this).text().trim());
+            const txt = $(this).text().trim();
+            headerRow2.push(txt);
+            sessionLabels.push(txt);
         });
 
         let html = `<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -640,17 +660,21 @@ $(document).ready(function() {
                 if (rowDept !== dept) return;
 
                 let rowHtml = '<tr>';
-                // First 7 cells as text
-                for (let i = 0; i < Math.min(7, $cells.length); i++) {
-                    rowHtml += `<td>${($cells.eq(i).text() || '').trim()}</td>`;
-                }
-                // Remaining cells: show ✓ if checked
-                for (let i = 7; i < $cells.length; i++) {
+                // Base columns (Name..Email)
+                baseHeaderIndices.forEach(function(idx) {
+                    if (idx < $cells.length) {
+                        rowHtml += `<td>${($cells.eq(idx).text() || '').trim()}</td>`;
+                    } else {
+                        rowHtml += '<td></td>';
+                    }
+                });
+                // Remaining cells: show date & session if checked
+                for (let i = FIXED_COLS, sessionCounter = 0; i < $cells.length; i++, sessionCounter++) {
                     const $cb = $cells.eq(i).find('input[type="checkbox"]');
                     if ($cb.length && $cb.prop('checked')) {
-                        const dateLabel = (headerRow1[i] || '').trim();
-                        const sessionLabel = (headerRow2[i] || '').trim();
-                        const displayText = `${dateLabel}${sessionLabel ? ' ' + sessionLabel : ''}`.trim();
+                        const dateLabel = (dateLabelsPerSession[sessionCounter] || '').trim();
+                        const sessionLabel = (sessionLabels[sessionCounter] || '').trim();
+                        const displayText = [dateLabel, sessionLabel].filter(Boolean).join(' ');
                         rowHtml += `<td>${displayText}</td>`;
                     } else {
                         rowHtml += '<td></td>';
