@@ -1,0 +1,78 @@
+[
+    {
+        "Name": "Dr. Jagadeesh P. Ganjigatti",
+        "Initials": "DJP",
+        "Designation": "Professor",
+        "Phone": "9964313284",
+        "Email": "jpganjigatti@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.G.V.Prabhushankar",
+        "Designation": "Professor",
+        "Phone": "9845430739",
+        "Email": "gvpshankar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.B.Adaveesh",
+        "Designation": "Associate Professor",
+        "Phone": "9964388174",
+        "Email": "badaveesh@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.B.Lathashankar",
+        "Designation": "Associate Professor",
+        "Phone": "9964505469",
+        "Email": "blshankar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. T. R. Veena",
+        "Initials": "DTR",
+        "Designation": "Assistant Professor",
+        "Phone": "9844274363",
+        "Email": "trveena@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.K.V.Manjunath",
+        "Designation": "Assistant Professor",
+        "Phone": "9916308766",
+        "Email": "kvmanju@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. P. M. Nagaraj",
+        "Initials": "DPM",
+        "Designation": "Assistant Professor",
+        "Phone": "9886515821",
+        "Email": "nagarajpm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. M. Vishwas",
+        "Initials": "DMV",
+        "Designation": "Assistant Professor",
+        "Phone": "9986644944",
+        "Email": "vishwasm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. T. S. Mohan Kumar",
+        "Initials": "DTS",
+        "Designation": "Assistant Professor",
+        "Phone": "9964107757",
+        "Email": "mohankumarts@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. K. C. Anil",
+        "Initials": "DKC",
+        "Designation": "Assistant Professor",
+        "Phone": "9986900982",
+        "Email": "anilkc@sit.ac.in",
+        "isActive": true
+    }
+]

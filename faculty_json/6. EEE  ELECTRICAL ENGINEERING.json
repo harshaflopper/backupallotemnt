@@ -1,0 +1,89 @@
+[
+    {
+        "Name": "K.M.Chandrasekhar Swamy",
+        "Initials": "KMC",
+        "Designation": "Assistant Professor",
+        "Phone": "9886883488",
+        "Email": "kmcswamy@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Associate Professor",
+        "Initials": "AP",
+        "Designation": "Associate Professor",
+        "Phone": "9243185619",
+        "Email": "sridharaba@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.Rashmi",
+        "Designation": "Professor",
+        "Phone": "9740110576",
+        "Email": "rash_mysore@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Assistant Professor",
+        "Initials": "AP",
+        "Designation": "Assistant Professor",
+        "Phone": "8073876247",
+        "Email": "rupeshkc@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Naveen Kumar S.B.",
+        "Initials": "NKS",
+        "Designation": "Assistant Professor",
+        "Phone": "9886456965",
+        "Email": "sbnaveen@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Madhu.B.M",
+        "Initials": "DMB",
+        "Designation": "Assistant Professor",
+        "Phone": "9986163831",
+        "Email": "madhubm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H. S. Sridhar",
+        "Initials": "DHS",
+        "Designation": "Assistant Professor",
+        "Phone": "9886356950",
+        "Email": "sri054@gmail.com",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Vinayaka K.U.",
+        "Initials": "DVK",
+        "Designation": "Assistant Professor",
+        "Phone": "9538539591",
+        "Email": "vinayka@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Rajesh Uppara",
+        "Initials": "RU",
+        "Designation": "Assistant Professor",
+        "Phone": "8884217476",
+        "Email": "rajeshu@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Jayanendra Kumar",
+        "Initials": "DJK",
+        "Designation": "Assistant Professor",
+        "Phone": "7985555946",
+        "Email": "jayanendrakumar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Priya S",
+        "Initials": "PS",
+        "Designation": "Assistant Professor",
+        "Phone": "9986434716",
+        "Email": "priyas@sit.ac.in",
+        "isActive": true
+    }
+]

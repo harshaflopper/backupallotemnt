@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Add Faculty Modal -->
+<div class="modal fade" id="addFacultyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Add New Faculty Member</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addFacultyForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="facultyDept" class="form-label">Department <span class="text-danger">*</span></label>
+                        <select class="form-select" id="facultyDept" required>
+                            <option value="">Select Department</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="facultyName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="facultyName" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="facultyInitials" class="form-label">Initials <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control text-uppercase" id="facultyInitials" required maxlength="5">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="facultyDesignation" class="form-label">Designation <span class="text-danger">*</span></label>
+                                <select class="form-select" id="facultyDesignation" required>
+                                    <option value="">Select...</option>
+                                    <option value="Professor">Professor</option>
+                                    <option value="Associate Professor">Associate Professor</option>
+                                    <option value="Assistant Professor">Assistant Professor</option>
+                                    <option value="Visiting Faculty">Visiting Faculty</option>
+                                    <option value="Guest Faculty">Guest Faculty</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="facultyPhone" class="form-label">Phone <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="facultyPhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="facultyEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="facultyEmail" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="spinner-border spinner-border-sm d-none" id="addFacultySpinner" role="status" aria-hidden="true"></span>
+                        Add Faculty
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Departments Section -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>Departments</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for dept in departments %}
+                    <a href="#" class="list-group-item list-group-item-action department-item" 
+                       data-dept-id="{{ dept.id }}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ dept.name }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty List Section -->
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="departmentTitle"><i class="bi bi-people-fill me-2"></i>Faculty Members</h5>
+                    <button class="btn btn-sm btn-primary" id="openAddFacultyModal">
+                        <i class="bi bi-plus-lg me-1"></i> Add Faculty
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Initials</th>
+                                    <th>Name</th>
+                                    <th>Designation</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody id="facultyList">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="bi bi-arrow-left-circle text-muted d-block mb-2" style="font-size: 2rem;"></i>
+                                        <span class="text-muted">Select a department to view faculty</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// Use window object to avoid variable scope issues
+if (typeof window.currentDepartmentId === 'undefined') {
+    window.currentDepartmentId = null;
+}
+
+$(document).ready(function() {
+    // Initialize modal
+    const addFacultyModal = new bootstrap.Modal(document.getElementById('addFacultyModal'));
+    
+    // Open add faculty modal
+    $('#openAddFacultyModal').click(function() {
+        // Auto-select the current department if any
+        if (window.currentDepartmentId) {
+            $('#facultyDept').val(window.currentDepartmentId);
+        }
+        addFacultyModal.show();
+    });
+    
+    // Auto-uppercase initials
+    $('#facultyInitials').on('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Handle add faculty form submission
+    $('#addFacultyForm').on('submit', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const form = this;
+        const submitBtn = $(form).find('button[type="submit"]');
+        const spinner = $('#addFacultySpinner');
+        
+        // Show loading state
+        submitBtn.prop('disabled', true);
+        spinner.removeClass('d-none');
+        
+        try {
+            // Get department ID from the form
+            const departmentId = $('#facultyDept').val();
+            if (!departmentId) {
+                throw new Error('Please select a department');
+            }
+            
+            // Prepare faculty data
+            const facultyData = {
+                name: $('#facultyName').val().trim(),
+                initials: $('#facultyInitials').val().trim().toUpperCase(),
+                designation: $('#facultyDesignation').val(),
+                phone: $('#facultyPhone').val().trim(),
+                email: $('#facultyEmail').val().trim().toLowerCase()
+            };
+            
+            // Validate required fields
+            for (const [key, value] of Object.entries(facultyData)) {
+                if (!value) {
+                    throw new Error(`Please fill in all required fields (${key} is missing)`);
+                }
+            }
+            
+            // Send data to server using fetch API
+            const response = await fetch(`/api/faculty/${encodeURIComponent(departmentId)}/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(facultyData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add faculty member');
+            }
+            
+            const data = await response.json();
+            
+            // Close modal and reset form
+            addFacultyModal.hide();
+            form.reset();
+            
+            // If the added faculty is in the currently viewed department, reload the list
+            if (window.currentDepartmentId === departmentId) {
+                // Trigger a click on the current department to refresh the list
+                $(`.department-item[data-dept-id="${departmentId}"]`).click();
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Failed to add faculty member');
+        } finally {
+            // Reset button state
+            submitBtn.prop('disabled', false);
+            spinner.addClass('d-none');
+        }
+    });
+    
+    // Prevent any default form submissions
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+            
+            // Initialize status toggle handlers for any new buttons
+            function initStatusToggle() {
+                $(document).off('click', '.btn-toggle-status').on('click', '.btn-toggle-status', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const button = $(this);
+                    const departmentId = button.data('dept-id');
+                    const facultyIndex = parseInt(button.data('index'));
+                    const currentStatus = button.data('active') === true || button.data('active') === 'true';
+                    const newStatus = !currentStatus;
+                    const icon = button.find('i');
+                    
+                    // Show loading state
+                    button.prop('disabled', true);
+                    icon.removeClass().addClass('bi-arrow-repeat bi-spin');
+                    
+                    console.log('Toggling status:', {
+                        departmentId,
+                        facultyIndex,
+                        currentStatus,
+                        newStatus,
+                        type: typeof facultyIndex
+                    });
+                    
+                    try {
+                        // Make the API call first
+                        const response = await fetch(`/api/faculty/${encodeURIComponent(departmentId)}/toggle_status`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ 
+                                index: facultyIndex,
+                                currentStatus: currentStatus
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        console.log('API Response:', result);
+                        
+                        if (response.ok && result.status === 'success') {
+                            // Update UI only after successful API call
+                            const updatedStatus = result.isActive;
+                            button.data('active', updatedStatus);
+                            button.toggleClass('btn-outline-success btn-outline-danger', true);
+                            icon.removeClass().addClass(updatedStatus ? 'bi-unlock' : 'bi-lock');
+                            button.attr('title', updatedStatus ? 'Click to lock' : 'Click to unlock');
+                        } else {
+                            throw new Error(result.message || 'Failed to update status');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error toggling status:', error);
+                        // Revert UI on error
+                        button.data('active', currentStatus);
+                        button.toggleClass('btn-outline-success btn-outline-danger', true);
+                        icon.removeClass().addClass(currentStatus ? 'bi-unlock' : 'bi-lock');
+                        button.attr('title', currentStatus ? 'Click to lock' : 'Click to unlock');
+                        
+                        alert('Failed to update faculty status: ' + (error.message || 'Unknown error'));
+                    } finally {
+                        button.prop('disabled', false);
+                    }
+                });
+            }
+            
+            // Initialize status toggles after loading faculty data
+            initStatusToggle();
+            
+            // Handle department selection
+            $('.department-item').click(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Update active state
+                $('.department-item').removeClass('active');
+                $(this).addClass('active');
+                
+                window.currentDepartmentId = $(this).data('dept-id');
+                const deptName = $(this).find('span:first').text().trim();
+        
+        // Update department title
+        $('#departmentTitle').html(`<i class="bi bi-people-fill me-2"></i>${deptName} - Faculty`);
+        
+        // Show loading
+        $('#facultyList').html(`
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+        
+        // Fetch faculty data
+        $.ajax({
+            url: `/api/faculty/${encodeURIComponent(window.currentDepartmentId)}`,
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(data) {
+            if (data.length === 0) {
+                $('#facultyList').html(`
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            No faculty members found in this department
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            let html = '';
+            data.forEach(function(faculty, index) {
+                const isActive = faculty.isActive !== false; // Default to true if not set
+                html += `
+                    <tr>
+                        <td class="text-center align-middle">
+                            <button class="btn btn-sm btn-toggle-status ${isActive ? 'btn-outline-success' : 'btn-outline-danger'}" 
+                                    data-dept-id="${window.currentDepartmentId}" 
+                                    data-index="${index}"
+                                    data-active="${isActive}"
+                                    title="${isActive ? 'Click to lock' : 'Click to unlock'}">
+                                <i class="bi ${isActive ? 'bi-unlock' : 'bi-lock'}"></i>
+                            </button>
+                        </td>
+                        <td>${faculty.Initials || 'N/A'}</td>
+                        <td>${faculty.Name || 'N/A'}</td>
+                        <td>${faculty.Designation || 'N/A'}</td>
+                        <td>${faculty.Phone || 'N/A'}</td>
+                        <td>${faculty.Email ? `<a href="mailto:${faculty.Email}">${faculty.Email}</a>` : 'N/A'}</td>
+                    </tr>`;
+            });
+            
+                $('#facultyList').html(html);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading faculty data:', error);
+                $('#facultyList').html(`
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Error loading faculty data
+                        </td>
+                    </tr>
+                `);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

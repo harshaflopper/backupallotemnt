@@ -1,0 +1,57 @@
+[
+    {
+        "Name": "Dr.B.G.Premasudha",
+        "Designation": "Professor",
+        "Phone": "9845238744",
+        "Email": "bgpremasudha@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.Asha Gowda Karegowda",
+        "Initials": "DAG",
+        "Designation": "Associate Professor",
+        "Phone": "9844327268",
+        "Email": "asha_gowda@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H.S.Vijay Kumar",
+        "Initials": "DHS",
+        "Designation": "Assistant Professor",
+        "Phone": "9844521479",
+        "Email": "vijayakumar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Bhanuprakash C",
+        "Initials": "DBC",
+        "Designation": "Assistant Professor",
+        "Phone": "9844418422",
+        "Email": "bc_prakash@hotmail.com",
+        "isActive": true
+    },
+    {
+        "Name": "H. K. Virupakshaiah",
+        "Initials": "HKV",
+        "Designation": "Assistant Professor",
+        "Phone": "9448701608",
+        "Email": "viru@gsit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Prashanth G.K.",
+        "Initials": "DPG",
+        "Designation": "Assistant Professor",
+        "Phone": "9980933552",
+        "Email": "prashanthgk@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Venkata Reddy Y",
+        "Initials": "VRY",
+        "Designation": "Assistant Professor",
+        "Phone": "8762007166",
+        "Email": "yvr@sit.ac.in",
+        "isActive": true
+    }
+]

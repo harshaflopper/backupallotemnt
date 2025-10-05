@@ -1,0 +1,50 @@
+[
+    {
+        "Name": "Dr. Madhumathi P",
+        "Initials": "DMP",
+        "Designation": "Professor",
+        "Phone": "9916071151",
+        "Email": "madhumathi@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Siddeshagowda S",
+        "Initials": "SS",
+        "Designation": "Assistant Professor",
+        "Phone": "7022715643",
+        "Email": "siddu.art@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Bhoomika U",
+        "Initials": "BU",
+        "Designation": "Assistant Professor",
+        "Phone": "9902829404",
+        "Email": "bhoomikau@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Gautham N",
+        "Initials": "GN",
+        "Designation": "Assistant Professor",
+        "Phone": "9538402926",
+        "Email": "gautham@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Vijetha C P",
+        "Initials": "VCP",
+        "Designation": "Assistant Professor",
+        "Phone": "9986752725",
+        "Email": "vijethacp@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Mohamed Inam Ulla Khan",
+        "Initials": "MIU",
+        "Designation": "Assistant Professor",
+        "Phone": "8105221190",
+        "Email": "mdinamuk@sit.ac.in",
+        "isActive": true
+    }
+]

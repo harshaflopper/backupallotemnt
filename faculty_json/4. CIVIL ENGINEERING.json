@@ -1,0 +1,82 @@
+[
+    {
+        "Name": "Dr. H. Siddesha",
+        "Initials": "DHS",
+        "Designation": "Associate Professor",
+        "Phone": "9740120265",
+        "Email": "sh@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Mamatha K H",
+        "Initials": "DMK",
+        "Designation": "Associate Professor",
+        "Phone": "8217070903",
+        "Email": "mamthakh@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.Nahushananda Chakravarthy H G",
+        "Initials": "DNC",
+        "Designation": "Assistant Professor",
+        "Phone": "7619193649",
+        "Email": "chakravarthyn@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.Sreedhara B.M",
+        "Initials": "DSB",
+        "Designation": "Assistant Professor",
+        "Phone": "9945498010",
+        "Email": "sreedharbm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Harsha M M",
+        "Initials": "DHM",
+        "Designation": "Assistant Professor",
+        "Phone": "7760048194",
+        "Email": "harshamm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Vinay H N",
+        "Initials": "DVH",
+        "Designation": "Assistant Professor",
+        "Phone": "9980709307",
+        "Email": "vinayhn@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Pavan Kumar Emani",
+        "Initials": "DPK",
+        "Designation": "Professor",
+        "Phone": "9690772484",
+        "Email": "pavankumar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Roopa M",
+        "Initials": "DRM",
+        "Designation": "Assistant Professor",
+        "Phone": "8660599466",
+        "Email": "roopm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Vishal R Khandagale",
+        "Initials": "VRK",
+        "Designation": "Assistant Professor",
+        "Phone": "9164328099",
+        "Email": "vishalrk@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Muttanna S Balaready",
+        "Initials": "DMS",
+        "Designation": "Associate Professor",
+        "Phone": "9986692622",
+        "Email": "msb@sit.ac.in",
+        "isActive": true
+    }
+]

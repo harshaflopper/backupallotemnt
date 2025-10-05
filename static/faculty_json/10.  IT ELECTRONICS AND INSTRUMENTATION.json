@@ -1,0 +1,98 @@
+[
+    {
+        "Name": "Dr.V.Siddeswara Prasad",
+        "Initials": "DVS",
+        "Designation": "Professor",
+        "Phone": "9480030333",
+        "Email": "vsiddesh@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. G.R.Kiranmayi",
+        "Initials": "DGR",
+        "Designation": "Associate Professor",
+        "Phone": "9880890246",
+        "Email": "kiranmayi@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H.M.Kalpana",
+        "Initials": "DHM",
+        "Designation": "Professor",
+        "Phone": "9480784395",
+        "Email": "kalpanahm@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H.K.E.Latha",
+        "Initials": "DHK",
+        "Designation": "Professor",
+        "Phone": "9449852696",
+        "Email": "lathahke@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. G.N.Keshava Murthy",
+        "Initials": "DGN",
+        "Designation": "Associate Professor",
+        "Phone": "9845657064",
+        "Email": "gnk@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H. K. Ravi",
+        "Initials": "DHK",
+        "Designation": "Assistant Professor",
+        "Phone": "9972912920",
+        "Email": "ravihk@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.D. Savitha",
+        "Initials": "DDS",
+        "Designation": "Assistant Professor",
+        "Phone": "9916430457",
+        "Email": "savithad@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Chaitra C.",
+        "Initials": "DCC",
+        "Designation": "Assistant Professor",
+        "Phone": "9686468926",
+        "Email": "chaitrac@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Basavaraju K. S.",
+        "Initials": "DBK",
+        "Designation": "Assistant Professor",
+        "Phone": "9902966841",
+        "Email": "ksbasavaraju@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr Panwala Fenil Chetankumar",
+        "Initials": "DPF",
+        "Designation": "Assistant Professor",
+        "Phone": "9790717226",
+        "Email": "panwalafenil@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Rajeshwari B. S.",
+        "Initials": "DRB",
+        "Designation": "Assistant Professor",
+        "Phone": "8105063720",
+        "Email": "rajeshwari@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Ramesha K. S.",
+        "Initials": "RKS",
+        "Designation": "Assistant Professor",
+        "Phone": "9845020784",
+        "Email": "rameshaks@sit.ac.in",
+        "isActive": true
+    }
+]

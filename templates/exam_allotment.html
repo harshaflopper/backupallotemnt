@@ -1,0 +1,2193 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Allotment - Faculty Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exam-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .professor-table {
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .table-dark {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+    }
+    
+    .table-secondary {
+        background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%) !important;
+    }
+    
+    .professor-row {
+        background: #ffffff;
+        transition: all 0.3s ease;
+    }
+    
+    .professor-row:hover {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .date-column {
+        background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%);
+        border-left: 3px solid #4caf50 !important;
+    }
+    
+    .session-am {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        border-top: 2px solid #ff9800;
+    }
+    
+    .session-pm {
+        background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+        border-top: 2px solid #3f51b5;
+    }
+    
+    .allocation-number {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white !important;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 2px auto;
+    }
+    
+    .dept-badge {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .initials-badge {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    
+    .control-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-auto-allocate {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border: none;
+        box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-auto-allocate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+    }
+    
+    .form-check-input:checked {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        border-color: #4caf50;
+    }
+    
+    .table-container {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    /* Progress Steps Styles */
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        border: 2px solid #e9ecef;
+    }
+    
+    .step-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-align: center;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .step-connector {
+        flex: 1;
+        height: 2px;
+        background: #e9ecef;
+        margin: 0 10px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Active Step */
+    .step-item.active .step-circle {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .step-item.active .step-label {
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    /* Completed Step */
+    .step-item.completed .step-circle {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-color: #28a745;
+    }
+    
+    .step-item.completed .step-label {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .step-item.completed .step-circle::before {
+        content: "✓";
+        font-size: 14px;
+    }
+    
+    .step-item.completed .step-circle {
+        font-size: 0; /* Hide the number */
+    }
+    
+    /* Active Connector */
+    .step-item.completed + .step-connector {
+        background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Progress Bar -->
+    <div class="card mb-4">
+        <div class="card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="step-item" id="step1">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Select Dates</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-item" id="step2">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Load Faculty</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-item" id="step3">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Configure Sessions</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-item" id="step4">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">Allocate Faculty</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-item" id="step5">
+                            <div class="step-circle">5</div>
+                            <div class="step-label">Print Report</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card exam-card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <h4 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Exam Allotment</h4>
+        </div>
+        <div class="card-body">
+             <!-- Date Selection Section -->
+            <div class="row mb-4">
+                 <div class="col-md-4">
+                     <label for="examStartDate" class="form-label">Exam Start Date</label>
+                     <input type="date" class="form-control" id="examStartDate" required>
+                 </div>
+                 <div class="col-md-4">
+                     <label for="examEndDate" class="form-label">Exam End Date</label>
+                     <input type="date" class="form-control" id="examEndDate" required>
+                </div>
+                 <div class="col-md-4 d-flex align-items-end">
+                     <button type="button" id="loadProfessorsBtn" class="btn btn-primary w-100">
+                         <i class="bi bi-people me-1"></i>Load Professors & Setup Sessions
+                    </button>
+                 </div>
+                 </div>
+
+            <!-- Session Configuration Section -->
+            <div id="sessionConfigSection" class="d-none mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Session Configuration</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="sessionConfigContainer">
+                            <!-- Session configuration will be added here dynamically -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="button" id="proceedToAllocationBtn" class="btn btn-success">
+                                <i class="bi bi-arrow-right me-1"></i>Proceed to Allocation
+                    </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Auto Allocation Controls -->
+             <div class="control-section" id="allocationControls" style="display: none;">
+                 <!-- Professor Allocation Section -->
+                 <div class="row mb-3">
+                     <div class="col-md-6">
+                         <div class="text-center p-3" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 10px;">
+                             <h6 class="text-white mb-2"><i class="bi bi-mortarboard me-2"></i>PROFESSORS</h6>
+                             <button type="button" id="autoAllocateBtn" class="btn btn-light btn-lg">
+                         <i class="bi bi-magic me-1"></i>Auto Allocate Professors
+                     </button>
+                         </div>
+                     </div>
+                     <div class="col-md-6">
+                         <div class="text-center p-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;">
+                             <h6 class="text-white mb-2"><i class="bi bi-people me-2"></i>NON-PROFESSORS</h6>
+                             <button type="button" id="autoAllocateNonProfBtn" class="btn btn-light btn-lg">
+                                 <i class="bi bi-people-fill me-1"></i>Auto Allocate Non-Professors
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+                 
+                 <!-- Control Buttons -->
+                 <div class="text-center">
+                     <button type="button" id="clearAllocationBtn" class="btn btn-outline-light">
+                         <i class="bi bi-x-circle me-1"></i>Clear All
+                     </button>
+                     <button type="button" id="resetRotationBtn" class="btn btn-outline-light ms-2">
+                         <i class="bi bi-arrow-clockwise me-1"></i>Reset Rotation
+                     </button>
+                     <button type="button" id="printAllocationBtn" class="btn btn-outline-light ms-2">
+                         <i class="bi bi-printer me-1"></i>Print Report
+                     </button>
+                 </div>
+             </div>
+                
+            <!-- Professors Table Section -->
+            <div id="professorsSection" class="d-none">
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0" style="color: #2c3e50; font-weight: bold;">
+                            <i class="bi bi-people-fill me-2"></i>Faculty Exam Duty Assignment
+                    </h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-success" id="toggleProfessorsBtn">
+                                <i class="bi bi-mortarboard me-1"></i>Show Professors
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="toggleNonProfessorsBtn">
+                                <i class="bi bi-people me-1"></i>Show Non-Professors
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleTableBtn">
+                                <i class="bi bi-chevron-up me-1"></i>Collapse Table
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Top horizontal scroll bar -->
+                    <div id="topScrollBar" style="overflow-x: auto; overflow-y: hidden; height: 20px; margin-bottom: 5px; width: 100%;">
+                        <div id="topScrollContent" style="height: 1px; min-width: 1200px;"></div>
+                    </div>
+                    
+                    <div class="table-responsive professor-table" id="facultyTableContainer" style="overflow-x: auto; overflow-y: auto; max-height: 600px; width: 100%;">
+                        <table class="table table-bordered table-hover table-sm" id="professorsTable" style="min-width: 1200px; white-space: nowrap;">
+                            <thead class="table-dark">
+                             <tr id="tableHeader">
+                                 <th style="min-width: 150px;">Name</th>
+                                 <th style="min-width: 80px;">Initials</th>
+                                 <th style="min-width: 120px;">Designation</th>
+                                 <th style="min-width: 150px;">Department</th>
+                                 <th style="min-width: 120px;">Phone</th>
+                                 <th style="min-width: 180px;">Email</th>
+                                 <th style="min-width: 100px; background: #e8f5e8; color: #2e7d32; font-weight: bold;">Total Allotments</th>
+                                 <!-- Date columns will be added here dynamically -->
+                             </tr>
+                             <tr id="sessionHeader" class="table-secondary">
+                                 <th colspan="7"></th>
+                                 <!-- AM/PM headers will be added here dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="professorsTableBody">
+                            <!-- Professor rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    console.log('Exam Allotment page loaded');
+    
+    // Initialize progress bar
+    updateProgressStep(1);
+    
+    // Set default dates (today and next week)
+        const today = new Date();
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7);
+        
+    $('#examStartDate').val(today.toISOString().split('T')[0]);
+    $('#examEndDate').val(nextWeek.toISOString().split('T')[0]);
+    
+    // Update progress when dates are selected
+    $('#examStartDate, #examEndDate').on('change', function() {
+        if ($('#examStartDate').val() && $('#examEndDate').val()) {
+            updateProgressStep(1, true); // Mark step 1 as completed
+        }
+    });
+    
+    // Load professors button click handler
+    $('#loadProfessorsBtn').on('click', function() {
+        const startDate = $('#examStartDate').val();
+        const endDate = $('#examEndDate').val();
+        
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+        
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('End date must be after start date');
+            return;
+        }
+        
+        console.log('Loading professors for date range:', startDate, 'to', endDate);
+        loadProfessorsAndSetupSessions(startDate, endDate);
+    });
+
+    // Proceed to allocation button handler
+    $('#proceedToAllocationBtn').on('click', function() {
+        if (validateSessionConfiguration()) {
+            createProfessorsTable();
+            $('#professorsSection').removeClass('d-none');
+            $('#allocationControls').show();
+            updateProgressStep(3, true); // Mark step 3 as completed
+            updateProgressStep(4); // Activate step 4
+        }
+    });
+
+    // Progress bar update function
+    function updateProgressStep(stepNumber, completed = false) {
+        // Reset all steps to default
+        $('.step-item').removeClass('active completed');
+        $('.step-connector').css('background', '#e9ecef');
+        
+        // Mark completed steps
+        for (let i = 1; i < stepNumber; i++) {
+            $(`#step${i}`).addClass('completed');
+        }
+        
+        // Mark current step
+        if (completed) {
+            $(`#step${stepNumber}`).addClass('completed');
+            // If not the last step, activate next step
+            if (stepNumber < 5) {
+                $(`#step${stepNumber + 1}`).addClass('active');
+            }
+        } else {
+            $(`#step${stepNumber}`).addClass('active');
+        }
+        
+        // Update connectors for completed steps
+        for (let i = 1; i < stepNumber; i++) {
+            $(`#step${i} + .step-connector`).css('background', 'linear-gradient(90deg, #28a745 0%, #20c997 100%)');
+        }
+        
+        console.log(`Progress updated: Step ${stepNumber} ${completed ? 'completed' : 'active'}`);
+    }
+    
+    function loadProfessorsAndSetupSessions(startDate, endDate) {
+        const $btn = $('#loadProfessorsBtn');
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Loading...');
+        
+        // Generate exam dates (Monday to Saturday, excluding Sunday)
+        const examDates = [];
+        const currentDate = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        
+        while (currentDate <= endDateObj) {
+            const dayOfWeek = currentDate.getDay();
+            // Include all days except Sunday (0 = Sunday)
+            if (dayOfWeek !== 0) {
+                examDates.push(new Date(currentDate));
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        
+        window.examDates = examDates;
+        console.log('Exam dates:', examDates);
+        
+        // First load all departments
+        $.get('/api/departments')
+            .done(function(departments) {
+                console.log('Loaded departments:', departments);
+                
+                // Load professors from all departments (filter only Professors)
+                const professorPromises = departments.map(function(dept) {
+                    return $.get('/api/faculty/' + encodeURIComponent(dept.id))
+                        .then(function(faculty) {
+                            // Filter professors and non-professors separately
+                            const professors = faculty.filter(function(prof) {
+                                return prof.Designation && prof.Designation.trim() === 'Professor';
+                            });
+                            
+                            const nonProfessors = faculty.filter(function(prof) {
+                                return prof.Designation && prof.Designation.trim() !== 'Professor';
+                            });
+                            
+                            console.log(`${dept.name}: ${professors.length} professors, ${nonProfessors.length} non-professors out of ${faculty.length} total faculty`);
+                            
+                            const professorData = professors.map(function(prof) {
+                                return {
+                                    name: prof.Name || 'N/A',
+                                    initials: prof.Initials || 'N/A',
+                                    designation: prof.Designation || 'N/A',
+                                    phone: prof.Phone || 'N/A',
+                                    email: prof.Email || 'N/A',
+                                    department: dept.name,
+                                    totalAllotments: 0,
+                                    type: 'professor'
+                                };
+                            });
+                            
+                            const nonProfessorData = nonProfessors.map(function(prof) {
+                                return {
+                                    name: prof.Name || 'N/A',
+                                    initials: prof.Initials || 'N/A',
+                                    designation: prof.Designation || 'N/A',
+                                    phone: prof.Phone || 'N/A',
+                                    email: prof.Email || 'N/A',
+                                    department: dept.name,
+                                    totalAllotments: 0,
+                                    type: 'non-professor'
+                                };
+                            });
+                            
+                            return { professors: professorData, nonProfessors: nonProfessorData };
+                        });
+                });
+                
+                Promise.all(professorPromises)
+                    .then(function(allFacultyData) {
+                        const professors = allFacultyData.flatMap(data => data.professors);
+                        const nonProfessors = allFacultyData.flatMap(data => data.nonProfessors);
+                        
+                        console.log('Total professors loaded:', professors.length);
+                        console.log('Total non-professors loaded:', nonProfessors.length);
+                        
+                        if (professors.length > 0 || nonProfessors.length > 0) {
+                             window.allProfessors = professors; // Store globally for allocation
+                            window.allNonProfessors = nonProfessors; // Store non-professors separately
+                            setupSessionConfiguration(examDates);
+                            $('#sessionConfigSection').removeClass('d-none');
+                            updateProgressStep(2, true); // Mark step 2 as completed
+                            updateProgressStep(3); // Activate step 3
+                         } else {
+                            alert('No faculty found in any department');
+                         }
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading professors:', error);
+                        alert('Error loading professors');
+                    })
+                    .finally(function() {
+                        $btn.prop('disabled', false).html('<i class="bi bi-people me-1"></i>Load Professors & Setup Sessions');
+                    });
+            })
+            .fail(function(error) {
+                console.error('Error loading departments:', error);
+                alert('Error loading departments');
+                $btn.prop('disabled', false).html('<i class="bi bi-people me-1"></i>Load Professors & Setup Sessions');
+            });
+    }
+
+    function setupSessionConfiguration(examDates) {
+        const container = $('#sessionConfigContainer');
+        container.empty();
+        
+        let configHtml = `
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Default Rooms per Professor</label>
+                    <input type="number" class="form-control" id="defaultRoomsPerProf" min="1" value="7">
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-outline-primary mt-4" id="applyDefaultRooms">
+                        <i class="bi bi-arrow-down me-1"></i>Apply to All Sessions
+                    </button>
+                </div>
+            </div>
+            <hr>
+        `;
+        
+        examDates.forEach(function(date, index) {
+            const dateStr = date.toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                weekday: 'long'
+            });
+            const dateValue = date.toISOString().split('T')[0];
+            
+            configHtml += `
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">${dateStr}</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="form-label">AM - Total Rooms</label>
+                                <input type="number" class="form-control session-rooms" 
+                                       data-date="${dateValue}" data-session="AM" 
+                                       min="1" value="40" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">AM - Rooms per Prof</label>
+                                <input type="number" class="form-control rooms-per-prof" 
+                                       data-date="${dateValue}" data-session="AM" 
+                                       min="1" value="7" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">AM - Relievers</label>
+                                <input type="number" class="form-control relievers" 
+                                       data-date="${dateValue}" data-session="AM" 
+                                       min="0" value="5" placeholder="Additional relievers">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">PM - Total Rooms</label>
+                                <input type="number" class="form-control session-rooms" 
+                                       data-date="${dateValue}" data-session="PM" 
+                                       min="1" value="40" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">PM - Rooms per Prof</label>
+                                <input type="number" class="form-control rooms-per-prof" 
+                                       data-date="${dateValue}" data-session="PM" 
+                                       min="1" value="7" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">PM - Relievers</label>
+                                <input type="number" class="form-control relievers" 
+                                       data-date="${dateValue}" data-session="PM" 
+                                       min="0" value="5" placeholder="Additional relievers">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <small class="text-info">AM - Professors: <span class="prof-count" data-date="${dateValue}" data-session="AM">6</span> | Non-Professors: <span class="non-prof-count" data-date="${dateValue}" data-session="AM">45</span> (40 rooms + 5 relievers)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-info">PM - Professors: <span class="prof-count" data-date="${dateValue}" data-session="PM">6</span> | Non-Professors: <span class="non-prof-count" data-date="${dateValue}" data-session="PM">45</span> (40 rooms + 5 relievers)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.html(configHtml);
+        
+        // Add event listeners for dynamic calculation
+        $(document).on('input', '.session-rooms, .rooms-per-prof, .relievers', function() {
+            updateProfessorCount();
+        });
+        
+        $('#applyDefaultRooms').on('click', function() {
+            const defaultRooms = $('#defaultRoomsPerProf').val();
+            $('.rooms-per-prof').val(defaultRooms);
+            updateProfessorCount();
+        });
+        
+        updateProfessorCount();
+    }
+
+    function updateProfessorCount() {
+        $('.session-rooms').each(function() {
+            const $this = $(this);
+            const date = $this.data('date');
+            const session = $this.data('session');
+            const totalRooms = parseInt($this.val()) || 0;
+            const roomsPerProf = parseInt($(`.rooms-per-prof[data-date="${date}"][data-session="${session}"]`).val()) || 1;
+            const relievers = parseInt($(`.relievers[data-date="${date}"][data-session="${session}"]`).val()) || 0;
+            
+            const professorsNeeded = Math.ceil(totalRooms / roomsPerProf);
+            const nonProfessorsNeeded = totalRooms + relievers; // Total rooms + relievers
+            
+            $(`.prof-count[data-date="${date}"][data-session="${session}"]`).text(professorsNeeded);
+            $(`.non-prof-count[data-date="${date}"][data-session="${session}"]`).text(nonProfessorsNeeded);
+            
+            // Update the display text to show the calculation
+            const $nonProfDisplay = $(`.non-prof-count[data-date="${date}"][data-session="${session}"]`).parent();
+            const newText = $nonProfDisplay.html().replace(/\(.*?\)/, `(${totalRooms} rooms + ${relievers} relievers)`);
+            $nonProfDisplay.html(newText);
+        });
+    }
+
+    function validateSessionConfiguration() {
+        let isValid = true;
+        let errorMessage = '';
+        
+        $('.session-rooms, .rooms-per-prof').each(function() {
+            const value = parseInt($(this).val());
+            if (!value || value < 1) {
+                isValid = false;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            alert('Please fill in all room configuration fields with valid numbers');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function createProfessorsTable() {
+        console.log('Creating faculty table with exam dates:', window.examDates);
+        console.log('Professors:', window.allProfessors.length);
+        console.log('Non-professors:', window.allNonProfessors.length);
+        
+         // Clear existing table
+         $('#tableHeader').html(`
+             <th>Name</th>
+             <th>Initials</th>
+             <th>Designation</th>
+             <th>Department</th>
+             <th>Phone</th>
+             <th>Email</th>
+             <th style="min-width: 100px; background: #e8f5e8; color: #2e7d32; font-weight: bold;">Total Allotments</th>
+         `);
+         
+         $('#sessionHeader').html('<th colspan="7"></th>');
+        
+        // Add date columns to header
+        window.examDates.forEach(function(date) {
+                const dateStr = date.toLocaleDateString('en-GB', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric' 
+                });
+            $('#tableHeader').append(`<th colspan="2" class="text-center" style="min-width: 120px;">${dateStr}</th>`);
+            $('#sessionHeader').append('<th class="text-center" style="min-width: 60px;">AM</th><th class="text-center" style="min-width: 60px;">PM</th>');
+        });
+        
+        // Clear and populate table body
+        const $tbody = $('#professorsTableBody');
+        $tbody.empty();
+        
+        // Add professors first
+        window.allProfessors.forEach(function(professor, index) {
+             let row = `
+                 <tr class="professor-row faculty-professor" data-professor-index="${index}" data-faculty-type="professor">
+                     <td class="fw-medium" style="color: #2c3e50;">${professor.name}</td>
+                     <td><span class="initials-badge">${professor.initials}</span></td>
+                     <td style="color: #34495e; font-weight: bold;">${professor.designation}</td>
+                     <td><span class="dept-badge">${professor.department}</span></td>
+                     <td style="color: #7f8c8d;">${professor.phone}</td>
+                     <td style="color: #7f8c8d;">${professor.email}</td>
+                     <td class="text-center total-allotments" style="background: #e8f5e8; font-weight: bold; color: #2e7d32;">
+                         <span class="badge bg-success">${professor.totalAllotments}</span>
+                     </td>
+             `;
+            
+            // Add AM/PM checkboxes for each exam date
+            window.examDates.forEach(function(date, dateIndex) {
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // AM checkbox
+                 row += `
+                     <td class="text-center session-am">
+                         <input type="checkbox" class="form-check-input" 
+                                data-professor="${index}" 
+                                data-date="${dateStr}" 
+                                data-session="AM"
+                                data-faculty-type="professor">
+                     </td>
+                 `;
+                 
+                 // PM checkbox
+                 row += `
+                     <td class="text-center session-pm">
+                         <input type="checkbox" class="form-check-input" 
+                                data-professor="${index}" 
+                                data-date="${dateStr}" 
+                                data-session="PM"
+                                data-faculty-type="professor">
+                     </td>
+                 `;
+            });
+            
+            row += '</tr>';
+            $tbody.append(row);
+        });
+        
+        // Add separator row
+        if (window.allNonProfessors.length > 0) {
+            let separatorRow = `
+                <tr class="faculty-separator" style="background: #f8f9fa; border-top: 3px solid #007bff;">
+                    <td colspan="${7 + (window.examDates.length * 2)}" class="text-center fw-bold py-2" style="color: #007bff;">
+                        <i class="bi bi-people me-2"></i>NON-PROFESSORS (Assistant Professors, Associate Professors, etc.)
+                    </td>
+                </tr>
+            `;
+            $tbody.append(separatorRow);
+        }
+        
+        // Add non-professors
+        window.allNonProfessors.forEach(function(nonProfessor, index) {
+             let row = `
+                 <tr class="professor-row faculty-non-professor" data-professor-index="${index}" data-faculty-type="non-professor">
+                     <td class="fw-medium" style="color: #2c3e50;">${nonProfessor.name}</td>
+                     <td><span class="initials-badge" style="background: #6c757d;">${nonProfessor.initials}</span></td>
+                     <td style="color: #6c757d;">${nonProfessor.designation}</td>
+                     <td><span class="dept-badge" style="background: #6c757d;">${nonProfessor.department}</span></td>
+                     <td style="color: #7f8c8d;">${nonProfessor.phone}</td>
+                     <td style="color: #7f8c8d;">${nonProfessor.email}</td>
+                     <td class="text-center total-allotments" style="background: #e8f5e8; font-weight: bold; color: #2e7d32;">
+                         <span class="badge bg-secondary">${nonProfessor.totalAllotments}</span>
+                     </td>
+             `;
+            
+            // Add AM/PM checkboxes for each exam date
+            window.examDates.forEach(function(date, dateIndex) {
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // AM checkbox
+                 row += `
+                     <td class="text-center session-am">
+                         <input type="checkbox" class="form-check-input" 
+                                data-professor="${index}" 
+                                data-date="${dateStr}" 
+                                data-session="AM"
+                                data-faculty-type="non-professor">
+                     </td>
+                 `;
+                 
+                 // PM checkbox
+                 row += `
+                     <td class="text-center session-pm">
+                         <input type="checkbox" class="form-check-input" 
+                                data-professor="${index}" 
+                                data-date="${dateStr}" 
+                                data-session="PM"
+                                data-faculty-type="non-professor">
+                     </td>
+                 `;
+            });
+            
+            row += '</tr>';
+            $tbody.append(row);
+        });
+        
+        // Add TOTAL row for non-professors
+        if (window.allNonProfessors.length > 0) {
+            let totalRow = `
+                <tr class="faculty-non-professor" style="background: #e9ecef; border-top: 2px solid #6c757d; font-weight: bold;">
+                    <td class="text-center" style="color: #495057;">TOTAL</td>
+                    <td class="text-center" style="color: #495057;">-</td>
+                    <td class="text-center" style="color: #495057;">Non-Professors</td>
+                    <td class="text-center" style="color: #495057;">All Departments</td>
+                    <td class="text-center" style="color: #495057;">-</td>
+                    <td class="text-center" style="color: #495057;">-</td>
+                    <td class="text-center total-allotments" style="background: #e8f5e8; font-weight: bold; color: #2e7d32;">
+                        <span class="badge bg-info" id="totalNonProfAllotments">0</span>
+                    </td>
+            `;
+            
+            // Add total count cells for each exam date
+            window.examDates.forEach(function(date, dateIndex) {
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // AM total cell
+                totalRow += `
+                    <td class="text-center session-am" style="background: #fff3cd; font-weight: bold;">
+                        <span class="daily-total-am" data-date="${dateStr}">0</span>
+                    </td>
+                `;
+                
+                // PM total cell
+                totalRow += `
+                    <td class="text-center session-pm" style="background: #d1ecf1; font-weight: bold;">
+                        <span class="daily-total-pm" data-date="${dateStr}">0</span>
+                    </td>
+                `;
+            });
+            
+            totalRow += '</tr>';
+            $tbody.append(totalRow);
+        }
+        
+         console.log('Faculty table created successfully');
+         
+         // Add table toggle functionality
+         $('#toggleTableBtn').on('click', function() {
+             const $table = $('#facultyTableContainer');
+             const $icon = $(this).find('i');
+             
+             if ($table.is(':visible')) {
+                 $table.slideUp();
+                 $icon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+                 $(this).html('<i class="bi bi-chevron-down me-1"></i>Expand Table');
+             } else {
+                 $table.slideDown();
+                 $icon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+                 $(this).html('<i class="bi bi-chevron-up me-1"></i>Collapse Table');
+             }
+         });
+         
+         // Toggle professors visibility
+         $('#toggleProfessorsBtn').on('click', function() {
+             const $professorRows = $('.faculty-professor');
+             const $btn = $(this);
+             
+             if ($professorRows.is(':visible')) {
+                 $professorRows.hide();
+                 $btn.removeClass('btn-outline-success').addClass('btn-success');
+                 $btn.html('<i class="bi bi-mortarboard me-1"></i>Show Professors');
+             } else {
+                 $professorRows.show();
+                 $btn.removeClass('btn-success').addClass('btn-outline-success');
+                 $btn.html('<i class="bi bi-mortarboard me-1"></i>Hide Professors');
+             }
+         });
+         
+         // Toggle non-professors visibility
+         $('#toggleNonProfessorsBtn').on('click', function() {
+             const $nonProfessorRows = $('.faculty-non-professor, .faculty-separator');
+             const $btn = $(this);
+             
+             if ($nonProfessorRows.is(':visible')) {
+                 $nonProfessorRows.hide();
+                 $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                 $btn.html('<i class="bi bi-people me-1"></i>Show Non-Professors');
+             } else {
+                 $nonProfessorRows.show();
+                 $btn.removeClass('btn-primary').addClass('btn-outline-primary');
+                 $btn.html('<i class="bi bi-people me-1"></i>Hide Non-Professors');
+             }
+         });
+         
+         // Initialize button states (both visible by default)
+         $('#toggleProfessorsBtn').html('<i class="bi bi-mortarboard me-1"></i>Hide Professors');
+         $('#toggleNonProfessorsBtn').html('<i class="bi bi-people me-1"></i>Hide Non-Professors');
+         
+         // Set the correct width for top scroll bar to match table
+         const tableWidth = $('#professorsTable').outerWidth();
+         $('#topScrollContent').css('width', tableWidth + 'px');
+         console.log('Set top scroll width to:', tableWidth + 'px');
+         
+         // Synchronize top scroll bar with table scroll
+         $('#topScrollBar').on('scroll', function() {
+             $('#facultyTableContainer').scrollLeft($(this).scrollLeft());
+         });
+         
+         $('#facultyTableContainer').on('scroll', function() {
+             $('#topScrollBar').scrollLeft($(this).scrollLeft());
+         });
+         
+         // Update total counts initially
+         updateNonProfessorTotals();
+     }
+     
+     // Professor Auto Allocation Logic
+     $('#autoAllocateBtn').on('click', function() {
+         console.log('Professor Auto Allocate button clicked!');
+         
+         if (!window.allProfessors || window.allProfessors.length === 0) {
+             alert('Please load professors first');
+             return;
+         }
+         
+         if (!window.examDates || window.examDates.length === 0) {
+             alert('No exam dates available. Please load professors first.');
+             return;
+         }
+         
+         console.log('Starting professor allocation algorithm...');
+         try {
+             cleanAutoAllocateProfessors();
+         } catch (error) {
+             console.error('Error in professor allocation:', error);
+             alert('Error in professor allocation: ' + error.message);
+         }
+     });
+
+     // Non-Professor Auto Allocation Logic
+     $('#autoAllocateNonProfBtn').on('click', function() {
+         console.log('Non-Professor Auto Allocate button clicked!');
+         
+         if (!window.allNonProfessors || window.allNonProfessors.length === 0) {
+             alert('Please load non-professors first');
+             return;
+         }
+         
+         if (!window.examDates || window.examDates.length === 0) {
+             alert('No exam dates available. Please load faculty first.');
+             return;
+         }
+         
+         console.log('Starting non-professor allocation algorithm...');
+         try {
+             autoAllocateNonProfessorsOnly();
+         } catch (error) {
+             console.error('Error in non-professor allocation:', error);
+             alert('Error in non-professor allocation: ' + error.message);
+         }
+     });
+     
+     $('#clearAllocationBtn').on('click', function() {
+         // Clear all checkboxes
+         $('.form-check-input').prop('checked', false);
+         // Clear all allocation numbers
+         $('.allocation-number').remove();
+         // Reset total allotments for both types
+         if (window.allProfessors) {
+             window.allProfessors.forEach(prof => prof.totalAllotments = 0);
+         }
+         if (window.allNonProfessors) {
+             window.allNonProfessors.forEach(prof => prof.totalAllotments = 0);
+         }
+         updateTotalAllotmentDisplay();
+         
+         // Reset non-professor totals
+         updateNonProfessorTotals();
+     });
+     
+     $('#resetRotationBtn').on('click', function() {
+         // Reset professor rotation tracking
+         if (window.professorRotationIndex) {
+             window.professorRotationIndex = 0;
+         }
+         
+         // Reset non-professor department rotation
+         if (window.nonProfDepartmentRotation) {
+             window.nonProfDepartmentRotation = {};
+         }
+         
+         alert('All rotation tracking has been reset! Next allocation will start fresh with new department groupings.');
+         console.log('Professor and non-professor rotation reset');
+     });
+
+     $('#printAllocationBtn').on('click', function() {
+         if (!window.allProfessors || window.allProfessors.length === 0) {
+             alert('Please load professors first');
+             return;
+         }
+         
+         if (!window.examDates || window.examDates.length === 0) {
+             alert('No exam dates available');
+             return;
+         }
+         
+         generatePrintReport();
+     });
+
+     function newAutoAllocateAllFaculty() {
+         console.log('=== NEW DUAL ALLOCATION ALGORITHM ===');
+         console.log('Available professors:', window.allProfessors ? window.allProfessors.length : 0);
+         console.log('Available non-professors:', window.allNonProfessors ? window.allNonProfessors.length : 0);
+         
+         // Clear existing allocations
+         $('.form-check-input').prop('checked', false);
+         $('.allocation-number').remove();
+         
+         // Reset total allotments for both types
+         if (window.allProfessors) {
+             window.allProfessors.forEach(prof => prof.totalAllotments = 0);
+         }
+         if (window.allNonProfessors) {
+             window.allNonProfessors.forEach(prof => prof.totalAllotments = 0);
+         }
+         
+         let totalAllocations = 0;
+         
+         // Process each exam date
+         window.examDates.forEach((date, dateIndex) => {
+             const dateStr = date.toISOString().split('T')[0];
+             console.log(`\n=== Processing ${dateStr} ===`);
+             
+             // Get session configurations for this date
+             const amRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="AM"]`).val()) || 0;
+             const amRoomsPerProf = parseInt($(`.rooms-per-prof[data-date="${dateStr}"][data-session="AM"]`).val()) || 7;
+             const amRelievers = parseInt($(`.relievers[data-date="${dateStr}"][data-session="AM"]`).val()) || 0;
+             
+             const pmRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="PM"]`).val()) || 0;
+             const pmRoomsPerProf = parseInt($(`.rooms-per-prof[data-date="${dateStr}"][data-session="PM"]`).val()) || 7;
+             const pmRelievers = parseInt($(`.relievers[data-date="${dateStr}"][data-session="PM"]`).val()) || 0;
+             
+             const amProfsNeeded = Math.ceil(amRooms / amRoomsPerProf);
+             const amNonProfsNeeded = amRooms + amRelievers; // Total rooms + relievers
+             const pmProfsNeeded = Math.ceil(pmRooms / pmRoomsPerProf);
+             const pmNonProfsNeeded = pmRooms + pmRelievers; // Total rooms + relievers
+             
+             console.log(`AM: ${amProfsNeeded} professors + ${amNonProfsNeeded} non-professors needed`);
+             console.log(`PM: ${pmProfsNeeded} professors + ${pmNonProfsNeeded} non-professors needed`);
+             
+             // Allocate AM session - Professors first
+             const amProfResults = allocateSessionWithConstraints(dateStr, 'AM', amProfsNeeded, groupProfessorsByDept(window.allProfessors));
+             totalAllocations += amProfResults.length;
+             
+             // Allocate AM session - Non-Professors
+             const amNonProfResults = allocateNonProfessorsWithConstraints(dateStr, 'AM', amNonProfsNeeded, groupProfessorsByDept(window.allNonProfessors), amProfResults);
+             totalAllocations += amNonProfResults.length;
+             
+             // Combine AM allocated faculty for PM exclusion
+             const amAllAllocated = [...amProfResults, ...amNonProfResults];
+             
+             // Allocate PM session - Professors (excluding AM professors and their departments)
+             const pmProfResults = allocateSessionWithConstraints(dateStr, 'PM', pmProfsNeeded, groupProfessorsByDept(window.allProfessors), amProfResults);
+             totalAllocations += pmProfResults.length;
+             
+             // Allocate PM session - Non-Professors (excluding AM non-professors and their departments)
+             const pmNonProfResults = allocateNonProfessorsWithConstraints(dateStr, 'PM', pmNonProfsNeeded, groupProfessorsByDept(window.allNonProfessors), amNonProfResults);
+             totalAllocations += pmNonProfResults.length;
+             
+             console.log(`${dateStr} completed: ${amProfResults.length + pmProfResults.length} professors, ${amNonProfResults.length + pmNonProfResults.length} non-professors`);
+         });
+         
+         // Update total allotment display
+         updateTotalAllotmentDisplay();
+         
+         // Show summary
+         const summary = generateDualAllocationSummary();
+         alert(`Allocation completed!\n${totalAllocations} total faculty allocations\nProfessors: ${summary.professorAllocations}\nNon-Professors: ${summary.nonProfessorAllocations}`);
+     }
+
+     function cleanAutoAllocateProfessors() {
+         console.log('=== CLEANED PROFESSOR ALLOCATION ALGORITHM ===');
+         console.log('Available professors:', window.allProfessors.length);
+         console.log('Available exam dates:', window.examDates.length);
+         
+         // Clear existing PROFESSOR allocations only
+         $('.form-check-input[data-faculty-type="professor"]').prop('checked', false);
+         $('.form-check-input[data-faculty-type="professor"]').parent().find('.allocation-number').remove();
+         
+         // Reset total allotments for professors only
+         window.allProfessors.forEach(prof => prof.totalAllotments = 0);
+         
+         // Group professors by department
+         const professorsByDept = {};
+         window.allProfessors.forEach((prof, index) => {
+             if (!professorsByDept[prof.department]) {
+                 professorsByDept[prof.department] = [];
+             }
+             professorsByDept[prof.department].push({...prof, originalIndex: index});
+         });
+         
+         console.log('Professors by department:', Object.keys(professorsByDept).map(dept => 
+             `${dept}: ${professorsByDept[dept].length} professors`
+         ));
+         
+         // Initialize rotation index if not exists
+         if (!window.professorRotationIndex) {
+             window.professorRotationIndex = 0;
+         }
+         
+         let totalAllocations = 0;
+         
+         // Process each exam date
+         window.examDates.forEach((date, dateIndex) => {
+             const dateStr = date.toISOString().split('T')[0];
+             console.log(`\n=== Processing ${dateStr} ===`);
+             
+             // Log current distribution before this date
+             const currentDistribution = window.allProfessors.map(prof => prof.totalAllotments);
+             const currentMin = Math.min(...currentDistribution);
+             const currentMax = Math.max(...currentDistribution);
+             console.log(`📊 Current distribution before ${dateStr}: Range ${currentMin}-${currentMax}`);
+             
+             // Get session configurations for this date
+             const amRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="AM"]`).val()) || 0;
+             const amRoomsPerProf = parseInt($(`.rooms-per-prof[data-date="${dateStr}"][data-session="AM"]`).val()) || 7;
+             const pmRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="PM"]`).val()) || 0;
+             const pmRoomsPerProf = parseInt($(`.rooms-per-prof[data-date="${dateStr}"][data-session="PM"]`).val()) || 7;
+             
+             const amProfsNeeded = Math.ceil(amRooms / amRoomsPerProf);
+             const pmProfsNeeded = Math.ceil(pmRooms / pmRoomsPerProf);
+             
+             console.log(`AM: ${amRooms} rooms, ${amRoomsPerProf} per prof = ${amProfsNeeded} professors needed`);
+             console.log(`PM: ${pmRooms} rooms, ${pmRoomsPerProf} per prof = ${pmProfsNeeded} professors needed`);
+             
+             // Allocate AM session
+             const amAllocatedProfs = allocateSessionWithConstraints(dateStr, 'AM', amProfsNeeded, professorsByDept);
+             totalAllocations += amAllocatedProfs.length;
+             
+             // Log distribution after AM
+             const afterAMDistribution = window.allProfessors.map(prof => prof.totalAllotments);
+             const afterAMMin = Math.min(...afterAMDistribution);
+             const afterAMMax = Math.max(...afterAMDistribution);
+             console.log(`📊 After AM ${dateStr}: Range ${afterAMMin}-${afterAMMax}`);
+             
+             // Allocate PM session (excluding only AM professors, NOT their departments)
+             const pmAllocatedProfs = allocateSessionWithConstraints(dateStr, 'PM', pmProfsNeeded, professorsByDept, amAllocatedProfs);
+             totalAllocations += pmAllocatedProfs.length;
+             
+             // Log distribution after PM
+             const afterPMDistribution = window.allProfessors.map(prof => prof.totalAllotments);
+             const afterPMMin = Math.min(...afterPMDistribution);
+             const afterPMMax = Math.max(...afterPMDistribution);
+             console.log(`📊 After PM ${dateStr}: Range ${afterPMMin}-${afterPMMax}`);
+             
+             console.log(`${dateStr} completed: ${amAllocatedProfs.length} AM + ${pmAllocatedProfs.length} PM = ${amAllocatedProfs.length + pmAllocatedProfs.length} total`);
+             
+             // CRITICAL CHECK: Stop if distribution becomes unfair
+             if (afterPMMax - afterPMMin > 1) {
+                 console.log(`🚨 UNFAIR DISTRIBUTION DETECTED! Range: ${afterPMMin}-${afterPMMax}`);
+                 console.log('Distribution details:', window.allProfessors.map(prof => `${prof.name}: ${prof.totalAllotments}`));
+             }
+         });
+         
+         // Update total allotment display
+         updateTotalAllotmentDisplay();
+         
+         // Show summary
+         const summary = generateAllocationSummary();
+         console.log('\n=== FINAL ALLOCATION SUMMARY ===');
+         console.log(`Total allocations made: ${totalAllocations}`);
+         console.log('Professor allocation distribution:');
+         summary.forEach(prof => {
+             console.log(`${prof.name} (${prof.department}): ${prof.totalAllotments} allotments`);
+         });
+         
+         // Calculate distribution statistics
+         const allotmentCounts = summary.map(prof => prof.totalAllotments);
+         const minAllotments = Math.min(...allotmentCounts);
+         const maxAllotments = Math.max(...allotmentCounts);
+         const avgAllotments = (totalAllocations / window.allProfessors.length).toFixed(1);
+         const range = maxAllotments - minAllotments;
+         
+         // Count professors by allotment levels
+         const allotmentDistribution = {};
+         allotmentCounts.forEach(count => {
+             allotmentDistribution[count] = (allotmentDistribution[count] || 0) + 1;
+         });
+         
+         let distributionDetails = '';
+         Object.keys(allotmentDistribution).sort((a, b) => a - b).forEach(allotments => {
+             distributionDetails += `  • ${allotments} allotments: ${allotmentDistribution[allotments]} professors\n`;
+         });
+         
+         const fairnessStatus = range <= 1 ? '✅ EXCELLENT' : range === 2 ? '⚠️ ACCEPTABLE' : '❌ UNFAIR - NEEDS FIXING';
+         
+         // Check for consecutive day violations
+         let consecutiveDayViolations = 0;
+         window.examDates.forEach((date, index) => {
+             if (index === 0) return; // Skip first day
+             
+             const currentDateStr = date.toISOString().split('T')[0];
+             const previousDate = window.examDates[index - 1];
+             const previousDateStr = previousDate.toISOString().split('T')[0];
+             
+             window.allProfessors.forEach((prof, profIndex) => {
+                 const workedToday = $(`.form-check-input[data-professor="${profIndex}"][data-date="${currentDateStr}"][data-faculty-type="professor"]:checked`).length > 0;
+                 const workedYesterday = $(`.form-check-input[data-professor="${profIndex}"][data-date="${previousDateStr}"][data-faculty-type="professor"]:checked`).length > 0;
+                 
+                 if (workedToday && workedYesterday) {
+                     consecutiveDayViolations++;
+                 }
+             });
+         });
+         
+         const consecutiveStatus = consecutiveDayViolations === 0 ? '✅ No consecutive days' : `⚠️ ${consecutiveDayViolations} consecutive day assignments`;
+         
+         const distributionMsg = `Allocation completed!\n\n` +
+             `📊 Distribution Summary:\n` +
+             `• Total allocations: ${totalAllocations}\n` +
+             `• Professors involved: ${window.allProfessors.length}\n` +
+             `• Average per professor: ${avgAllotments}\n` +
+             `• Range: ${minAllotments} - ${maxAllotments} allotments (difference: ${range})\n` +
+             `• Fairness: ${fairnessStatus}\n` +
+             `• Consecutive days: ${consecutiveStatus}\n\n` +
+             `📈 Distribution Breakdown:\n${distributionDetails}\n` +
+             `💡 Check the "Total Allotments" column for detailed view`;
+         
+         alert(distributionMsg);
+         
+         // Update progress
+         updateProgressStep(4, true); // Mark step 4 as completed
+         updateProgressStep(5); // Activate step 5 (Print Report)
+     }
+
+     function allocateSessionWithConstraints(dateStr, session, profsNeeded, professorsByDept, excludeProfs = []) {
+         console.log(`\n--- Allocating ${session} session for ${dateStr} (need ${profsNeeded} professors) ---`);
+         
+         // Get departments that are excluded (from AM session)
+         const excludedDepts = new Set(excludeProfs.map(prof => prof.department));
+         const excludedProfIndexes = new Set(excludeProfs.map(prof => prof.originalIndex));
+         
+         console.log('Excluded departments:', Array.from(excludedDepts));
+         console.log('Excluded professor indexes:', Array.from(excludedProfIndexes));
+         
+         // Create available professor pool (excluding constraints)
+         let availableProfs = [];
+         Object.keys(professorsByDept).forEach(dept => {
+             // Skip departments that are excluded
+             if (excludedDepts.has(dept)) {
+                 console.log(`Skipping department ${dept} (already allocated in AM)`);
+                 return;
+             }
+             
+             professorsByDept[dept].forEach(prof => {
+                 // Skip professors who are already allocated today
+                 if (excludedProfIndexes.has(prof.originalIndex)) {
+                     return;
+                 }
+                 
+                 // Skip professors who worked yesterday (consecutive day constraint)
+                 if (workedYesterday(prof.originalIndex, dateStr)) {
+                     console.log(`Skipping ${prof.name} - worked yesterday`);
+                     return;
+                 }
+                 
+                 availableProfs.push(prof);
+             });
+         });
+         
+         console.log(`Available professors for ${session}: ${availableProfs.length}`);
+         
+         // If not enough professors due to consecutive day constraint, relax the constraint
+         if (availableProfs.length < profsNeeded) {
+             console.log(`⚠️ Not enough professors (${availableProfs.length}) for ${profsNeeded} needed. Relaxing consecutive day constraint...`);
+             
+             // Add back professors who worked yesterday but respect other constraints
+             Object.keys(professorsByDept).forEach(dept => {
+                 if (excludedDepts.has(dept)) return;
+                 
+                 professorsByDept[dept].forEach(prof => {
+                     if (excludedProfIndexes.has(prof.originalIndex)) return;
+                     
+                     // Only add if not already in available pool
+                     const alreadyIncluded = availableProfs.some(p => p.originalIndex === prof.originalIndex);
+                     if (!alreadyIncluded) {
+                         availableProfs.push(prof);
+                         console.log(`Added back ${prof.name} (worked yesterday but needed)`);
+                     }
+                 });
+             });
+         }
+         
+         console.log(`Final available professors for ${session}: ${availableProfs.length}`);
+         
+         // Sort by total allotments (least allocated first) then randomly
+         availableProfs.sort((a, b) => {
+             const profA = window.allProfessors[a.originalIndex];
+             const profB = window.allProfessors[b.originalIndex];
+             
+             if (profA.totalAllotments !== profB.totalAllotments) {
+                 return profA.totalAllotments - profB.totalAllotments;
+             }
+             return Math.random() - 0.5; // Random among equal
+         });
+         
+         // Select professors ensuring STRICT equal distribution
+         const selectedProfs = [];
+         
+         for (let i = 0; i < profsNeeded && availableProfs.length > 0; i++) {
+             // Re-sort to get the most up-to-date least allocated professors
+             availableProfs.sort((a, b) => {
+                 const profA = window.allProfessors[a.originalIndex];
+                 const profB = window.allProfessors[b.originalIndex];
+                 
+                 if (profA.totalAllotments !== profB.totalAllotments) {
+                     return profA.totalAllotments - profB.totalAllotments; // Least allocated first
+                 }
+                 return Math.random() - 0.5; // Random among equal
+             });
+             
+             // Get the minimum allotment count among available professors
+             const minAllotments = Math.min(...availableProfs.map(prof => window.allProfessors[prof.originalIndex].totalAllotments));
+             
+             // Get the global minimum allotments across ALL professors to ensure strict fairness
+             const globalMinAllotments = Math.min(...window.allProfessors.map(prof => prof.totalAllotments));
+             const globalMaxAllotments = Math.max(...window.allProfessors.map(prof => prof.totalAllotments));
+             
+             // If the difference is already 2 or more, only select from professors with global minimum
+             const strictMinAllotments = (globalMaxAllotments - globalMinAllotments >= 2) ? globalMinAllotments : minAllotments;
+             
+             // Only select from professors with the strictest minimum allotments
+             const leastAllocatedProfs = availableProfs.filter(prof => 
+                 window.allProfessors[prof.originalIndex].totalAllotments === strictMinAllotments
+             );
+             
+             console.log(`Global range: ${globalMinAllotments}-${globalMaxAllotments}, Using threshold: ${strictMinAllotments}`);
+             
+             console.log(`Available professors with minimum allotments (${strictMinAllotments}):`, 
+                 leastAllocatedProfs.map(p => `${p.name}(${window.allProfessors[p.originalIndex].totalAllotments})`));
+             
+             if (leastAllocatedProfs.length > 0) {
+                 // Randomly select from professors with least allotments
+                 const randomIndex = Math.floor(Math.random() * leastAllocatedProfs.length);
+                 const selectedProf = leastAllocatedProfs[randomIndex];
+                 
+                 // STRICT fairness check: Don't allow selection if it would create unfair distribution
+                 const newAllotmentCount = window.allProfessors[selectedProf.originalIndex].totalAllotments + 1;
+                 const currentGlobalMin = Math.min(...window.allProfessors.map(prof => prof.totalAllotments));
+                 const currentGlobalMax = Math.max(...window.allProfessors.map(prof => prof.totalAllotments));
+                 
+                 // Calculate what the new range would be after this assignment
+                 const potentialNewMax = Math.max(currentGlobalMax, newAllotmentCount);
+                 const potentialRange = potentialNewMax - currentGlobalMin;
+                 
+                 // BLOCK if this would create a range > 1 (strict fairness)
+                 if (potentialRange > 1) {
+                     console.log(`🚫 BLOCKED ${selectedProf.name} - would create unfair range ${potentialRange} (${newAllotmentCount} vs min:${currentGlobalMin})`);
+                     
+                     // Remove this professor from available pool and try next
+                     const indexToRemove = availableProfs.findIndex(prof => prof.originalIndex === selectedProf.originalIndex);
+                     if (indexToRemove !== -1) {
+                         availableProfs.splice(indexToRemove, 1);
+                     }
+                     
+                     // Re-filter to only professors with absolute minimum
+                     const absoluteMin = Math.min(...availableProfs.map(prof => window.allProfessors[prof.originalIndex].totalAllotments));
+                     availableProfs = availableProfs.filter(prof => 
+                         window.allProfessors[prof.originalIndex].totalAllotments === absoluteMin
+                     );
+                     
+                     if (availableProfs.length === 0) {
+                         console.log('⚠️ No fair professors available with current constraints');
+                         
+                         // EMERGENCY FALLBACK: Relax constraints to find fair professors
+                         console.log('🔄 Relaxing constraints to find fair professors...');
+                         
+                         // Get ALL professors (ignoring consecutive day constraints)
+                         let emergencyPool = [];
+                         Object.keys(professorsByDept).forEach(dept => {
+                             professorsByDept[dept].forEach(prof => {
+                                 // Only exclude if already worked today (same day constraint)
+                                 if (!excludedProfIndexes.has(prof.originalIndex)) {
+                                     emergencyPool.push(prof);
+                                 }
+                             });
+                         });
+                         
+                         // Filter to only those with minimum allotments
+                         const globalMin = Math.min(...window.allProfessors.map(prof => prof.totalAllotments));
+                         emergencyPool = emergencyPool.filter(prof => 
+                             window.allProfessors[prof.originalIndex].totalAllotments === globalMin
+                         );
+                         
+                         if (emergencyPool.length > 0) {
+                             availableProfs = emergencyPool;
+                             console.log(`✅ Found ${emergencyPool.length} fair professors in emergency pool`);
+                         } else {
+                             console.log('❌ No fair professors available even with relaxed constraints - breaking');
+                             break;
+                         }
+                     }
+                     
+                     i--; // Retry this iteration with updated pool
+                     continue;
+                 }
+                 
+                 selectedProfs.push(selectedProf);
+                 
+                 // Mark checkbox
+                 const checkbox = $(`.form-check-input[data-professor="${selectedProf.originalIndex}"][data-date="${dateStr}"][data-session="${session}"]`);
+                     checkbox.prop('checked', true);
+                     checkbox.parent().append('<div class="allocation-number">1</div>');
+                     
+                 // Update professor's total allotments
+                 window.allProfessors[selectedProf.originalIndex].totalAllotments++;
+                 
+                 console.log(`✅ Selected: ${selectedProf.name} (${selectedProf.department}) - Total allotments: ${window.allProfessors[selectedProf.originalIndex].totalAllotments}`);
+                 
+                 // Remove selected professor from available pool for this session
+                 const indexToRemove = availableProfs.findIndex(prof => prof.originalIndex === selectedProf.originalIndex);
+                 if (indexToRemove !== -1) {
+                     availableProfs.splice(indexToRemove, 1);
+                 }
+             } else {
+                 console.log('No professors available for selection');
+                 break;
+             }
+         }
+         
+         return selectedProfs;
+     }
+
+     function allocateNonProfessorsWithConstraints(dateStr, session, nonProfsNeeded, nonProfessorsByDept, excludeProfs = []) {
+         console.log(`\n--- Allocating NON-PROFESSORS ${session} session for ${dateStr} (need ${nonProfsNeeded} non-professors) ---`);
+         
+         if (!window.allNonProfessors || window.allNonProfessors.length === 0) {
+             console.log('No non-professors available');
+             return [];
+         }
+         
+         if (nonProfsNeeded === 0) {
+             console.log('No non-professors needed for this session');
+             return [];
+         }
+         
+         // Get individual non-professors that are excluded (from AM session) - NOT departments
+         const excludedProfIndexes = new Set(excludeProfs.map(prof => prof.originalIndex));
+         
+         console.log('Excluded non-professor indexes:', Array.from(excludedProfIndexes));
+         
+         // Initialize department rotation tracking for non-professors
+         if (!window.nonProfDepartmentRotation) {
+             window.nonProfDepartmentRotation = {};
+         }
+         
+         // Create available non-professor pool using 50-50 department rotation
+         let availableNonProfs = [];
+         Object.keys(nonProfessorsByDept).forEach(dept => {
+             const deptNonProfs = nonProfessorsByDept[dept];
+             
+             if (deptNonProfs.length === 0) return;
+             
+             // Initialize rotation for this department if not exists
+             if (!window.nonProfDepartmentRotation[dept]) {
+                 window.nonProfDepartmentRotation[dept] = {
+                     currentDay: 0,
+                     group1: [],
+                     group2: []
+                 };
+                 
+                 // Split department into 2 groups (50-50)
+                 const shuffled = [...deptNonProfs].sort(() => Math.random() - 0.5);
+                 const midPoint = Math.ceil(shuffled.length / 2);
+                 window.nonProfDepartmentRotation[dept].group1 = shuffled.slice(0, midPoint);
+                 window.nonProfDepartmentRotation[dept].group2 = shuffled.slice(midPoint);
+                 
+                 console.log(`${dept}: Split into Group1(${window.nonProfDepartmentRotation[dept].group1.length}) and Group2(${window.nonProfDepartmentRotation[dept].group2.length})`);
+             }
+             
+             // Determine which group to use based on day rotation
+             const rotation = window.nonProfDepartmentRotation[dept];
+             const currentDateIndex = window.examDates.findIndex(d => d.toISOString().split('T')[0] === dateStr);
+             const useGroup1 = (currentDateIndex % 2) === 0; // Even days use group1, odd days use group2
+             
+             const activeGroup = useGroup1 ? rotation.group1 : rotation.group2;
+             console.log(`${dept}: Using ${useGroup1 ? 'Group1' : 'Group2'} (${activeGroup.length} non-professors) for ${dateStr}`);
+             
+             // Add active group to available pool
+             activeGroup.forEach(prof => {
+                 // Skip non-professors who are already allocated today
+                 if (excludedProfIndexes.has(prof.originalIndex)) {
+                     return;
+                 }
+                 
+                 // Skip non-professors who worked yesterday (consecutive day constraint)
+                 if (workedYesterdayNonProf(prof.originalIndex, dateStr)) {
+                     console.log(`Skipping ${prof.name} - worked yesterday`);
+                     return;
+                 }
+                 
+                 availableNonProfs.push(prof);
+             });
+         });
+         
+         console.log(`Available non-professors for ${session}: ${availableNonProfs.length}`);
+         
+         // If not enough non-professors due to consecutive day constraint, relax the constraint
+         if (availableNonProfs.length < nonProfsNeeded) {
+             console.log(`⚠️ Not enough non-professors (${availableNonProfs.length}) for ${nonProfsNeeded} needed. Relaxing consecutive day constraint...`);
+             
+             // Add back non-professors who worked yesterday but respect other constraints  
+             Object.keys(nonProfessorsByDept).forEach(dept => {
+                 
+                 nonProfessorsByDept[dept].forEach(prof => {
+                     if (excludedProfIndexes.has(prof.originalIndex)) return;
+                     
+                     // Only add if not already in available pool
+                     const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
+                     if (!alreadyIncluded) {
+                         availableNonProfs.push(prof);
+                         console.log(`Added back ${prof.name} (worked yesterday but needed)`);
+                     }
+                 });
+             });
+         }
+         
+         console.log(`Final available non-professors for ${session}: ${availableNonProfs.length}`);
+         
+         // Sort by total allotments (least allocated first) then randomly
+         availableNonProfs.sort((a, b) => {
+             const profA = window.allNonProfessors[a.originalIndex];
+             const profB = window.allNonProfessors[b.originalIndex];
+             
+             if (profA.totalAllotments !== profB.totalAllotments) {
+                 return profA.totalAllotments - profB.totalAllotments;
+             }
+             return Math.random() - 0.5; // Random among equal
+         });
+         
+         // Select non-professors ensuring STRICT equal distribution
+         const selectedNonProfs = [];
+         
+         for (let i = 0; i < nonProfsNeeded && availableNonProfs.length > 0; i++) {
+             // Re-sort to get the most up-to-date least allocated non-professors
+             availableNonProfs.sort((a, b) => {
+                 const profA = window.allNonProfessors[a.originalIndex];
+                 const profB = window.allNonProfessors[b.originalIndex];
+                 
+                 if (profA.totalAllotments !== profB.totalAllotments) {
+                     return profA.totalAllotments - profB.totalAllotments; // Least allocated first
+                 }
+                 return Math.random() - 0.5; // Random among equal
+             });
+             
+             // Get the minimum allotment count among available non-professors
+             const minAllotments = Math.min(...availableNonProfs.map(prof => window.allNonProfessors[prof.originalIndex].totalAllotments));
+             
+             // Get the global minimum allotments across ALL non-professors to ensure strict fairness
+             const globalMinAllotments = Math.min(...window.allNonProfessors.map(prof => prof.totalAllotments));
+             const globalMaxAllotments = Math.max(...window.allNonProfessors.map(prof => prof.totalAllotments));
+             
+             // If the difference is already 2 or more, only select from non-professors with global minimum
+             const strictMinAllotments = (globalMaxAllotments - globalMinAllotments >= 2) ? globalMinAllotments : minAllotments;
+             
+             // Only select from non-professors with the strictest minimum allotments
+             const leastAllocatedNonProfs = availableNonProfs.filter(prof => 
+                 window.allNonProfessors[prof.originalIndex].totalAllotments === strictMinAllotments
+             );
+             
+             console.log(`Global range: ${globalMinAllotments}-${globalMaxAllotments}, Using threshold: ${strictMinAllotments}`);
+             
+             if (leastAllocatedNonProfs.length > 0) {
+                 // Randomly select from non-professors with least allotments
+                 const randomIndex = Math.floor(Math.random() * leastAllocatedNonProfs.length);
+                 const selectedNonProf = leastAllocatedNonProfs[randomIndex];
+                 
+                 // STRICT fairness check: Don't allow selection if it would create unfair distribution
+                 const newAllotmentCount = window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments + 1;
+                 const currentGlobalMin = Math.min(...window.allNonProfessors.map(prof => prof.totalAllotments));
+                 const currentGlobalMax = Math.max(...window.allNonProfessors.map(prof => prof.totalAllotments));
+                 
+                 // Calculate what the new range would be after this assignment
+                 const potentialNewMax = Math.max(currentGlobalMax, newAllotmentCount);
+                 const potentialRange = potentialNewMax - currentGlobalMin;
+                 
+                 // BLOCK if this would create a range > 1 (strict fairness)
+                 if (potentialRange > 1) {
+                     console.log(`🚫 BLOCKED ${selectedNonProf.name} - would create unfair range ${potentialRange} (${newAllotmentCount} vs min:${currentGlobalMin})`);
+                     
+                     // Remove this non-professor from available pool and try next
+                     const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === selectedNonProf.originalIndex);
+                     if (indexToRemove !== -1) {
+                         availableNonProfs.splice(indexToRemove, 1);
+                     }
+                     
+                     // Re-filter to only non-professors with absolute minimum
+                     const absoluteMin = Math.min(...availableNonProfs.map(prof => window.allNonProfessors[prof.originalIndex].totalAllotments));
+                     availableNonProfs = availableNonProfs.filter(prof => 
+                         window.allNonProfessors[prof.originalIndex].totalAllotments === absoluteMin
+                     );
+                     
+                     if (availableNonProfs.length === 0) {
+                         console.log('❌ No fair non-professors available - breaking');
+                         break;
+                     }
+                     
+                     i--; // Retry this iteration with updated pool
+                     continue;
+                 }
+                 
+                 selectedNonProfs.push(selectedNonProf);
+                 
+                 // Mark checkbox
+                 const checkbox = $(`.form-check-input[data-professor="${selectedNonProf.originalIndex}"][data-date="${dateStr}"][data-session="${session}"][data-faculty-type="non-professor"]`);
+                     checkbox.prop('checked', true);
+                     checkbox.parent().append('<div class="allocation-number">1</div>');
+                     
+                 // Update non-professor's total allotments
+                 window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments++;
+                 
+                 console.log(`✅ Selected: ${selectedNonProf.name} (${selectedNonProf.department}) - Total allotments: ${window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments}`);
+                 
+                 // Remove selected non-professor from available pool for this session
+                 const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === selectedNonProf.originalIndex);
+                 if (indexToRemove !== -1) {
+                     availableNonProfs.splice(indexToRemove, 1);
+                 }
+             } else {
+                 console.log('No non-professors available for selection');
+                 break;
+             }
+         }
+         
+         return selectedNonProfs;
+     }
+
+     function workedYesterdayNonProf(nonProfessorIndex, currentDateStr) {
+         // Get yesterday's date
+         const currentDate = new Date(currentDateStr);
+         const yesterday = new Date(currentDate);
+         yesterday.setDate(currentDate.getDate() - 1);
+         const yesterdayStr = yesterday.toISOString().split('T')[0];
+         
+         // Check if non-professor worked yesterday (AM or PM)
+         const workedYesterday = $(`.form-check-input[data-professor="${nonProfessorIndex}"][data-date="${yesterdayStr}"][data-faculty-type="non-professor"]:checked`).length > 0;
+         
+         if (workedYesterday) {
+             console.log(`Non-professor ${nonProfessorIndex} worked on ${yesterdayStr}, skipping for ${currentDateStr}`);
+         }
+         
+         return workedYesterday;
+     }
+
+     function updateTotalAllotmentDisplay() {
+         // Update professors
+         if (window.allProfessors) {
+             window.allProfessors.forEach((prof, index) => {
+                 const $badge = $(`.professor-row[data-professor-index="${index}"][data-faculty-type="professor"] .total-allotments .badge`);
+                 $badge.text(prof.totalAllotments);
+                 
+                 // Color coding based on allotment count
+                 $badge.removeClass('bg-success bg-warning bg-danger bg-secondary');
+                 if (prof.totalAllotments === 0) {
+                     $badge.addClass('bg-secondary');
+                 } else if (prof.totalAllotments <= 2) {
+                     $badge.addClass('bg-success');
+                 } else if (prof.totalAllotments <= 4) {
+                     $badge.addClass('bg-warning');
+                 } else {
+                     $badge.addClass('bg-danger');
+                 }
+             });
+         }
+         
+         // Update non-professors
+         if (window.allNonProfessors) {
+             window.allNonProfessors.forEach((prof, index) => {
+                 const $badge = $(`.professor-row[data-professor-index="${index}"][data-faculty-type="non-professor"] .total-allotments .badge`);
+                 $badge.text(prof.totalAllotments);
+                 
+                 // Color coding based on allotment count
+                 $badge.removeClass('bg-success bg-warning bg-danger bg-secondary');
+                 if (prof.totalAllotments === 0) {
+                     $badge.addClass('bg-secondary');
+                 } else if (prof.totalAllotments <= 2) {
+                     $badge.addClass('bg-secondary'); // Keep gray for non-professors
+                 } else if (prof.totalAllotments <= 4) {
+                     $badge.addClass('bg-warning');
+                 } else {
+                     $badge.addClass('bg-danger');
+                 }
+             });
+         }
+     }
+
+     function generateAllocationSummary() {
+         return window.allProfessors.map(prof => ({
+             name: prof.name,
+             department: prof.department,
+             totalAllotments: prof.totalAllotments
+         })).sort((a, b) => b.totalAllotments - a.totalAllotments);
+     }
+
+     function groupProfessorsByDept(facultyArray) {
+         const professorsByDept = {};
+         facultyArray.forEach((prof, index) => {
+             if (!professorsByDept[prof.department]) {
+                 professorsByDept[prof.department] = [];
+             }
+             professorsByDept[prof.department].push({...prof, originalIndex: index});
+         });
+         return professorsByDept;
+     }
+
+     function generateDualAllocationSummary() {
+         const professorAllocations = window.allProfessors ? 
+             window.allProfessors.reduce((sum, prof) => sum + prof.totalAllotments, 0) : 0;
+         const nonProfessorAllocations = window.allNonProfessors ? 
+             window.allNonProfessors.reduce((sum, prof) => sum + prof.totalAllotments, 0) : 0;
+         
+         return {
+             professorAllocations,
+             nonProfessorAllocations,
+             totalAllocations: professorAllocations + nonProfessorAllocations
+         };
+     }
+
+     function workedYesterday(professorIndex, currentDateStr) {
+         // Get yesterday's date
+         const currentDate = new Date(currentDateStr);
+         const yesterday = new Date(currentDate);
+         yesterday.setDate(currentDate.getDate() - 1);
+         const yesterdayStr = yesterday.toISOString().split('T')[0];
+         
+         // Check if professor worked yesterday (AM or PM)
+         const workedYesterday = $(`.form-check-input[data-professor="${professorIndex}"][data-date="${yesterdayStr}"]:checked`).length > 0;
+         
+         if (workedYesterday) {
+             console.log(`Professor ${professorIndex} worked on ${yesterdayStr}, skipping for ${currentDateStr}`);
+         }
+         
+         return workedYesterday;
+     }
+
+     function autoAllocateNonProfessorsOnly() {
+         console.log('=== NON-PROFESSOR ALLOCATION ALGORITHM ===');
+         console.log('Available non-professors:', window.allNonProfessors ? window.allNonProfessors.length : 0);
+         console.log('Available exam dates:', window.examDates.length);
+         
+         if (!window.allNonProfessors || window.allNonProfessors.length === 0) {
+             alert('No non-professors available for allocation');
+             return;
+         }
+         
+         // Clear existing NON-PROFESSOR allocations only
+         $('.form-check-input[data-faculty-type="non-professor"]').prop('checked', false);
+         $('.form-check-input[data-faculty-type="non-professor"]').parent().find('.allocation-number').remove();
+         
+         // Reset total allotments for non-professors only
+         window.allNonProfessors.forEach(prof => prof.totalAllotments = 0);
+         
+         // Group non-professors by department
+         const nonProfessorsByDept = groupProfessorsByDept(window.allNonProfessors);
+         
+         console.log('Non-professors by department:', Object.keys(nonProfessorsByDept).map(dept => 
+             `${dept}: ${nonProfessorsByDept[dept].length} non-professors`
+         ));
+         
+         let totalNonProfAllocations = 0;
+         
+         // Process each exam date
+         window.examDates.forEach((date, dateIndex) => {
+             const dateStr = date.toISOString().split('T')[0];
+             console.log(`\n=== Processing Non-Professors for ${dateStr} ===`);
+             
+             // Get session configurations for this date
+             const amRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="AM"]`).val()) || 0;
+             const amRelievers = parseInt($(`.relievers[data-date="${dateStr}"][data-session="AM"]`).val()) || 0;
+             const pmRooms = parseInt($(`.session-rooms[data-date="${dateStr}"][data-session="PM"]`).val()) || 0;
+             const pmRelievers = parseInt($(`.relievers[data-date="${dateStr}"][data-session="PM"]`).val()) || 0;
+             
+             const amNonProfsNeeded = amRooms + amRelievers; // Total rooms + relievers
+             const pmNonProfsNeeded = pmRooms + pmRelievers; // Total rooms + relievers
+             
+             console.log(`AM: ${amRooms} rooms + ${amRelievers} relievers = ${amNonProfsNeeded} non-professors needed`);
+             console.log(`PM: ${pmRooms} rooms + ${pmRelievers} relievers = ${pmNonProfsNeeded} non-professors needed`);
+             
+             // Allocate AM session - Non-Professors
+             const amNonProfResults = allocateNonProfessorsWithConstraints(dateStr, 'AM', amNonProfsNeeded, nonProfessorsByDept);
+             totalNonProfAllocations += amNonProfResults.length;
+             
+             // Allocate PM session - Non-Professors (excluding AM non-professors and their departments)
+             const pmNonProfResults = allocateNonProfessorsWithConstraints(dateStr, 'PM', pmNonProfsNeeded, nonProfessorsByDept, amNonProfResults);
+             totalNonProfAllocations += pmNonProfResults.length;
+             
+             console.log(`${dateStr} completed: ${amNonProfResults.length} AM + ${pmNonProfResults.length} PM = ${amNonProfResults.length + pmNonProfResults.length} non-professors`);
+         });
+         
+         // Update total allotment display
+         updateTotalAllotmentDisplay();
+         
+         // Update non-professor totals
+         updateNonProfessorTotals();
+         
+         // Show summary for non-professors
+         const nonProfSummary = generateNonProfessorAllocationSummary();
+         console.log('\n=== NON-PROFESSOR ALLOCATION SUMMARY ===');
+         console.log(`Total non-professor allocations made: ${totalNonProfAllocations}`);
+         
+         const nonProfAllotmentCounts = nonProfSummary.map(prof => prof.totalAllotments);
+         const nonProfMinAllotments = Math.min(...nonProfAllotmentCounts);
+         const nonProfMaxAllotments = Math.max(...nonProfAllotmentCounts);
+         const nonProfAvgAllotments = (totalNonProfAllocations / window.allNonProfessors.length).toFixed(1);
+         const nonProfRange = nonProfMaxAllotments - nonProfMinAllotments;
+         
+         const nonProfFairnessStatus = nonProfRange <= 1 ? '✅ EXCELLENT' : nonProfRange === 2 ? '⚠️ ACCEPTABLE' : '❌ UNFAIR - NEEDS FIXING';
+         
+         const nonProfDistributionMsg = `Non-Professor Allocation completed!\n\n` +
+             `📊 Distribution Summary:\n` +
+             `• Total allocations: ${totalNonProfAllocations}\n` +
+             `• Non-professors involved: ${window.allNonProfessors.length}\n` +
+             `• Average per non-professor: ${nonProfAvgAllotments}\n` +
+             `• Range: ${nonProfMinAllotments} - ${nonProfMaxAllotments} allotments (difference: ${nonProfRange})\n` +
+             `• Fairness: ${nonProfFairnessStatus}\n\n` +
+             `💡 Check the "Total Allotments" column for detailed view`;
+         
+         alert(nonProfDistributionMsg);
+         
+         // Update progress
+         updateProgressStep(4, true); // Mark step 4 as completed
+         updateProgressStep(5); // Activate step 5 (Print Report)
+     }
+
+     function generateNonProfessorAllocationSummary() {
+         return window.allNonProfessors.map(prof => ({
+             name: prof.name,
+             department: prof.department,
+             totalAllotments: prof.totalAllotments
+         })).sort((a, b) => b.totalAllotments - a.totalAllotments);
+     }
+
+     function updateNonProfessorTotals() {
+         if (!window.examDates || !window.allNonProfessors) return;
+         
+         let grandTotal = 0;
+         
+         // Calculate totals for each date
+         window.examDates.forEach(function(date) {
+             const dateStr = date.toISOString().split('T')[0];
+             
+             // Count AM allocations for this date
+             const amCount = $(`.form-check-input[data-date="${dateStr}"][data-session="AM"][data-faculty-type="non-professor"]:checked`).length;
+             $(`.daily-total-am[data-date="${dateStr}"]`).text(amCount);
+             
+             // Count PM allocations for this date
+             const pmCount = $(`.form-check-input[data-date="${dateStr}"][data-session="PM"][data-faculty-type="non-professor"]:checked`).length;
+             $(`.daily-total-pm[data-date="${dateStr}"]`).text(pmCount);
+             
+             grandTotal += amCount + pmCount;
+         });
+         
+         // Update grand total
+         $('#totalNonProfAllotments').text(grandTotal);
+         
+         console.log('Updated non-professor totals. Grand total:', grandTotal);
+     }
+
+     function generatePrintReport() {
+         console.log('Generating print report...');
+         
+         // Collect allocation data organized by date
+         const allocationsByDate = {};
+         
+         window.examDates.forEach(date => {
+             const dateStr = date.toISOString().split('T')[0];
+             const dateDisplay = date.toLocaleDateString('en-GB', { 
+                 day: '2-digit', 
+                 month: '2-digit', 
+                 year: 'numeric',
+                 weekday: 'long'
+             });
+             
+             allocationsByDate[dateStr] = {
+                 dateDisplay: dateDisplay,
+                 AM: [],
+                 PM: []
+             };
+         });
+         
+         // Collect allocated professors for each date and session
+         $('.form-check-input:checked').each(function() {
+             const $checkbox = $(this);
+             const professorIndex = parseInt($checkbox.data('professor'));
+             const dateStr = $checkbox.data('date');
+             const session = $checkbox.data('session');
+             
+             if (allocationsByDate[dateStr] && window.allProfessors[professorIndex]) {
+                 const prof = window.allProfessors[professorIndex];
+                 allocationsByDate[dateStr][session].push({
+                     name: prof.name,
+                     initials: prof.initials,
+                     department: prof.department,
+                     phone: prof.phone,
+                     email: prof.email
+                 });
+             }
+         });
+         
+         // Generate HTML for print
+         let printHTML = `
+             <!DOCTYPE html>
+             <html>
+             <head>
+                 <meta charset="UTF-8">
+                 <title>Exam Duty Allocation Report</title>
+                 <style>
+                     body {
+                         font-family: Arial, sans-serif;
+                         margin: 20px;
+                         font-size: 12px;
+                         line-height: 1.4;
+                     }
+                     .header {
+                         text-align: center;
+                         margin-bottom: 30px;
+                         border-bottom: 2px solid #333;
+                         padding-bottom: 15px;
+                     }
+                     .header h1 {
+                         margin: 0;
+                         color: #333;
+                         font-size: 24px;
+                     }
+                     .header p {
+                         margin: 5px 0;
+                         color: #666;
+                         font-size: 14px;
+                     }
+                     .date-section {
+                         margin-bottom: 25px;
+                         page-break-inside: avoid;
+                     }
+                     .date-header {
+                         background: #f0f0f0;
+                         padding: 10px;
+                         border-left: 4px solid #007bff;
+                         margin-bottom: 15px;
+                         font-weight: bold;
+                         font-size: 16px;
+                         color: #333;
+                     }
+                     .session-section {
+                         margin-bottom: 15px;
+                     }
+                     .session-header {
+                         background: #e9ecef;
+                         padding: 8px 12px;
+                         font-weight: bold;
+                         color: #495057;
+                         border-radius: 4px;
+                         margin-bottom: 10px;
+                     }
+                     .session-header.am {
+                         background: #fff3cd;
+                         color: #856404;
+                     }
+                     .session-header.pm {
+                         background: #d1ecf1;
+                         color: #0c5460;
+                     }
+                     .professors-table {
+                         width: 100%;
+                         border-collapse: collapse;
+                         margin-bottom: 15px;
+                     }
+                     .professors-table th,
+                     .professors-table td {
+                         border: 1px solid #ddd;
+                         padding: 8px;
+                         text-align: left;
+                     }
+                     .professors-table th {
+                         background: #f8f9fa;
+                         font-weight: bold;
+                         color: #495057;
+                     }
+                     .professors-table tr:nth-child(even) {
+                         background: #f9f9f9;
+                     }
+                     .no-allocation {
+                         color: #6c757d;
+                         font-style: italic;
+                         text-align: center;
+                         padding: 15px;
+                     }
+                     .summary {
+                         margin-top: 30px;
+                         padding: 15px;
+                         background: #f8f9fa;
+                         border-radius: 5px;
+                         border-left: 4px solid #28a745;
+                     }
+                     .summary h3 {
+                         margin-top: 0;
+                         color: #333;
+                     }
+                     @media print {
+                         body { margin: 15px; }
+                         .date-section { page-break-inside: avoid; }
+                     }
+                 </style>
+             </head>
+             <body>
+                 <div class="header">
+                     <h1>Exam Duty Allocation Report</h1>
+                     <p>Generated on: ${new Date().toLocaleDateString('en-GB', { 
+                         day: '2-digit', 
+                         month: '2-digit', 
+                         year: 'numeric',
+                         hour: '2-digit',
+                         minute: '2-digit'
+                     })}</p>
+                     <p>Total Professors: ${window.allProfessors.length} | Total Exam Days: ${window.examDates.length}</p>
+                 </div>
+         `;
+         
+         // Add date-wise allocations
+         Object.keys(allocationsByDate).sort().forEach(dateStr => {
+             const dateData = allocationsByDate[dateStr];
+             const totalAllocated = dateData.AM.length + dateData.PM.length;
+             
+             printHTML += `
+                 <div class="date-section">
+                     <div class="date-header">
+                         ${dateData.dateDisplay} (${totalAllocated} professors allocated)
+                     </div>
+             `;
+             
+             // AM Session
+             printHTML += `
+                 <div class="session-section">
+                     <div class="session-header am">
+                         Morning Session (AM) - ${dateData.AM.length} professors
+                     </div>
+             `;
+             
+             if (dateData.AM.length > 0) {
+                 printHTML += `
+                     <table class="professors-table">
+                         <thead>
+                             <tr>
+                                 <th>S.No</th>
+                                 <th>Name</th>
+                                 <th>Initials</th>
+                                 <th>Department</th>
+                                 <th>Phone</th>
+                                 <th>Email</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                 `;
+                 
+                 dateData.AM.forEach((prof, index) => {
+                     printHTML += `
+                         <tr>
+                             <td>${index + 1}</td>
+                             <td>${prof.name}</td>
+                             <td>${prof.initials}</td>
+                             <td>${prof.department}</td>
+                             <td>${prof.phone}</td>
+                             <td>${prof.email}</td>
+                         </tr>
+                     `;
+                 });
+                 
+                 printHTML += `
+                         </tbody>
+                     </table>
+                 `;
+             } else {
+                 printHTML += `<div class="no-allocation">No professors allocated for AM session</div>`;
+             }
+             
+             printHTML += `</div>`;
+             
+             // PM Session
+             printHTML += `
+                 <div class="session-section">
+                     <div class="session-header pm">
+                         Afternoon Session (PM) - ${dateData.PM.length} professors
+                     </div>
+             `;
+             
+             if (dateData.PM.length > 0) {
+                 printHTML += `
+                     <table class="professors-table">
+                         <thead>
+                             <tr>
+                                 <th>S.No</th>
+                                 <th>Name</th>
+                                 <th>Initials</th>
+                                 <th>Department</th>
+                                 <th>Phone</th>
+                                 <th>Email</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                 `;
+                 
+                 dateData.PM.forEach((prof, index) => {
+                     printHTML += `
+                         <tr>
+                             <td>${index + 1}</td>
+                             <td>${prof.name}</td>
+                             <td>${prof.initials}</td>
+                             <td>${prof.department}</td>
+                             <td>${prof.phone}</td>
+                             <td>${prof.email}</td>
+                         </tr>
+                     `;
+                 });
+                 
+                 printHTML += `
+                         </tbody>
+                     </table>
+                 `;
+             } else {
+                 printHTML += `<div class="no-allocation">No professors allocated for PM session</div>`;
+             }
+             
+             printHTML += `</div></div>`;
+         });
+         
+         // Add summary
+         const summary = generateAllocationSummary();
+         const totalAllocations = summary.reduce((sum, prof) => sum + prof.totalAllotments, 0);
+         
+         printHTML += `
+             <div class="summary">
+                 <h3>Allocation Summary</h3>
+                 <p><strong>Total Allocations:</strong> ${totalAllocations}</p>
+                 <p><strong>Average per Professor:</strong> ${(totalAllocations / window.allProfessors.length).toFixed(1)}</p>
+                 <p><strong>Distribution Range:</strong> ${Math.min(...summary.map(p => p.totalAllotments))} - ${Math.max(...summary.map(p => p.totalAllotments))} allotments</p>
+             </div>
+             </body>
+             </html>
+         `;
+         
+         // Open print window
+         const printWindow = window.open('', '_blank', 'width=800,height=600');
+         printWindow.document.write(printHTML);
+         printWindow.document.close();
+         
+         // Auto-trigger print dialog after content loads
+         printWindow.onload = function() {
+             printWindow.print();
+         };
+         
+         console.log('Print report generated successfully');
+     }
+    });
+</script>
+{% endblock %}

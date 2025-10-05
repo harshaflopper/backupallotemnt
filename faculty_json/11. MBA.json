@@ -1,0 +1,74 @@
+[
+    {
+        "Name": "Dr. M.Ajoy Kumar",
+        "Initials": "DMA",
+        "Designation": "Professor",
+        "Phone": "9886145620",
+        "Email": "ajoy@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.S.Pannerselvam",
+        "Initials": "SPSS",
+        "Designation": "Professor",
+        "Phone": "9480250369",
+        "Email": "panneerselvam@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. C.Somashekar",
+        "Initials": "DCS",
+        "Designation": "Associate Professor",
+        "Phone": "9844420529",
+        "Email": "csomashekar@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Mahantesh Jakaty",
+        "Initials": "MJ",
+        "Designation": "Assistant Professor",
+        "Phone": "9886634895",
+        "Email": "mahamathj@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Manu T U",
+        "Initials": "DMT",
+        "Designation": "Assistant Professor",
+        "Phone": "9886345863",
+        "Email": "manu@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Preeti.S.Desai",
+        "Initials": "DPS",
+        "Designation": "Assistant Professor",
+        "Phone": "9008977611",
+        "Email": "preeti@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Aishwarya M R",
+        "Initials": "AMR",
+        "Designation": "Assistant Professor",
+        "Phone": "9945917991",
+        "Email": "ishwaryamr@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Pushpalatha S Patil",
+        "Initials": "PSP",
+        "Designation": "Assistant Professor",
+        "Phone": "9986000424",
+        "Email": "pushpalatha@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Anitha B R",
+        "Initials": "ABR",
+        "Designation": "Assistant Professor",
+        "Phone": "6361042779",
+        "Email": "anithabr@sit.ac.in",
+        "isActive": true
+    }
+]

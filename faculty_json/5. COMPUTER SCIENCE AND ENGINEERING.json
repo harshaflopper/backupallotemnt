@@ -1,0 +1,238 @@
+[
+    {
+        "Name": "Dr.Y.S.Nijagunarya",
+        "Designation": "Professor",
+        "Phone": "9844453688",
+        "Email": "nijagunarya@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.N.R.Sunitha",
+        "Designation": "Professor",
+        "Phone": "9986276851",
+        "Email": "nrsunitha@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.R.Sumathi",
+        "Designation": "Professor",
+        "Phone": "9972131024",
+        "Email": "rsumathi@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. M.B.Nirmala",
+        "Initials": "DMB",
+        "Designation": "Associate Professor",
+        "Phone": "9739302826",
+        "Email": "mbnirmala@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. K.N.Shreenath",
+        "Initials": "DKN",
+        "Designation": "Associate Professor",
+        "Phone": "9844321171",
+        "Email": "shreenathk_n@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. K.G.Manjunath",
+        "Initials": "DKG",
+        "Designation": "Assistant Professor",
+        "Phone": "8884155795",
+        "Email": "kgmanjunath@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. A.H.Shanthakumara",
+        "Initials": "DAH",
+        "Designation": "Assistant Professor",
+        "Phone": "9886589750",
+        "Email": "shanthakumara@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Assistant Professor",
+        "Initials": "AP",
+        "Designation": "Assistant Professor",
+        "Phone": "9980577442",
+        "Email": "krishnamohan_av@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Srinivasa K",
+        "Initials": "DSK",
+        "Designation": "Assistant Professor",
+        "Phone": "9845399083",
+        "Email": "srinivasa@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. R.M.Savithramma",
+        "Initials": "DRM",
+        "Designation": "Assistant Professor",
+        "Phone": "8495822888",
+        "Email": "savirmrl@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "S. P. Gururaj",
+        "Initials": "SPG",
+        "Designation": "Assistant Professor",
+        "Phone": "9886515472",
+        "Email": "gururajsp@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. H. D. Kallinath",
+        "Initials": "DHD",
+        "Designation": "Assistant Professor",
+        "Phone": "9986295070",
+        "Email": "hdk@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Ashwini B.P.",
+        "Initials": "DAB",
+        "Designation": "Assistant Professor",
+        "Phone": "9900567454",
+        "Email": "ashwinibp@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. K Bhargavi",
+        "Initials": "DKB",
+        "Designation": "Associate Professor",
+        "Phone": "9886280931",
+        "Email": "bhargavik@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Shwetha A.N",
+        "Initials": "SAN",
+        "Designation": "Assistant Professor",
+        "Phone": "8746982111",
+        "Email": "shwethaan@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.SumalathaAaradhya",
+        "Designation": "Assistant Professor",
+        "Phone": "9900609254",
+        "Email": "sumalatah@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Shobha K",
+        "Initials": "DSK",
+        "Designation": "Assistant Professor",
+        "Phone": "7760434039",
+        "Email": "shobhak@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Pramod T C",
+        "Initials": "DPT",
+        "Designation": "Assistant Professor",
+        "Phone": "8123432938",
+        "Email": "pramodhtc@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Kiran Kumar T M",
+        "Initials": "DKK",
+        "Designation": "Assistant Professor",
+        "Phone": "9844379612",
+        "Email": "tmkiran@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Bharathi P T",
+        "Initials": "DBP",
+        "Designation": "Assistant Professor",
+        "Phone": "9480030582",
+        "Email": "bharathi_pt@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Sowmya M N",
+        "Initials": "SMN",
+        "Designation": "Assistant Professor",
+        "Phone": "9986617496",
+        "Email": "sowmyamn@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Sheela S",
+        "Initials": "SS",
+        "Designation": "Assistant Professor",
+        "Phone": "9591055888",
+        "Email": "sheelas@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Akshatha Y",
+        "Initials": "DAY",
+        "Designation": "Assistant Professor",
+        "Phone": "7411438641",
+        "Email": "akshathay@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Tejashwini D A",
+        "Initials": "TDA",
+        "Designation": "Assistant Professor",
+        "Phone": "8296631233",
+        "Email": "tejashwinida@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Shilpa S P",
+        "Initials": "SSP",
+        "Designation": "Assistant Professor",
+        "Phone": "7483164188",
+        "Email": "shilpashree@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Navyashree S",
+        "Initials": "NS",
+        "Designation": "Assistant Professor",
+        "Phone": "8951789329",
+        "Email": "navyashrees@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr.Prasannakumar K R",
+        "Initials": "DPK",
+        "Designation": "Assistant Professor",
+        "Phone": "9880771132",
+        "Email": "prasanna.kghatta@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Anupama B S",
+        "Initials": "ABS",
+        "Designation": "Assistant Professor",
+        "Phone": "9741169089",
+        "Email": "anupamabs@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Rajeshwari K R",
+        "Initials": "RKR",
+        "Designation": "Assistant Professor",
+        "Phone": "8095532729",
+        "Email": "rajeshwarikr@sit.ac.in",
+        "isActive": true
+    },
+    {
+        "Name": "Dr. Anupama T A",
+        "Initials": "DAT",
+        "Designation": "Assistant Professor",
+        "Phone": "9900398122",
+        "Email": "anupamata@sit.ac.in",
+        "isActive": true
+    }
+]
