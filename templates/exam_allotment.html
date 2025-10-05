@@ -1895,48 +1895,62 @@ $(document).ready(function() {
          console.log('Updated non-professor totals. Grand total:', grandTotal);
      }
 
-     function generatePrintReport() {
-         console.log('Generating print report...');
-         
-         // Collect allocation data organized by date
-         const allocationsByDate = {};
-         
-         window.examDates.forEach(date => {
-             const dateStr = date.toISOString().split('T')[0];
-             const dateDisplay = date.toLocaleDateString('en-GB', { 
-                 day: '2-digit', 
-                 month: '2-digit', 
-                 year: 'numeric',
-                 weekday: 'long'
-             });
-             
-             allocationsByDate[dateStr] = {
-                 dateDisplay: dateDisplay,
-                 AM: [],
-                 PM: []
-             };
-         });
-         
-         // Collect allocated professors for each date and session
-         $('.form-check-input:checked').each(function() {
-             const $checkbox = $(this);
-             const professorIndex = parseInt($checkbox.data('professor'));
-             const dateStr = $checkbox.data('date');
-             const session = $checkbox.data('session');
-             
-             if (allocationsByDate[dateStr] && window.allProfessors[professorIndex]) {
-                 const prof = window.allProfessors[professorIndex];
-                 allocationsByDate[dateStr][session].push({
-                     name: prof.name,
-                     initials: prof.initials,
-                     department: prof.department,
-                     phone: prof.phone,
-                     email: prof.email
-                 });
-             }
-         });
-         
-         // Generate HTML for print
+    function generatePrintReport() {
+        console.log('Generating print report...');
+        
+        // Collect allocation data organized by date
+        const allocationsByDate = {};
+        
+        window.examDates.forEach(date => {
+            const dateStr = date.toISOString().split('T')[0];
+            const dateDisplay = date.toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                weekday: 'long'
+            });
+            
+            allocationsByDate[dateStr] = {
+                dateDisplay: dateDisplay,
+                AM: { professors: [], nonProfessors: [] },
+                PM: { professors: [], nonProfessors: [] }
+            };
+        });
+        
+        // Collect allocated faculty (both types) for each date and session
+        $('.form-check-input:checked').each(function() {
+            const $checkbox = $(this);
+            const idx = parseInt($checkbox.data('professor'));
+            const dateStr = $checkbox.data('date');
+            const session = $checkbox.data('session');
+            const facultyType = $checkbox.data('faculty-type');
+            
+            if (!allocationsByDate[dateStr]) return;
+            
+            if (facultyType === 'professor' && window.allProfessors[idx]) {
+                const prof = window.allProfessors[idx];
+                allocationsByDate[dateStr][session].professors.push({
+                    name: prof.name,
+                    initials: prof.initials,
+                    designation: prof.designation,
+                    email: prof.email,
+                    department: prof.department,
+                    phone: prof.phone
+                });
+            } else if (facultyType === 'non-professor' && window.allNonProfessors && window.allNonProfessors[idx]) {
+                const prof = window.allNonProfessors[idx];
+                allocationsByDate[dateStr][session].nonProfessors.push({
+                    name: prof.name,
+                    initials: prof.initials,
+                    designation: prof.designation,
+                    email: prof.email,
+                    department: prof.department,
+                    phone: prof.phone
+                });
+            }
+        });
+        
+        // Generate HTML for print
          let printHTML = `
              <!DOCTYPE html>
              <html>
@@ -2054,112 +2068,138 @@ $(document).ready(function() {
                  </div>
          `;
          
-         // Add date-wise allocations
-         Object.keys(allocationsByDate).sort().forEach(dateStr => {
-             const dateData = allocationsByDate[dateStr];
-             const totalAllocated = dateData.AM.length + dateData.PM.length;
-             
-             printHTML += `
-                 <div class="date-section">
-                     <div class="date-header">
-                         ${dateData.dateDisplay} (${totalAllocated} professors allocated)
-                     </div>
-             `;
-             
-             // AM Session
-             printHTML += `
-                 <div class="session-section">
-                     <div class="session-header am">
-                         Morning Session (AM) - ${dateData.AM.length} professors
-                     </div>
-             `;
-             
-             if (dateData.AM.length > 0) {
-                 printHTML += `
-                     <table class="professors-table">
-                         <thead>
-                             <tr>
-                                 <th>S.No</th>
-                                 <th>Name</th>
-                                 <th>Initials</th>
-                                 <th>Department</th>
-                                 <th>Phone</th>
-                                 <th>Email</th>
-                             </tr>
-                         </thead>
-                         <tbody>
-                 `;
-                 
-                 dateData.AM.forEach((prof, index) => {
-                     printHTML += `
-                         <tr>
-                             <td>${index + 1}</td>
-                             <td>${prof.name}</td>
-                             <td>${prof.initials}</td>
-                             <td>${prof.department}</td>
-                             <td>${prof.phone}</td>
-                             <td>${prof.email}</td>
-                         </tr>
-                     `;
-                 });
-                 
-                 printHTML += `
-                         </tbody>
-                     </table>
-                 `;
-             } else {
-                 printHTML += `<div class="no-allocation">No professors allocated for AM session</div>`;
-             }
-             
-             printHTML += `</div>`;
-             
-             // PM Session
-             printHTML += `
-                 <div class="session-section">
-                     <div class="session-header pm">
-                         Afternoon Session (PM) - ${dateData.PM.length} professors
-                     </div>
-             `;
-             
-             if (dateData.PM.length > 0) {
-                 printHTML += `
-                     <table class="professors-table">
-                         <thead>
-                             <tr>
-                                 <th>S.No</th>
-                                 <th>Name</th>
-                                 <th>Initials</th>
-                                 <th>Department</th>
-                                 <th>Phone</th>
-                                 <th>Email</th>
-                             </tr>
-                         </thead>
-                         <tbody>
-                 `;
-                 
-                 dateData.PM.forEach((prof, index) => {
-                     printHTML += `
-                         <tr>
-                             <td>${index + 1}</td>
-                             <td>${prof.name}</td>
-                             <td>${prof.initials}</td>
-                             <td>${prof.department}</td>
-                             <td>${prof.phone}</td>
-                             <td>${prof.email}</td>
-                         </tr>
-                     `;
-                 });
-                 
-                 printHTML += `
-                         </tbody>
-                     </table>
-                 `;
-             } else {
-                 printHTML += `<div class="no-allocation">No professors allocated for PM session</div>`;
-             }
-             
-             printHTML += `</div></div>`;
-         });
+        // Add date-wise allocations in required structure
+        Object.keys(allocationsByDate).sort().forEach(dateStr => {
+            const dateData = allocationsByDate[dateStr];
+            
+            printHTML += `
+                <div class="date-section">
+                    <div class="date-header">${dateData.dateDisplay}</div>
+                    
+                    <div class="session-section">
+                        <div class="session-header am">Morning Session (AM)</div>
+                        <h3 style="text-align:center; margin:8px 0;">List of Deputy Superintendents</h3>
+                        ${dateData.AM.professors.length > 0 ? `
+                        <table class="professors-table">
+                            <thead>
+                                <tr>
+                                    <th>Sl No</th>
+                                    <th>Staff Name</th>
+                                    <th>Initials</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Dept</th>
+                                    <th>Contact No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dateData.AM.professors.map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${p.name}</td>
+                                        <td>${p.initials}</td>
+                                        <td>${p.designation || ''}</td>
+                                        <td>${p.email}</td>
+                                        <td>${p.department}</td>
+                                        <td>${p.phone}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>` : '<div class="no-allocation">No Deputy Superintendents allocated for AM session</div>'}
+                        
+                        <h3 style="text-align:center; margin:12px 0 8px;">List of Invigilators/Relievers</h3>
+                        ${dateData.AM.nonProfessors.length > 0 ? `
+                        <table class="professors-table">
+                            <thead>
+                                <tr>
+                                    <th>Sl No</th>
+                                    <th>Staff Name</th>
+                                    <th>Initials</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Dept</th>
+                                    <th>Contact No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dateData.AM.nonProfessors.map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${p.name}</td>
+                                        <td>${p.initials}</td>
+                                        <td>${p.designation || ''}</td>
+                                        <td>${p.email}</td>
+                                        <td>${p.department}</td>
+                                        <td>${p.phone}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>` : '<div class="no-allocation">No Invigilators/Relievers allocated for AM session</div>'}
+                    </div>
+                    
+                    <div class="session-section">
+                        <div class="session-header pm">Afternoon Session (PM)</div>
+                        <h3 style="text-align:center; margin:8px 0;">List of Deputy Superintendents</h3>
+                        ${dateData.PM.professors.length > 0 ? `
+                        <table class="professors-table">
+                            <thead>
+                                <tr>
+                                    <th>Sl No</th>
+                                    <th>Staff Name</th>
+                                    <th>Initials</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Dept</th>
+                                    <th>Contact No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dateData.PM.professors.map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${p.name}</td>
+                                        <td>${p.initials}</td>
+                                        <td>${p.designation || ''}</td>
+                                        <td>${p.email}</td>
+                                        <td>${p.department}</td>
+                                        <td>${p.phone}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>` : '<div class="no-allocation">No Deputy Superintendents allocated for PM session</div>'}
+                        
+                        <h3 style="text-align:center; margin:12px 0 8px;">List of Invigilators/Relievers</h3>
+                        ${dateData.PM.nonProfessors.length > 0 ? `
+                        <table class="professors-table">
+                            <thead>
+                                <tr>
+                                    <th>Sl No</th>
+                                    <th>Staff Name</th>
+                                    <th>Initials</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Dept</th>
+                                    <th>Contact No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dateData.PM.nonProfessors.map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${p.name}</td>
+                                        <td>${p.initials}</td>
+                                        <td>${p.designation || ''}</td>
+                                        <td>${p.email}</td>
+                                        <td>${p.department}</td>
+                                        <td>${p.phone}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>` : '<div class="no-allocation">No Invigilators/Relievers allocated for PM session</div>'}
+                    </div>
+                </div>
+            `;
+        });
          
          // Add summary
          const summary = generateAllocationSummary();
@@ -2188,6 +2228,43 @@ $(document).ready(function() {
          
          console.log('Print report generated successfully');
      }
+        // --- Enable print only when both professor and non-professor allocations exist ---
+        function updatePrintButtonState() {
+            const hasProfAlloc = $('.form-check-input[data-faculty-type="professor"]:checked').length > 0;
+            const hasNonProfAlloc = $('.form-check-input[data-faculty-type="non-professor"]:checked').length > 0;
+            const enable = hasProfAlloc && hasNonProfAlloc;
+            $('#printAllocationBtn').prop('disabled', !enable);
+        }
+
+        // Disable print initially
+        $('#printAllocationBtn').prop('disabled', true);
+
+        // Re-evaluate when any checkbox allocation changes
+        $(document).on('change', '.form-check-input', function() {
+            updatePrintButtonState();
+        });
+
+        // Also re-evaluate after auto-allocation actions complete
+        $('#autoAllocateBtn').on('click', function() {
+            // Allocation runs synchronously; re-check right after
+            setTimeout(updatePrintButtonState, 0);
+        });
+        $('#autoAllocateNonProfBtn').on('click', function() {
+            setTimeout(updatePrintButtonState, 0);
+        });
+
+        // After clearing allocations, ensure it's disabled again
+        $('#clearAllocationBtn').on('click', function() {
+            setTimeout(updatePrintButtonState, 0);
+        });
+
+        // Safety: when session config is (re)created and table rebuilt
+        $(document).on('click', '#proceedToAllocationBtn', function() {
+            setTimeout(updatePrintButtonState, 0);
+        });
+
+        // Initial check
+        updatePrintButtonState();
     });
 </script>
 {% endblock %}
