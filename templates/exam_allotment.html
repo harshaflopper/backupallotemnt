@@ -306,6 +306,9 @@
                      <button type="button" id="printAllocationBtn" class="btn btn-outline-light ms-2">
                          <i class="bi bi-printer me-1"></i>Print Report
                      </button>
+                     <button type="button" id="printByDeptBtn" class="btn btn-outline-light ms-2">
+                         <i class="bi bi-printer-fill me-1"></i>Print Dept-wise
+                     </button>
                      <button type="button" id="exportAllocationBtn" class="btn btn-outline-light ms-2">
                          <i class="bi bi-download me-1"></i>Export
                      </button>
@@ -477,11 +480,31 @@ $(document).ready(function() {
             return;
         }
 
-        // Build header rows from the existing header
+        // Build header rows, expanding HTML colspans so columns align in Excel
+        const FIXED_COLS = 7; // Name..Total Allotments
         const headerRow1 = [];
-        $('#tableHeader th').each(function(){ headerRow1.push($(this).text().trim()); });
+        // First 7 fixed headers as-is
+        $('#tableHeader th').each(function(index){
+            if (index < FIXED_COLS) headerRow1.push($(this).text().trim());
+        });
+        // For each date header (with colspan=2 in HTML), duplicate the label twice (AM, PM)
+        $('#tableHeader th').each(function(index){
+            if (index >= FIXED_COLS) {
+                const label = $(this).text().trim();
+                headerRow1.push(label);
+                headerRow1.push(label);
+            }
+        });
+
         const headerRow2 = [];
-        $('#sessionHeader th').each(function(){ headerRow2.push($(this).text().trim()); });
+        // First row of sessions needs 7 blanks to align under fixed columns
+        for (let i = 0; i < FIXED_COLS; i++) headerRow2.push('');
+        // Then AM/PM for each date
+        $('#sessionHeader th').each(function(index){
+            if (index === 0) return; // skip the first th that is colspan=7 placeholder
+            const txt = $(this).text().trim();
+            headerRow2.push(txt);
+        });
 
         const wb = XLSX.utils.book_new();
 
@@ -538,6 +561,111 @@ $(document).ready(function() {
         const end = $('#examEndDate').val() || '';
         const filename = `ExamAllotment_ByDepartment_${start}_${end}.xlsx`.replace(/[:\\/\\\\]/g, '-');
         XLSX.writeFile(wb, filename);
+    });
+
+    // Print by Department - opens print dialog with one section per department
+    $('#printByDeptBtn').on('click', function() {
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before printing.');
+            return;
+        }
+
+        const departments = new Set();
+        $('#professorsTableBody tr').each(function() {
+            const $cells = $(this).children('td');
+            if ($cells.length === 0) return;
+            if ($(this).hasClass('faculty-separator')) return;
+            const dept = ($cells.eq(3).text() || '').trim();
+            if (dept) departments.add(dept);
+        });
+
+        if (departments.size === 0) {
+            alert('No department data found to print.');
+            return;
+        }
+
+        // Build printable HTML
+        const start = $('#examStartDate').val() || '';
+        const end = $('#examEndDate').val() || '';
+        // Build aligned headers (same logic as export fix)
+        const FIXED_COLS = 7; // Name..Total Allotments
+        const headerRow1 = [];
+        $('#tableHeader th').each(function(index){
+            if (index < FIXED_COLS) headerRow1.push($(this).text().trim());
+        });
+        $('#tableHeader th').each(function(index){
+            if (index >= FIXED_COLS) {
+                const label = $(this).text().trim();
+                headerRow1.push(label);
+                headerRow1.push(label);
+            }
+        });
+        const headerRow2 = [];
+        for (let i = 0; i < FIXED_COLS; i++) headerRow2.push('');
+        $('#sessionHeader th').each(function(index){
+            if (index === 0) return; // skip the first colspan placeholder
+            headerRow2.push($(this).text().trim());
+        });
+
+        let html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+            <title>Exam Allotment Department-wise</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                @media print {
+                    .page-break { page-break-after: always; }
+                    th, td { font-size: 11px; }
+                }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ccc; padding: 6px; }
+                thead th { background: #f0f3f5; }
+            </style>
+        </head><body class="p-3">`;
+
+        departments.forEach(function(dept, idx){
+            html += `<div class="mb-4 ${idx < departments.size - 1 ? 'page-break' : ''}">`;
+            html += `<h4 class="mb-2">${dept} &mdash; Exam Allotment (${start} to ${end})</h4>`;
+            html += `<table class="table table-sm"><thead>`;
+            html += `<tr>${headerRow1.map(t=>`<th>${t}</th>`).join('')}</tr>`;
+            html += `<tr>${headerRow2.map(t=>`<th>${t}</th>`).join('')}</tr>`;
+            html += `</thead><tbody>`;
+
+            $('#professorsTableBody tr').each(function(){
+                const $row = $(this);
+                const $cells = $row.children('td');
+                if ($cells.length === 0) return;
+                if ($row.hasClass('faculty-separator')) return;
+                const rowDept = ($cells.eq(3).text() || '').trim();
+                if (rowDept !== dept) return;
+
+                let rowHtml = '<tr>';
+                // First 7 cells as text
+                for (let i = 0; i < Math.min(7, $cells.length); i++) {
+                    rowHtml += `<td>${($cells.eq(i).text() || '').trim()}</td>`;
+                }
+                // Remaining cells: show ✓ if checked
+                for (let i = 7; i < $cells.length; i++) {
+                    const $cb = $cells.eq(i).find('input[type="checkbox"]');
+                    rowHtml += `<td>${$cb.length && $cb.prop('checked') ? '✓' : ''}</td>`;
+                }
+                rowHtml += '</tr>';
+                html += rowHtml;
+            });
+
+            html += `</tbody></table></div>`;
+        });
+
+        html += `</body></html>`;
+
+        const w = window.open('', '_blank');
+        if (!w) {
+            alert('Popup blocked. Please allow popups to print.');
+            return;
+        }
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+        // Give the new window a moment to render before printing
+        setTimeout(function(){ w.print(); }, 300);
     });
 
     // Progress bar update function
