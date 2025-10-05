@@ -306,6 +306,12 @@
                      <button type="button" id="printAllocationBtn" class="btn btn-outline-light ms-2">
                          <i class="bi bi-printer me-1"></i>Print Report
                      </button>
+                     <button type="button" id="exportAllocationBtn" class="btn btn-outline-light ms-2">
+                         <i class="bi bi-download me-1"></i>Export
+                     </button>
+                     <button type="button" id="exportByDeptBtn" class="btn btn-outline-light ms-2">
+                         <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export by Department
+                     </button>
                  </div>
              </div>
                 
@@ -364,6 +370,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 $(document).ready(function() {
     console.log('Exam Allotment page loaded');
@@ -414,6 +421,123 @@ $(document).ready(function() {
             updateProgressStep(3, true); // Mark step 3 as completed
             updateProgressStep(4); // Activate step 4
         }
+    });
+
+    // Export button handler - exports the current professors table to Excel
+    $('#exportAllocationBtn').on('click', function() {
+        // Ensure table is available
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before exporting.');
+            return;
+        }
+        const tableEl = document.getElementById('professorsTable');
+        if (!tableEl) {
+            alert('Table not found.');
+            return;
+        }
+
+        try {
+            const wb = XLSX.utils.table_to_book(tableEl, { sheet: 'Allotment' });
+            const start = $('#examStartDate').val() || '';
+            const end = $('#examEndDate').val() || '';
+            const filename = `ExamAllotment_${start}_${end}.xlsx`.replace(/[:\\/\\\\]/g, '-');
+            XLSX.writeFile(wb, filename);
+        } catch (e) {
+            console.error('Export failed:', e);
+            alert('Export failed. Please try again.');
+        }
+    });
+
+    // Export by Department - creates one sheet per department from the current table
+    $('#exportByDeptBtn').on('click', function() {
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before exporting.');
+            return;
+        }
+
+        const $table = $('#professorsTable');
+        if ($table.length === 0) {
+            alert('Table not found.');
+            return;
+        }
+
+        // Collect department names from the table body (4th index cell -> Department)
+        const departmentsSet = new Set();
+        $('#professorsTableBody tr').each(function() {
+            const $cells = $(this).children('td');
+            if ($cells.length === 0) return; // skip non-data rows
+            // Skip separator/total rows
+            if ($(this).hasClass('faculty-separator')) return;
+            const deptText = ($cells.eq(3).text() || '').trim();
+            if (deptText) departmentsSet.add(deptText);
+        });
+
+        if (departmentsSet.size === 0) {
+            alert('No department data found to export.');
+            return;
+        }
+
+        // Build header rows from the existing header
+        const headerRow1 = [];
+        $('#tableHeader th').each(function(){ headerRow1.push($(this).text().trim()); });
+        const headerRow2 = [];
+        $('#sessionHeader th').each(function(){ headerRow2.push($(this).text().trim()); });
+
+        const wb = XLSX.utils.book_new();
+
+        const sanitizeSheetName = (name) => {
+            // Remove invalid characters and trim to 31 chars per Excel limits
+            return name.replace(/[\\\/*?\[\]:]/g, ' ').substring(0, 31) || 'Sheet';
+        };
+
+        departmentsSet.forEach(function(dept){
+            const sheetData = [];
+            if (headerRow1.length) sheetData.push(headerRow1);
+            if (headerRow2.length) sheetData.push(headerRow2);
+
+            // Filter rows for this department
+            $('#professorsTableBody tr').each(function() {
+                const $row = $(this);
+                const $cells = $row.children('td');
+                if ($cells.length === 0) return;
+                if ($row.hasClass('faculty-separator')) return;
+
+                const rowDept = ($cells.eq(3).text() || '').trim();
+                if (rowDept !== dept) return;
+
+                const rowData = [];
+                // Fixed columns: Name..Total Allotments (first 7 cells)
+                for (let i = 0; i < Math.min(7, $cells.length); i++) {
+                    rowData.push(($cells.eq(i).text() || '').trim());
+                }
+                // Remaining cells: convert checkboxes to 1/blank
+                for (let i = 7; i < $cells.length; i++) {
+                    const $cell = $cells.eq(i);
+                    const $checkbox = $cell.find('input[type="checkbox"]');
+                    if ($checkbox.length) {
+                        rowData.push($checkbox.prop('checked') ? 1 : '');
+                    } else {
+                        rowData.push(($cell.text() || '').trim());
+                    }
+                }
+                sheetData.push(rowData);
+            });
+
+            if (sheetData.length > (headerRow1.length ? 1 : 0)) {
+                const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(dept));
+            }
+        });
+
+        if (!wb.SheetNames || wb.SheetNames.length === 0) {
+            alert('Nothing to export.');
+            return;
+        }
+
+        const start = $('#examStartDate').val() || '';
+        const end = $('#examEndDate').val() || '';
+        const filename = `ExamAllotment_ByDepartment_${start}_${end}.xlsx`.replace(/[:\\/\\\\]/g, '-');
+        XLSX.writeFile(wb, filename);
     });
 
     // Progress bar update function
