@@ -612,7 +612,9 @@ $(document).ready(function() {
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <style>
                 @media print {
-                    .page-break { page-break-after: always; }
+                    .department-section { page-break-after: always; }
+                    .department-section:last-of-type { page-break-after: auto; }
+                    table { page-break-inside: avoid; }
                     th, td { font-size: 11px; }
                 }
                 table { width: 100%; border-collapse: collapse; }
@@ -621,8 +623,8 @@ $(document).ready(function() {
             </style>
         </head><body class="p-3">`;
 
-        departments.forEach(function(dept, idx){
-            html += `<div class="mb-4 ${idx < departments.size - 1 ? 'page-break' : ''}">`;
+        departments.forEach(function(dept){
+            html += `<section class="department-section mb-4">`;
             html += `<h4 class="mb-2">${dept} &mdash; Exam Allotment (${start} to ${end})</h4>`;
             html += `<table class="table table-sm"><thead>`;
             html += `<tr>${headerRow1.map(t=>`<th>${t}</th>`).join('')}</tr>`;
@@ -645,13 +647,20 @@ $(document).ready(function() {
                 // Remaining cells: show ✓ if checked
                 for (let i = 7; i < $cells.length; i++) {
                     const $cb = $cells.eq(i).find('input[type="checkbox"]');
-                    rowHtml += `<td>${$cb.length && $cb.prop('checked') ? '✓' : ''}</td>`;
+                    if ($cb.length && $cb.prop('checked')) {
+                        const dateLabel = (headerRow1[i] || '').trim();
+                        const sessionLabel = (headerRow2[i] || '').trim();
+                        const displayText = `${dateLabel}${sessionLabel ? ' ' + sessionLabel : ''}`.trim();
+                        rowHtml += `<td>${displayText}</td>`;
+                    } else {
+                        rowHtml += '<td></td>';
+                    }
                 }
                 rowHtml += '</tr>';
                 html += rowHtml;
             });
 
-            html += `</tbody></table></div>`;
+            html += `</tbody></table></section>`;
         });
 
         html += `</body></html>`;
