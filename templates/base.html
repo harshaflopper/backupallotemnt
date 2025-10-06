@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Faculty Management System{% endblock %}</title>
+    <title>{% block title %}Siddaganga Institute of Technology{% endblock %}</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,8 +25,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #06457F 0%, #0474C4 100%); box-shadow: 0 4px 6px -1px rgba(6, 69, 127, 0.2), 0 2px 4px -1px rgba(6, 69, 127, 0.1);">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}" style="transition: all 0.3s ease;">
-                <i class="bi bi-people-fill me-2" style="font-size: 1.5rem; color: #A8C4EC;"></i>
-                <span class="fw-bold" style="font-size: 1.25rem; letter-spacing: 0.025em;">Faculty Management System</span>
+                <img src="{{ url_for('static', filename='img/sit-logo.png') }}" alt="Siddaganga Institute of Technology Logo" 
+                     style="height: 64px; width: 64px; object-fit: contain; margin-right: 14px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.35)) brightness(1.1) contrast(1.15) saturate(1.2);">
+                <span class="fw-bold" style="font-size: 1.6rem; letter-spacing: 0.01em; line-height: 1; color: #ffffff;">Siddaganga Institute of Technology</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -63,19 +64,6 @@
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="footer mt-5 py-4" style="background: linear-gradient(135deg, #262B40 0%, #2C444C 100%); color: rgba(255, 255, 255, 0.9); box-shadow: 0 -4px 6px -1px rgba(38, 43, 64, 0.2);">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-md-start gap-3">
-                    <img src="{{ url_for('static', filename='img/sit-logo.png') }}" alt="SIT Logo" style="height: 48px; width: 48px; object-fit: contain; filter: brightness(1.2);">
-                    <span class="mt-2 mt-md-0" style="font-weight: 500; letter-spacing: 0.025em;">&copy; 2025 Faculty Management System &mdash; Software by SIT Electronics and Telecommunication Students</span>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <span style="color: rgba(255, 255, 255, 0.8); font-weight: 500; padding: 0.5rem 1rem; background: rgba(168, 196, 236, 0.2); border-radius: 20px; backdrop-filter: blur(10px);">v1.0.0</span>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
