@@ -261,6 +261,25 @@ body {
     vertical-align: middle;
 }
 
+/* Inactive faculty styling */
+.inactive-faculty {
+    opacity: 0.5;
+    background-color: #f8f9fa !important;
+}
+
+.inactive-faculty td {
+    color: #6c757d !important;
+}
+
+.inactive-faculty:hover td {
+    background-color: rgba(108, 117, 125, 0.1) !important;
+}
+
+.inactive-faculty a {
+    color: #6c757d !important;
+    pointer-events: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .card {

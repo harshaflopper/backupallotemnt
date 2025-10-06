@@ -277,10 +277,21 @@ $(document).ready(function() {
                         if (response.ok && result.status === 'success') {
                             // Update UI only after successful API call
                             const updatedStatus = result.isActive;
+                            const row = button.closest('tr');
+                            
+                            // Update button state
                             button.data('active', updatedStatus);
-                            button.toggleClass('btn-outline-success btn-outline-danger', true);
+                            button.removeClass('btn-outline-success btn-outline-danger');
+                            button.addClass(updatedStatus ? 'btn-outline-success' : 'btn-outline-danger');
                             icon.removeClass().addClass(updatedStatus ? 'bi-unlock' : 'bi-lock');
                             button.attr('title', updatedStatus ? 'Click to lock' : 'Click to unlock');
+                            
+                            // Update row styling
+                            if (updatedStatus) {
+                                row.removeClass('inactive-faculty');
+                            } else {
+                                row.addClass('inactive-faculty');
+                            }
                         } else {
                             throw new Error(result.message || 'Failed to update status');
                         }
@@ -329,9 +340,9 @@ $(document).ready(function() {
             </tr>
         `);
         
-        // Fetch faculty data
+        // Fetch faculty data (including inactive ones)
         $.ajax({
-            url: `/api/faculty/${encodeURIComponent(window.currentDepartmentId)}`,
+            url: `/api/faculty/${encodeURIComponent(window.currentDepartmentId)}/all`,
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -351,8 +362,9 @@ $(document).ready(function() {
             let html = '';
             data.forEach(function(faculty, index) {
                 const isActive = faculty.isActive !== false; // Default to true if not set
+                const rowClass = isActive ? '' : 'inactive-faculty';
                 html += `
-                    <tr>
+                    <tr class="${rowClass}">
                         <td class="text-center align-middle">
                             <button class="btn btn-sm btn-toggle-status ${isActive ? 'btn-outline-success' : 'btn-outline-danger'}" 
                                     data-dept-id="${window.currentDepartmentId}" 

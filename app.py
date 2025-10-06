@@ -52,9 +52,15 @@ def api_departments():
 @app.route('/api/faculty/<path:department_id>')
 def api_faculty(department_id):
     faculty = get_faculty(department_id)
-    # Filter out inactive faculty
+    # Filter out inactive faculty (used by exam allotment)
     active_faculty = [f for f in faculty if f.get('isActive', True)]
     return jsonify(active_faculty)
+
+@app.route('/api/faculty/<path:department_id>/all')
+def api_faculty_all(department_id):
+    """Get all faculty including inactive ones (used by faculty management page)"""
+    faculty = get_faculty(department_id)
+    return jsonify(faculty)
 
 @app.route('/exam-allotment')
 def exam_allotment():
