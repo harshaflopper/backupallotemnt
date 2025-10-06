@@ -11,43 +11,50 @@
     }
     
     .professor-table {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
         border-radius: 10px;
         overflow: hidden;
     }
     
     .table-dark {
-        background: linear-gradient(135deg, #1f2937 0%, #2d3748 100%) !important;
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%) !important;
+        color: #f3f4f6 !important;
     }
     
     .table-secondary {
-        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5f5 100%) !important;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
+        color: #e5e7eb !important;
     }
     
     .professor-row {
-        background: #ffffff;
+        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+        color: #f3f4f6;
         transition: all 0.3s ease;
     }
     
     .professor-row:hover {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: #f9fafb !important;
     }
     
     .date-column {
-        background: linear-gradient(135deg, #eff3f9 0%, #e4ebf5 100%);
-        border-left: 3px solid #3f72af !important;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-left: 3px solid #0474C4 !important;
+        color: #f3f4f6;
     }
     
     .session-am {
-        background: linear-gradient(135deg, #f7f2e9 0%, #e9dcc5 100%);
-        border-top: 2px solid #c49a4a;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-top: 2px solid #06457F;
+        color: #e5e7eb;
     }
     
     .session-pm {
-        background: linear-gradient(135deg, #edf2fb 0%, #d7e3fc 100%);
-        border-top: 2px solid #3f72af;
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        border-top: 2px solid #0474C4;
+        color: #e5e7eb;
     }
     
     .allocation-number {
@@ -106,10 +113,10 @@
     }
     
     .table-container {
-        background: #f8f9fc;
+        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
         border-radius: 15px;
         padding: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
     
     /* Progress Steps Styles */
@@ -191,6 +198,206 @@
     .step-item.completed + .step-connector {
         background: linear-gradient(90deg, #2f855a 0%, #38a169 100%);
     }
+
+    /* Enhanced Date Highlighting Styles */
+    .date-highlight-card {
+        position: relative;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, rgba(168, 196, 236, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 16px;
+        border: 2px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(6, 69, 127, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .date-highlight-card:hover {
+        border-color: rgba(83, 121, 174, 0.3);
+        box-shadow: 0 8px 30px rgba(6, 69, 127, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .date-label {
+        font-weight: 700;
+        color: #06457F;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .date-label i {
+        color: #5379AE;
+        font-size: 1.2rem;
+    }
+
+    .date-input-highlight {
+        border: 2px solid #A8C4EC;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.95);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(6, 69, 127, 0.1);
+    }
+
+    .date-input-highlight:focus {
+        border-color: #06457F;
+        box-shadow: 0 0 0 4px rgba(83, 121, 174, 0.2);
+        background: #fff;
+        transform: scale(1.02);
+    }
+
+    .date-indicator {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .date-indicator.start-date {
+        background: linear-gradient(90deg, #0474C4 0%, #5379AE 100%);
+    }
+
+    .date-indicator.end-date {
+        background: linear-gradient(90deg, #5379AE 0%, #A8C4EC 100%);
+    }
+
+    .load-btn-enhanced {
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0474C4 0%, #5379AE 100%);
+        border: none;
+        box-shadow: 0 6px 20px rgba(4, 116, 196, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .load-btn-enhanced:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(4, 116, 196, 0.4);
+        background: linear-gradient(135deg, #06457F 0%, #0474C4 100%);
+    }
+
+    /* Enhanced Session Configuration Styles */
+    .session-config-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(6, 69, 127, 0.15);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .session-config-header {
+        background: linear-gradient(135deg, #06457F 0%, #0474C4 100%);
+        padding: 1.5rem 2rem;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .session-config-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .config-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .config-icon i {
+        font-size: 1.5rem;
+        color: #A8C4EC;
+    }
+
+    .config-badge {
+        background: rgba(168, 196, 236, 0.2);
+        color: #A8C4EC;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 196, 236, 0.3);
+    }
+
+    .session-config-body {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(168, 196, 236, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+    }
+
+    .session-container {
+        min-height: 200px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px dashed rgba(83, 121, 174, 0.3);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .session-container:hover {
+        border-color: rgba(83, 121, 174, 0.5);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .proceed-btn-enhanced {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #06457F 0%, #5379AE 100%);
+        border: none;
+        box-shadow: 0 8px 25px rgba(6, 69, 127, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .proceed-btn-enhanced:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(6, 69, 127, 0.4);
+        background: linear-gradient(135deg, #0474C4 0%, #A8C4EC 100%);
+    }
+
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.6s;
+    }
+
+    .proceed-btn-enhanced:hover .btn-shine {
+        left: 100%;
+    }
 </style>
 {% endblock %}
 
@@ -240,33 +447,56 @@
              <!-- Date Selection Section -->
             <div class="row mb-4">
                  <div class="col-md-4">
-                     <label for="examStartDate" class="form-label">Exam Start Date</label>
-                     <input type="date" class="form-control" id="examStartDate" required>
+                     <div class="date-highlight-card">
+                         <label for="examStartDate" class="form-label date-label">
+                             <i class="bi bi-calendar-event me-2"></i>Exam Start Date
+                         </label>
+                         <input type="date" class="form-control date-input-highlight" id="examStartDate" required>
+                         <div class="date-indicator start-date"></div>
+                     </div>
                  </div>
                  <div class="col-md-4">
-                     <label for="examEndDate" class="form-label">Exam End Date</label>
-                     <input type="date" class="form-control" id="examEndDate" required>
+                     <div class="date-highlight-card">
+                         <label for="examEndDate" class="form-label date-label">
+                             <i class="bi bi-calendar-check me-2"></i>Exam End Date
+                         </label>
+                         <input type="date" class="form-control date-input-highlight" id="examEndDate" required>
+                         <div class="date-indicator end-date"></div>
+                     </div>
                 </div>
                  <div class="col-md-4 d-flex align-items-end">
-                     <button type="button" id="loadProfessorsBtn" class="btn btn-primary w-100">
-                         <i class="bi bi-people me-1"></i>Load Professors & Setup Sessions
+                     <button type="button" id="loadProfessorsBtn" class="btn btn-primary w-100 load-btn-enhanced">
+                         <i class="bi bi-gear me-1"></i>Load Sessions
                     </button>
                  </div>
                  </div>
 
             <!-- Session Configuration Section -->
             <div id="sessionConfigSection" class="d-none mb-4">
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Session Configuration</h6>
+                <div class="card session-config-card">
+                    <div class="card-header session-config-header">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="config-icon">
+                                    <i class="bi bi-gear-fill"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h5 class="mb-0 text-white fw-bold">Sessions</h5>
+                                </div>
+                            </div>
+                            <div class="config-badge">
+                                <i class="bi bi-clock me-1"></i>Setup Required
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div id="sessionConfigContainer">
+                    <div class="card-body session-config-body">
+                        <div id="sessionConfigContainer" class="session-container">
                             <!-- Session configuration will be added here dynamically -->
                         </div>
-                        <div class="text-center mt-3">
-                            <button type="button" id="proceedToAllocationBtn" class="btn btn-success">
-                                <i class="bi bi-arrow-right me-1"></i>Proceed to Allocation
+                        <div class="text-center mt-4">
+                            <button type="button" id="proceedToAllocationBtn" class="btn btn-success proceed-btn-enhanced">
+                                <i class="bi bi-arrow-right-circle me-2"></i>Proceed to Allocation
+                                <span class="btn-shine"></span>
                     </button>
                         </div>
                     </div>
@@ -275,17 +505,14 @@
 
              <!-- Auto Allocation Controls -->
              <div class="control-section" id="allocationControls" style="display: none; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                 <!-- Professor Allocation Section -->
+                 <!-- Duty Allocation Section -->
                  <div class="row g-3 mb-4">
                      <div class="col-md-6">
                          <div class="card h-100 shadow-lg border-0" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border-radius: 12px; overflow: hidden;">
                              <div class="card-body text-center p-4">
-                                 <div class="mb-3">
-                                     <i class="bi bi-mortarboard" style="font-size: 3rem; color: white;"></i>
-                                 </div>
-                                 <h5 class="text-white mb-3 fw-bold">PROFESSORS</h5>
+                                 <h5 class="text-white mb-4 fw-bold">DEPUTY SUPERINTENDENTS</h5>
                                  <button type="button" id="autoAllocateBtn" class="btn btn-light btn-lg w-100 shadow" style="font-weight: 600; border-radius: 8px; padding: 12px;">
-                                     <i class="bi bi-magic me-2"></i>Auto Allocate Professors
+                                     Allocate Deputy Superintendents
                                  </button>
                              </div>
                          </div>
@@ -293,12 +520,9 @@
                      <div class="col-md-6">
                          <div class="card h-100 shadow-lg border-0" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 12px; overflow: hidden;">
                              <div class="card-body text-center p-4">
-                                 <div class="mb-3">
-                                     <i class="bi bi-people-fill" style="font-size: 3rem; color: white;"></i>
-                                 </div>
-                                 <h5 class="text-white mb-3 fw-bold">NON-PROFESSORS</h5>
+                                 <h5 class="text-white mb-4 fw-bold">INVIGILATORS</h5>
                                  <button type="button" id="autoAllocateNonProfBtn" class="btn btn-light btn-lg w-100 shadow" style="font-weight: 600; border-radius: 8px; padding: 12px;">
-                                     <i class="bi bi-people-fill me-2"></i>Auto Allocate Non-Professors
+                                     Allocate Invigilators
                                  </button>
                              </div>
                          </div>
@@ -349,14 +573,14 @@
                 <div class="table-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color: #2c3e50; font-weight: bold;">
-                            <i class="bi bi-people-fill me-2"></i>Faculty Exam Duty Assignment
+                            <i class="bi bi-clipboard-check me-2"></i>Exam Duty Assignment
                     </h5>
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-sm btn-outline-success" id="toggleProfessorsBtn">
-                                <i class="bi bi-mortarboard me-1"></i>Show Professors
+                                <i class="bi bi-shield-check me-1"></i>Show Deputy Superintendents
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-primary" id="toggleNonProfessorsBtn">
-                                <i class="bi bi-people me-1"></i>Show Non-Professors
+                                <i class="bi bi-eye-fill me-1"></i>Show Invigilators
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleTableBtn">
                                 <i class="bi bi-chevron-up me-1"></i>Collapse Table
@@ -378,7 +602,7 @@
                                  <th style="min-width: 150px;">Department</th>
                                  <th style="min-width: 120px;">Phone</th>
                                  <th style="min-width: 180px;">Email</th>
-                                 <th style="min-width: 100px; background: #edf2fb; color: #1f3c88; font-weight: bold;">Total Allotments</th>
+                                 <th style="min-width: 100px; background: #374151; color: #f3f4f6; font-weight: bold;">Total Allotments</th>
                                  <!-- Date columns will be added here dynamically -->
                              </tr>
                              <tr id="sessionHeader" class="table-secondary">
@@ -882,23 +1106,23 @@ $(document).ready(function() {
                     <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <h6 class="mb-0"><i class="bi bi-calendar-day me-2"></i>${dateStr}</h6>
                     </div>
-                    <div class="card-body" style="background: #f8f9fa;">
+                    <div class="card-body" style="background: linear-gradient(135deg, rgba(168, 196, 236, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);">
                         <div class="row g-3">
                             <!-- AM Session -->
                             <div class="col-md-6">
-                                <div class="card h-100" style="border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                                <div class="card h-100" style="border-left: 4px solid #5379AE; background: linear-gradient(135deg, rgba(168, 196, 236, 0.2) 0%, rgba(83, 121, 174, 0.1) 100%);">
                                     <div class="card-body">
-                                        <h6 class="mb-3" style="color: #92400e; font-weight: bold;">
+                                        <h6 class="mb-3" style="color: #06457F; font-weight: bold;">
                                             <i class="bi bi-sunrise me-2"></i>Morning Session (AM)
                                         </h6>
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold" style="color: #78350f;">
+                                            <label class="form-label fw-bold" style="color: #06457F;">
                                                 <i class="bi bi-door-open me-1"></i>Total Rooms
                                             </label>
                                             <input type="number" class="form-control form-control-lg session-rooms" 
                                                    data-date="${dateValue}" data-session="AM" 
                                                    min="0" value="40" required
-                                                   style="border: 2px solid #f59e0b; font-weight: bold; font-size: 1.1rem;">
+                                                   style="border: 2px solid #5379AE; font-weight: bold; font-size: 1.1rem;">
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
@@ -908,7 +1132,7 @@ $(document).ready(function() {
                                                 <input type="number" class="form-control rooms-per-prof" 
                                                        data-date="${dateValue}" data-session="AM" 
                                                        min="1" value="6" required readonly
-                                                       style="background: #fef3c7; border: 1px solid #fbbf24;">
+                                                       style="background: rgba(168, 196, 236, 0.3); border: 1px solid #A8C4EC;">
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label text-muted small">
@@ -917,17 +1141,17 @@ $(document).ready(function() {
                                                 <input type="number" class="form-control relievers" 
                                                        data-date="${dateValue}" data-session="AM" 
                                                        min="0" value="12" readonly
-                                                       style="background: #fef3c7; border: 1px solid #fbbf24;">
+                                                       style="background: rgba(168, 196, 236, 0.3); border: 1px solid #A8C4EC;">
                                             </div>
                                         </div>
-                                        <div class="mt-3 p-2 rounded" style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b;">
-                                            <small class="d-block mb-1" style="color: #78350f;">
-                                                <strong><i class="bi bi-mortarboard me-1"></i>Professors:</strong> 
-                                                <span class="badge bg-warning text-dark prof-count" data-date="${dateValue}" data-session="AM">6</span>
+                                        <div class="mt-3 p-2 rounded" style="background: rgba(83, 121, 174, 0.1); border-left: 3px solid #5379AE;">
+                                            <small class="d-block mb-1" style="color: #06457F;">
+                                                <strong><i class="bi bi-shield-check me-1"></i>Deputy Superintendents:</strong> 
+                                                <span class="badge text-white prof-count" data-date="${dateValue}" data-session="AM" style="background: #06457F;">6</span>
                                             </small>
-                                            <small class="d-block" style="color: #78350f;">
-                                                <strong><i class="bi bi-people-fill me-1"></i>Non-Professors:</strong> 
-                                                <span class="badge bg-warning text-dark non-prof-count" data-date="${dateValue}" data-session="AM">52</span>
+                                            <small class="d-block" style="color: #06457F;">
+                                                <strong><i class="bi bi-eye-fill me-1"></i>Invigilators:</strong> 
+                                                <span class="badge text-white non-prof-count" data-date="${dateValue}" data-session="AM" style="background: #5379AE;">52</span>
                                                 <span class="ms-1">(40 rooms + 12 relievers+extra)</span>
                                             </small>
                                         </div>
@@ -937,19 +1161,19 @@ $(document).ready(function() {
                             
                             <!-- PM Session -->
                             <div class="col-md-6">
-                                <div class="card h-100" style="border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <div class="card h-100" style="border-left: 4px solid #0474C4; background: linear-gradient(135deg, rgba(4, 116, 196, 0.1) 0%, rgba(6, 69, 127, 0.05) 100%);">
                                     <div class="card-body">
-                                        <h6 class="mb-3" style="color: #1e3a8a; font-weight: bold;">
+                                        <h6 class="mb-3" style="color: #06457F; font-weight: bold;">
                                             <i class="bi bi-sunset me-2"></i>Afternoon Session (PM)
                                         </h6>
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold" style="color: #1e40af;">
+                                            <label class="form-label fw-bold" style="color: #06457F;">
                                                 <i class="bi bi-door-open me-1"></i>Total Rooms
                                             </label>
                                             <input type="number" class="form-control form-control-lg session-rooms" 
                                                    data-date="${dateValue}" data-session="PM" 
                                                    min="0" value="40" required
-                                                   style="border: 2px solid #3b82f6; font-weight: bold; font-size: 1.1rem;">
+                                                   style="border: 2px solid #0474C4; font-weight: bold; font-size: 1.1rem;">
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
@@ -959,7 +1183,7 @@ $(document).ready(function() {
                                                 <input type="number" class="form-control rooms-per-prof" 
                                                        data-date="${dateValue}" data-session="PM" 
                                                        min="1" value="6" required readonly
-                                                       style="background: #dbeafe; border: 1px solid #60a5fa;">
+                                                       style="background: rgba(4, 116, 196, 0.2); border: 1px solid #0474C4;">
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label text-muted small">
@@ -968,17 +1192,17 @@ $(document).ready(function() {
                                                 <input type="number" class="form-control relievers" 
                                                        data-date="${dateValue}" data-session="PM" 
                                                        min="0" value="12" readonly
-                                                       style="background: #dbeafe; border: 1px solid #60a5fa;">
+                                                       style="background: rgba(4, 116, 196, 0.2); border: 1px solid #0474C4;">
                                             </div>
                                         </div>
-                                        <div class="mt-3 p-2 rounded" style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6;">
-                                            <small class="d-block mb-1" style="color: #1e3a8a;">
-                                                <strong><i class="bi bi-mortarboard me-1"></i>Professors:</strong> 
-                                                <span class="badge bg-primary prof-count" data-date="${dateValue}" data-session="PM">6</span>
+                                        <div class="mt-3 p-2 rounded" style="background: rgba(4, 116, 196, 0.1); border-left: 3px solid #0474C4;">
+                                            <small class="d-block mb-1" style="color: #06457F;">
+                                                <strong><i class="bi bi-shield-check me-1"></i>Deputy Superintendents:</strong> 
+                                                <span class="badge text-white prof-count" data-date="${dateValue}" data-session="PM" style="background: #06457F;">6</span>
                                             </small>
-                                            <small class="d-block" style="color: #1e3a8a;">
-                                                <strong><i class="bi bi-people-fill me-1"></i>Non-Professors:</strong> 
-                                                <span class="badge bg-primary non-prof-count" data-date="${dateValue}" data-session="PM">52</span>
+                                            <small class="d-block" style="color: #06457F;">
+                                                <strong><i class="bi bi-eye-fill me-1"></i>Invigilators:</strong> 
+                                                <span class="badge text-white non-prof-count" data-date="${dateValue}" data-session="PM" style="background: #0474C4;">52</span>
                                                 <span class="ms-1">(40 rooms + 12 relievers+extra)</span>
                                             </small>
                                         </div>
@@ -1075,7 +1299,7 @@ $(document).ready(function() {
              <th>Department</th>
              <th>Phone</th>
              <th>Email</th>
-             <th style="min-width: 100px; background: #e8f5e8; color: #2e7d32; font-weight: bold;">Total Allotments</th>
+             <th style="min-width: 100px; background: #374151; color: #f3f4f6; font-weight: bold;">Total Allotments</th>
          `);
          
          $('#sessionHeader').html('<th colspan="7"></th>');
@@ -1220,14 +1444,14 @@ $(document).ready(function() {
                 
                 // AM total cell
                 totalRow += `
-                    <td class="text-center session-am" style="background: #fff3cd; font-weight: bold;">
+                    <td class="text-center session-am" style="background: #4b5563; font-weight: bold; color: #f3f4f6;">
                         <span class="daily-total-am" data-date="${dateStr}">0</span>
                     </td>
                 `;
                 
                 // PM total cell
                 totalRow += `
-                    <td class="text-center session-pm" style="background: #d1ecf1; font-weight: bold;">
+                    <td class="text-center session-pm" style="background: #374151; font-weight: bold; color: #f3f4f6;">
                         <span class="daily-total-pm" data-date="${dateStr}">0</span>
                     </td>
                 `;

@@ -283,7 +283,7 @@ body {
 /* Table responsive container */
 .table-responsive {
     border-radius: var(--border-radius);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.226);
     backdrop-filter: blur(10px);
     box-shadow: var(--box-shadow);
     overflow: hidden;
