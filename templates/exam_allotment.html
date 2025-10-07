@@ -596,6 +596,16 @@
                                      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export by Dept
                                  </button>
                              </div>
+                             <div class="col-md-4 col-lg-2">
+                                 <button type="button" id="exportByDateBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-calendar2-range me-1"></i>Export AM Only
+                                 </button>
+                             </div>
+                             <div class="col-md-4 col-lg-2">
+                                 <button type="button" id="exportByDatePmBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-calendar2-week me-1"></i>Export PM Only
+                                 </button>
+                             </div>
                          </div>
                      </div>
                  </div>
@@ -732,6 +742,330 @@ $(document).ready(function() {
             console.error('Export failed:', e);
             alert('Export failed. Please try again.');
         }
+    });
+
+    // Export by Date helpers
+    function exportByDate(sessionFilter = 'both') {
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before exporting.');
+            return;
+        }
+
+        const $table = $('#professorsTable');
+        if ($table.length === 0) {
+            alert('Table not found.');
+            return;
+        }
+
+        const fixedCols = parseInt($('#sessionHeader th').first().attr('colspan') || '7', 10) || 7;
+        const dateSessionMap = {}; // { displayDate: { isoDate, am: [], pm: [] } }
+
+        $('#tableHeader th').each(function(index) {
+            if (index < fixedCols) {
+                return;
+            }
+
+            const dateText = $(this).text().trim();
+            const dateMatch = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+            if (!dateMatch) {
+                return;
+            }
+
+            const displayDate = dateMatch[0];
+            const isoDate = convertDisplayDateToIso(displayDate);
+            if (!isoDate) {
+                return;
+            }
+
+            if (!dateSessionMap[displayDate]) {
+                dateSessionMap[displayDate] = {
+                    isoDate,
+                    am: [],
+                    pm: []
+                };
+            }
+
+            const isPM = dateText.toLowerCase().includes('pm');
+            const sessionKey = isPM ? 'pm' : 'am';
+            dateSessionMap[displayDate][sessionKey].push({
+                headerIndex: index,
+                headerText: dateText
+            });
+        });
+
+        const dateKeys = Object.keys(dateSessionMap).sort(function(a, b) {
+            return parseDisplayDate(a) - parseDisplayDate(b);
+        });
+
+        if (dateKeys.length === 0) {
+            alert('No date data found to export.');
+            return;
+        }
+
+        const wb = XLSX.utils.book_new();
+        let sheetsCreated = 0;
+        const allowedSessions = sessionFilter === 'both' ? ['am', 'pm'] : [sessionFilter];
+
+        dateKeys.forEach(function(displayDate) {
+            const dateInfo = dateSessionMap[displayDate];
+            if (!dateInfo) {
+                return;
+            }
+
+            allowedSessions.forEach(function(sessionKey) {
+                const sessionHeaders = dateInfo[sessionKey];
+                if (!sessionHeaders || sessionHeaders.length === 0) {
+                    return;
+                }
+
+                const sessionSheet = buildSessionSheet(displayDate, dateInfo.isoDate, sessionKey, sessionHeaders);
+                if (!sessionSheet) {
+                    return;
+                }
+
+                const sheetName = sanitizeSheetName(`${displayDate.replace(/\//g, '-')}-${sessionKey.toUpperCase()}`);
+                XLSX.utils.book_append_sheet(wb, sessionSheet.worksheet, sheetName);
+                sheetsCreated += 1;
+            });
+        });
+
+        if (sheetsCreated === 0) {
+            alert('No session allocations found to export.');
+            return;
+        }
+
+        try {
+            const fileSuffix = dateKeys.length === 1
+                ? dateKeys[0].replace(/\//g, '-')
+                : `${dateKeys[0].replace(/\//g, '-')}_to_${dateKeys[dateKeys.length - 1].replace(/\//g, '-')}`;
+            const prefix = sessionFilter === 'both'
+                ? 'SIT_Tumkur_Exam_Allotment'
+                : sessionFilter === 'pm'
+                    ? 'SIT_Tumkur_PM_Allotment'
+                    : 'SIT_Tumkur_AM_Allotment';
+            XLSX.writeFile(wb, `${prefix}_${fileSuffix}.xlsx`);
+        } catch (e) {
+            console.error('Export failed:', e);
+            alert('Export failed. Please try again.');
+        }
+
+        function buildSessionSheet(displayDate, isoDate, sessionKey, sessionHeaders) {
+            const sessionLabel = sessionKey === 'am' ? 'Morning' : 'Afternoon';
+            const sessionCode = sessionKey.toUpperCase();
+            const TOTAL_COLS = 11;
+            const merges = [];
+            const rows = [];
+
+            const professorsSection = collectFacultyRows(sessionHeaders, 'professor');
+            const nonProfessorSection = collectFacultyRows(sessionHeaders, 'non-professor');
+
+            if (professorsSection.rows.length === 0 && nonProfessorSection.rows.length === 0) {
+                return null;
+            }
+
+            const collegeRow = padRow(['SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR'], TOTAL_COLS);
+            rows.push(collegeRow);
+            merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: TOTAL_COLS - 1 } });
+
+            rows.push(padRow([''], TOTAL_COLS));
+
+            const rooms = parseInt($(`.session-rooms[data-date="${isoDate}"][data-session="${sessionCode}"]`).val(), 10);
+            const relievers = parseInt($(`.relievers[data-date="${isoDate}"][data-session="${sessionCode}"]`).val(), 10);
+            const totalInvigilators = nonProfessorSection.count || 0;
+
+            const dateInfoRow = padRow([
+                'Date of Exam :',
+                `${formatDisplayDate(displayDate)} ${sessionCode}`,
+                '',
+                'Number of Rooms :',
+                Number.isFinite(rooms) ? rooms : '',
+                '',
+                'Reliever :',
+                Number.isFinite(relievers) ? relievers : '',
+                '',
+                'Total Invigilators :',
+                totalInvigilators
+            ], TOTAL_COLS);
+            rows.push(dateInfoRow);
+
+            const sessionTitleRow = padRow([`${sessionLabel.toUpperCase()} SESSION`], TOTAL_COLS);
+            rows.push(sessionTitleRow);
+            merges.push({ s: { r: rows.length - 1, c: 0 }, e: { r: rows.length - 1, c: TOTAL_COLS - 1 } });
+
+            rows.push(padRow([''], TOTAL_COLS));
+
+            const professorHeaderRow = padRow(['List of Deputy Superintendents'], TOTAL_COLS);
+            rows.push(professorHeaderRow);
+            merges.push({ s: { r: rows.length - 1, c: 0 }, e: { r: rows.length - 1, c: TOTAL_COLS - 1 } });
+
+            rows.push(padRow(['Sl No', 'Name', 'Designation', 'Initials', 'Contact No', 'Dept'], TOTAL_COLS));
+
+            professorsSection.rows.forEach(function(row) {
+                rows.push(padRow(row, TOTAL_COLS));
+            });
+
+            rows.push(padRow([''], TOTAL_COLS));
+
+            const invigilatorHeaderRow = padRow(['List of Invigilators'], TOTAL_COLS);
+            rows.push(invigilatorHeaderRow);
+            merges.push({ s: { r: rows.length - 1, c: 0 }, e: { r: rows.length - 1, c: TOTAL_COLS - 1 } });
+
+            rows.push(padRow(['Sl No', 'Name', 'Designation', 'Initials', 'Contact No', 'Dept', 'Alloted Room / Relieving ( R )'], TOTAL_COLS));
+
+            nonProfessorSection.rows.forEach(function(row) {
+                rows.push(padRow(row, TOTAL_COLS));
+            });
+
+            rows.push(padRow([''], TOTAL_COLS));
+
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
+            worksheet['!merges'] = merges;
+            worksheet['!cols'] = [
+                { wch: 6 },
+                { wch: 32 },
+                { wch: 24 },
+                { wch: 14 },
+                { wch: 18 },
+                { wch: 20 },
+                { wch: 30 },
+                { wch: 12 },
+                { wch: 12 },
+                { wch: 16 },
+                { wch: 14 }
+            ];
+
+            return {
+                worksheet,
+                totalInvigilators: totalInvigilators
+            };
+        }
+
+        function collectFacultyRows(sessionHeaders, targetType) {
+            const rows = [];
+            let serial = 1;
+
+            $('#professorsTableBody tr').each(function() {
+                const $row = $(this);
+                const facultyType = $row.data('facultyType');
+                if (!facultyType) {
+                    return;
+                }
+
+                const isProfessorRow = facultyType === 'professor';
+                if ((targetType === 'professor' && !isProfessorRow) || (targetType === 'non-professor' && isProfessorRow)) {
+                    return;
+                }
+
+                const $cells = $row.children('td');
+                if ($cells.length === 0) {
+                    return;
+                }
+
+                let hasAllocation = false;
+
+                sessionHeaders.forEach(function(session) {
+                    const $sessionCell = $cells.eq(session.headerIndex);
+                    if ($sessionCell.find('input[type="checkbox"]:checked').length > 0 || $sessionCell.hasClass('allocated')) {
+                        hasAllocation = true;
+                    }
+                });
+
+                if (!hasAllocation) {
+                    return;
+                }
+
+                const baseRow = [
+                    serial++,
+                    $cells.eq(0).text().trim(),
+                    $cells.eq(2).text().trim(),
+                    $cells.eq(1).text().trim(),
+                    $cells.eq(4).text().trim(),
+                    $cells.eq(3).text().trim()
+                ];
+
+                if (targetType === 'non-professor') {
+                    baseRow.push('');
+                }
+
+                rows.push(baseRow);
+            });
+
+            if (rows.length === 0) {
+                const placeholderLabel = 'No allocations found for this session.';
+                const placeholder = [placeholderLabel];
+                const targetLength = targetType === 'non-professor' ? 7 : 6;
+                while (placeholder.length < targetLength) {
+                    placeholder.push('');
+                }
+                rows.push(placeholder);
+            }
+
+            return {
+                rows,
+                count: rows[0][0] === 'No allocations found for this session.' ? 0 : rows.length
+            };
+        }
+
+        function padRow(row, targetLength) {
+            const padded = row.slice();
+            while (padded.length < targetLength) {
+                padded.push('');
+            }
+            return padded;
+        }
+
+        function convertDisplayDateToIso(displayDate) {
+            const parts = displayDate.split('/');
+            if (parts.length !== 3) {
+                return null;
+            }
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            const jsDate = new Date(year, month, day);
+            if (Number.isNaN(jsDate.getTime())) {
+                return null;
+            }
+            return jsDate.toISOString().split('T')[0];
+        }
+
+        function parseDisplayDate(displayDate) {
+            const iso = convertDisplayDateToIso(displayDate);
+            if (!iso) {
+                return Number.POSITIVE_INFINITY;
+            }
+            return new Date(iso).getTime();
+        }
+
+        function formatDisplayDate(displayDate) {
+            const iso = convertDisplayDateToIso(displayDate);
+            if (!iso) {
+                return displayDate;
+            }
+            const jsDate = new Date(iso);
+            return jsDate.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function sanitizeSheetName(name) {
+            return name
+                .replace(/[\\\/*?\[\]]/g, ' ')
+                .substring(0, 31)
+                .trim() || 'Sheet';
+        }
+    }
+
+    // Export by Date - generates SIT Tumkur formatted sheets grouped by date & session
+    $('#exportByDateBtn').on('click', function() {
+        exportByDate('both');
+    });
+
+    // Export PM sessions only
+    $('#exportByDatePmBtn').on('click', function() {
+        exportByDate('pm');
     });
 
     // Export by Department - creates one sheet per department from the current table
