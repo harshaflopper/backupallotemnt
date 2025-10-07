@@ -2217,16 +2217,9 @@ $(document).ready(function() {
          
          const consecutiveStatus = consecutiveDayViolations === 0 ? '✅ No consecutive days' : `⚠️ ${consecutiveDayViolations} consecutive day assignments`;
          
-         const distributionMsg = `Allocation completed!\n\n` +
-             `📊 Distribution Summary:\n` +
-             `• Total allocations: ${totalAllocations}\n` +
-             `• Professors involved: ${window.allProfessors.length}\n` +
-             `• Average per professor: ${avgAllotments}\n` +
-             `• Range: ${minAllotments} - ${maxAllotments} allotments (difference: ${range})\n` +
-             `• Fairness: ${fairnessStatus}\n` +
-             `• Consecutive days: ${consecutiveStatus}\n\n` +
-             `📈 Distribution Breakdown:\n${distributionDetails}\n` +
-             `💡 Check the "Total Allotments" column for detailed view`;
+         const distributionMsg = `Allocation completed!\n\n` ;
+     
+        
          
          alert(distributionMsg);
          
@@ -2818,14 +2811,8 @@ $(document).ready(function() {
          
          const nonProfFairnessStatus = nonProfRange <= 1 ? '✅ EXCELLENT' : nonProfRange === 2 ? '⚠️ ACCEPTABLE' : '❌ UNFAIR - NEEDS FIXING';
          
-         const nonProfDistributionMsg = `Non-Professor Allocation completed!\n\n` +
-             `📊 Distribution Summary:\n` +
-             `• Total allocations: ${totalNonProfAllocations}\n` +
-             `• Non-professors involved: ${window.allNonProfessors.length}\n` +
-             `• Average per non-professor: ${nonProfAvgAllotments}\n` +
-             `• Range: ${nonProfMinAllotments} - ${nonProfMaxAllotments} allotments (difference: ${nonProfRange})\n` +
-             `• Fairness: ${nonProfFairnessStatus}\n\n` +
-             `💡 Check the "Total Allotments" column for detailed view`;
+         const nonProfDistributionMsg = `Invigilators Allocation completed!\n\n` ;
+             
          
          alert(nonProfDistributionMsg);
          
