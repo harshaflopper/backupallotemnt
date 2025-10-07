@@ -572,7 +572,7 @@
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="resetRotationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                 <button type="button" id="resetRotationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;" disabled>
                                      <i class="bi bi-arrow-clockwise me-1"></i>Reset Rotation
                                  </button>
                              </div>
@@ -757,40 +757,61 @@ $(document).ready(function() {
             return;
         }
 
-        const fixedCols = parseInt($('#sessionHeader th').first().attr('colspan') || '7', 10) || 7;
+        const fixedCols = 7; // Name..Total Allotments
         const dateSessionMap = {}; // { displayDate: { isoDate, am: [], pm: [] } }
 
-        $('#tableHeader th').each(function(index) {
-            if (index < fixedCols) {
-                return;
-            }
+        // Build lookup for each actual column index -> date info
+        const headerMeta = [];
+        let headerPointer = 0;
+        $('#tableHeader th').each(function() {
+            const span = parseInt($(this).attr('colspan') || '1', 10) || 1;
+            const text = $(this).text().trim();
+            const match = text.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+            const displayDate = match ? match[0] : null;
+            const isoDate = displayDate ? convertDisplayDateToIso(displayDate) : null;
 
-            const dateText = $(this).text().trim();
-            const dateMatch = dateText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-            if (!dateMatch) {
-                return;
-            }
-
-            const displayDate = dateMatch[0];
-            const isoDate = convertDisplayDateToIso(displayDate);
-            if (!isoDate) {
-                return;
-            }
-
-            if (!dateSessionMap[displayDate]) {
-                dateSessionMap[displayDate] = {
-                    isoDate,
-                    am: [],
-                    pm: []
+            for (let i = 0; i < span; i++) {
+                headerMeta[headerPointer++] = {
+                    displayDate,
+                    isoDate
                 };
             }
+        });
 
-            const isPM = dateText.toLowerCase().includes('pm');
-            const sessionKey = isPM ? 'pm' : 'am';
-            dateSessionMap[displayDate][sessionKey].push({
-                headerIndex: index,
-                headerText: dateText
-            });
+        let columnPointer = 0;
+        $('#sessionHeader th').each(function() {
+            const span = parseInt($(this).attr('colspan') || '1', 10) || 1;
+            const sessionLabel = ($(this).text() || '').trim();
+
+            for (let i = 0; i < span; i++) {
+                if (columnPointer < fixedCols) {
+                    columnPointer += 1;
+                    continue;
+                }
+
+                const headerIndex = columnPointer;
+                const meta = headerMeta[headerIndex] || {};
+                const displayDate = meta.displayDate;
+                const isoDate = meta.isoDate;
+
+                if (displayDate && isoDate) {
+                    if (!dateSessionMap[displayDate]) {
+                        dateSessionMap[displayDate] = {
+                            isoDate,
+                            am: [],
+                            pm: []
+                        };
+                    }
+
+                    const sessionKey = sessionLabel.toLowerCase().includes('pm') ? 'pm' : 'am';
+                    dateSessionMap[displayDate][sessionKey].push({
+                        headerIndex,
+                        headerText: `${displayDate} ${sessionLabel}`.trim()
+                    });
+                }
+
+                columnPointer += 1;
+            }
         });
 
         const dateKeys = Object.keys(dateSessionMap).sort(function(a, b) {
