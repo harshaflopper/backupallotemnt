@@ -11,64 +11,96 @@
     }
     
     .professor-table {
-        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        background: #1a202c;
         border-radius: 10px;
         overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        border-collapse: separate;
+        border-spacing: 0;
     }
     
     .table-dark {
-        background: linear-gradient(135deg, #1f2937 0%, #374151 100%) !important;
-        color: #f3f4f6 !important;
+        background: #1a202c !important;
+        color: #e2e8f0 !important;
+        border-color: #2d3748;
     }
     
     .table-secondary {
-        background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
-        color: #e5e7eb !important;
+        background: #2d3748 !important;
+        color: #e2e8f0 !important;
+        border-color: #2d3748;
     }
     
     .professor-row {
-        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
-        color: #f3f4f6;
-        transition: all 0.3s ease;
+        background: #1a202c;
+        color: #e2e8f0;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #2d3748;
+        position: relative;
     }
     
     .professor-row:hover {
-        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        color: #f9fafb !important;
+        background: #2d3748 !important;
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        color: #ffffff !important;
+        border-left: 3px solid #4299e1;
+        z-index: 2;
     }
     
     .date-column {
-        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-        border-left: 3px solid #0474C4 !important;
-        color: #f3f4f6;
+        background: #1a202c;
+        border-left: 3px solid #4299e1 !important;
+        color: #e2e8f0;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+        border-bottom: 1px solid #2d3748;
+    }
+    
+    .date-column::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 1px;
+        background: rgba(255, 255, 255, 0.1);
     }
     
     .session-am {
-        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-        border-top: 2px solid #06457F;
-        color: #e5e7eb;
+        background: #2d3748;
+        border-top: 2px solid #3182ce;
+        color: #e2e8f0;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.5px;
     }
     
     .session-pm {
-        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-        border-top: 2px solid #0474C4;
-        color: #e5e7eb;
+        background: #1a202c;
+        border-top: 2px solid #4299e1;
+        color: #e2e8f0;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.5px;
     }
     
     .allocation-number {
-        background: linear-gradient(135deg, #1f3c88 0%, #3f72af 100%);
+        background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
         color: white !important;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
+        border-radius: 4px;
+        width: 24px;
+        height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 600;
         margin: 2px auto;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .dept-badge {
@@ -113,10 +145,11 @@
     }
     
     .table-container {
-        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
-        border-radius: 15px;
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        border-radius: 12px;
         padding: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border: 1px solid rgba(74, 85, 104, 0.3);
     }
     
     /* Progress Steps Styles */
@@ -530,36 +563,36 @@
                  </div>
                  
                  <!-- Control Buttons -->
-                 <div class="card border-0 shadow-sm" style="background: rgba(255,255,255,0.95); border-radius: 12px;">
+                 <div class="card border-0 shadow-sm" style="background: rgba(26, 32, 44, 0.8); border: 1px solid rgba(74, 85, 104, 0.3); border-radius: 12px;">
                      <div class="card-body p-4">
                          <div class="row g-3">
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="clearAllocationBtn" class="btn btn-outline-danger w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
-                                     <i class="bi bi-x-circle me-1"></i>Clear All
+                                 <button type="button" id="clearAllocationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-x-circle-fill me-1"></i>Clear All
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="resetRotationBtn" class="btn btn-outline-warning w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
+                                 <button type="button" id="resetRotationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                                      <i class="bi bi-arrow-clockwise me-1"></i>Reset Rotation
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="printAllocationBtn" class="btn btn-outline-primary w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
-                                     <i class="bi bi-printer me-1"></i>Print Report
+                                 <button type="button" id="printAllocationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-printer-fill me-1"></i>Print Report
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="printByDeptBtn" class="btn btn-outline-primary w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
-                                     <i class="bi bi-printer-fill me-1"></i>Print Dept-wise
+                                 <button type="button" id="printByDeptBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-printer me-1"></i>Print Dept-wise
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="exportAllocationBtn" class="btn btn-outline-success w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
+                                 <button type="button" id="exportAllocationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                                      <i class="bi bi-download me-1"></i>Export
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="exportByDeptBtn" class="btn btn-outline-success w-100 shadow-sm" style="border-width: 2px; font-weight: 500; border-radius: 8px;">
+                                 <button type="button" id="exportByDeptBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                                      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export by Dept
                                  </button>
                              </div>
@@ -572,14 +605,14 @@
             <div id="professorsSection" class="d-none">
                 <div class="table-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0" style="color: #2c3e50; font-weight: bold;">
-                            <i class="bi bi-clipboard-check me-2"></i>Exam Duty Assignment
+                        <h5 class="mb-0" style="color: #ffffff; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                            <i class="bi bi-clipboard2-check-fill me-2"></i>Exam Duties Assigned
                     </h5>
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm btn-outline-success" id="toggleProfessorsBtn">
+                            <button type="button" class="btn btn-sm" id="toggleProfessorsBtn" style="background: linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%); color: white; border: none; margin-right: 8px;">
                                 <i class="bi bi-shield-check me-1"></i>Show Deputy Superintendents
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="toggleNonProfessorsBtn">
+                            <button type="button" class="btn btn-sm" id="toggleNonProfessorsBtn" style="background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%); color: white; border: none;">
                                 <i class="bi bi-eye-fill me-1"></i>Show Invigilators
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleTableBtn">
