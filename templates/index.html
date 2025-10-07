@@ -283,8 +283,8 @@ $(document).ready(function() {
                             button.data('active', updatedStatus);
                             button.removeClass('btn-outline-success btn-outline-danger');
                             button.addClass(updatedStatus ? 'btn-outline-success' : 'btn-outline-danger');
-                            icon.removeClass().addClass(updatedStatus ? 'bi-unlock' : 'bi-lock');
-                            button.attr('title', updatedStatus ? 'Click to lock' : 'Click to unlock');
+                            button.html(updatedStatus ? ' Active' : ' Inactive');
+                            button.attr('title', updatedStatus ? 'Click to deactivate' : 'Click to activate');
                             
                             // Update row styling
                             if (updatedStatus) {
@@ -301,8 +301,8 @@ $(document).ready(function() {
                         // Revert UI on error
                         button.data('active', currentStatus);
                         button.toggleClass('btn-outline-success btn-outline-danger', true);
-                        icon.removeClass().addClass(currentStatus ? 'bi-unlock' : 'bi-lock');
-                        button.attr('title', currentStatus ? 'Click to lock' : 'Click to unlock');
+                        button.html(currentStatus ? ' Active' : ' Inactive');
+                        button.attr('title', currentStatus ? 'Click to deactivate' : 'Click to activate');
                         
                         alert('Failed to update faculty status: ' + (error.message || 'Unknown error'));
                     } finally {
@@ -371,7 +371,7 @@ $(document).ready(function() {
                                     data-index="${index}"
                                     data-active="${isActive}"
                                     title="${isActive ? 'Click to lock' : 'Click to unlock'}">
-                                <i class="bi ${isActive ? 'bi-unlock' : 'bi-lock'}"></i>
+ ${isActive ? 'Active' : 'Inactive'}
                             </button>
                         </td>
                         <td>${faculty.Initials || 'N/A'}</td>
