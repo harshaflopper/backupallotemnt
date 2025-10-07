@@ -1045,11 +1045,11 @@ $(document).ready(function() {
             const day = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10) - 1;
             const year = parseInt(parts[2], 10);
-            const jsDate = new Date(year, month, day);
-            if (Number.isNaN(jsDate.getTime())) {
+            if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) {
                 return null;
             }
-            return jsDate.toISOString().split('T')[0];
+            const twoDigit = (value) => value.toString().padStart(2, '0');
+            return `${year}-${twoDigit(month + 1)}-${twoDigit(day)}`;
         }
 
         function parseDisplayDate(displayDate) {
