@@ -2439,195 +2439,516 @@ $(document).ready(function() {
              return [];
          }
          
-         // Get individual non-professors that are excluded (from AM session) - NOT departments
+         // Get individual non-professors that are excluded (from AM session)
          const excludedProfIndexes = new Set(excludeProfs.map(prof => prof.originalIndex));
-         
          console.log('Excluded non-professor indexes:', Array.from(excludedProfIndexes));
          
-         // Initialize department rotation tracking for non-professors
-         if (!window.nonProfDepartmentRotation) {
-             window.nonProfDepartmentRotation = {};
-         }
+         // Calculate department allocation limits to ensure fair distribution and department retention
+         const departmentLimits = calculateDepartmentAllocationLimits(nonProfessorsByDept, nonProfsNeeded, dateStr, session);
+         console.log('Department allocation limits:', departmentLimits);
          
-         // Create available non-professor pool using 50-50 department rotation
+         // Create available non-professor pool with improved constraints
          let availableNonProfs = [];
+         const departmentAllocations = {}; // Track allocations per department
+         
+         // Initialize department allocation tracking
+         Object.keys(nonProfessorsByDept).forEach(dept => {
+             departmentAllocations[dept] = 0;
+         });
+         
+         // Build available pool considering all constraints
          Object.keys(nonProfessorsByDept).forEach(dept => {
              const deptNonProfs = nonProfessorsByDept[dept];
-             
              if (deptNonProfs.length === 0) return;
              
-             // Initialize rotation for this department if not exists
-             if (!window.nonProfDepartmentRotation[dept]) {
-                 window.nonProfDepartmentRotation[dept] = {
-                     currentDay: 0,
-                     group1: [],
-                     group2: []
-                 };
-                 
-                 // Split department into 2 groups (50-50)
-                 const shuffled = [...deptNonProfs].sort(() => Math.random() - 0.5);
-                 const midPoint = Math.ceil(shuffled.length / 2);
-                 window.nonProfDepartmentRotation[dept].group1 = shuffled.slice(0, midPoint);
-                 window.nonProfDepartmentRotation[dept].group2 = shuffled.slice(midPoint);
-                 
-                 console.log(`${dept}: Split into Group1(${window.nonProfDepartmentRotation[dept].group1.length}) and Group2(${window.nonProfDepartmentRotation[dept].group2.length})`);
+             // Calculate how many from this department are already allocated (session-independent for better allocation)
+             let alreadyAllocatedToday;
+             if (session === 'AM') {
+                 // For AM session, only count existing AM allocations
+                 alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                     const amAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="AM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                     return amAllocated;
+                 }).length;
+             } else {
+                 // For PM session, only count existing PM allocations (treat sessions independently)
+                 alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                     const pmAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="PM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                     return pmAllocated;
+                 }).length;
              }
              
-             // Determine which group to use based on day rotation
-             const rotation = window.nonProfDepartmentRotation[dept];
-             const currentDateIndex = window.examDates.findIndex(d => d.toISOString().split('T')[0] === dateStr);
-             const useGroup1 = (currentDateIndex % 2) === 0; // Even days use group1, odd days use group2
+             console.log(`${dept}: ${alreadyAllocatedToday}/${deptNonProfs.length} already allocated today`);
              
-             const activeGroup = useGroup1 ? rotation.group1 : rotation.group2;
-             console.log(`${dept}: Using ${useGroup1 ? 'Group1' : 'Group2'} (${activeGroup.length} non-professors) for ${dateStr}`);
-             
-             // Add active group to available pool
-             activeGroup.forEach(prof => {
-                 // Skip non-professors who are already allocated today
+             // Add available faculty from this department
+             deptNonProfs.forEach(prof => {
+                 // Skip if already allocated today
                  if (excludedProfIndexes.has(prof.originalIndex)) {
                      return;
                  }
                  
-                 // Skip non-professors who worked yesterday (consecutive day constraint)
+                 // Skip if worked yesterday (consecutive day constraint)
                  if (workedYesterdayNonProf(prof.originalIndex, dateStr)) {
                      console.log(`Skipping ${prof.name} - worked yesterday`);
                      return;
                  }
                  
-                 availableNonProfs.push(prof);
+                 // Check if department has reached its allocation limit for today
+                 const maxAllowedFromDept = departmentLimits[dept] || 0;
+                 if (alreadyAllocatedToday >= maxAllowedFromDept) {
+                     console.log(`Skipping ${prof.name} - department ${dept} has reached daily limit (${alreadyAllocatedToday}/${maxAllowedFromDept})`);
+                     return;
+                 }
+                 
+                 availableNonProfs.push({
+                     ...prof,
+                     department: dept,
+                     currentDeptAllocations: alreadyAllocatedToday
+                 });
              });
          });
          
          console.log(`Available non-professors for ${session}: ${availableNonProfs.length}`);
+         console.log('Available faculty breakdown by department:');
+         const deptBreakdown = {};
+         availableNonProfs.forEach(prof => {
+             deptBreakdown[prof.department] = (deptBreakdown[prof.department] || 0) + 1;
+         });
+         console.log(deptBreakdown);
          
-         // If not enough non-professors due to consecutive day constraint, relax the constraint
+         // If not enough non-professors, gradually relax constraints
          if (availableNonProfs.length < nonProfsNeeded) {
-             console.log(`⚠️ Not enough non-professors (${availableNonProfs.length}) for ${nonProfsNeeded} needed. Relaxing consecutive day constraint...`);
+             console.log(`⚠️ Not enough non-professors (${availableNonProfs.length}) for ${nonProfsNeeded} needed.`);
              
-             // Add back non-professors who worked yesterday but respect other constraints  
+             // First, relax consecutive day constraint but keep department limits
+             console.log('Step 1: Relaxing consecutive day constraint...');
              Object.keys(nonProfessorsByDept).forEach(dept => {
+                 const deptNonProfs = nonProfessorsByDept[dept];
+                 let alreadyAllocatedToday;
+                 if (session === 'AM') {
+                     alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                         const amAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="AM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                         return amAllocated;
+                     }).length;
+                 } else {
+                     alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                         const pmAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="PM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                         return pmAllocated;
+                     }).length;
+                 }
                  
-                 nonProfessorsByDept[dept].forEach(prof => {
+                 const maxAllowedFromDept = departmentLimits[dept] || 0;
+                 
+                 deptNonProfs.forEach(prof => {
                      if (excludedProfIndexes.has(prof.originalIndex)) return;
+                     if (alreadyAllocatedToday >= maxAllowedFromDept) return;
                      
-                     // Only add if not already in available pool
                      const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
                      if (!alreadyIncluded) {
-                         availableNonProfs.push(prof);
-                         console.log(`Added back ${prof.name} (worked yesterday but needed)`);
+                         availableNonProfs.push({
+                             ...prof,
+                             department: dept,
+                             currentDeptAllocations: alreadyAllocatedToday,
+                             relaxedConstraint: 'consecutive_day'
+                         });
+                         console.log(`Added back ${prof.name} (worked yesterday but needed, dept limit respected)`);
                      }
                  });
              });
+             
+             // If still not enough, progressively relax department limits
+             if (availableNonProfs.length < nonProfsNeeded) {
+                 console.log('Step 2: Relaxing department limits...');
+                 Object.keys(nonProfessorsByDept).forEach(dept => {
+                     const deptNonProfs = nonProfessorsByDept[dept];
+                     let alreadyAllocatedToday;
+                     if (session === 'AM') {
+                         alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                             const amAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="AM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                             return amAllocated;
+                         }).length;
+                     } else {
+                         alreadyAllocatedToday = deptNonProfs.filter(prof => {
+                             const pmAllocated = $(`.form-check-input[data-professor="${prof.originalIndex}"][data-date="${dateStr}"][data-session="PM"][data-faculty-type="non-professor"]:checked`).length > 0;
+                             return pmAllocated;
+                         }).length;
+                     }
+                     
+                     // More aggressive relaxation: allow up to 80% of department
+                     const relaxedLimit = Math.floor(deptNonProfs.length * 0.8);
+                     
+                     if (alreadyAllocatedToday < relaxedLimit) {
+                         deptNonProfs.forEach(prof => {
+                             if (excludedProfIndexes.has(prof.originalIndex)) return;
+                             
+                             const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
+                             if (!alreadyIncluded) {
+                                 availableNonProfs.push({
+                                     ...prof,
+                                     department: dept,
+                                     currentDeptAllocations: alreadyAllocatedToday,
+                                     relaxedConstraint: 'department_limit'
+                                 });
+                                 console.log(`Added back ${prof.name} (relaxed dept limit: ${alreadyAllocatedToday}/${relaxedLimit})`);
+                             }
+                         });
+                     }
+                 });
+             }
+             
+             // If STILL not enough, emergency relaxation - ignore most constraints
+             if (availableNonProfs.length < nonProfsNeeded * 0.9) {
+                 console.log('Step 3: EMERGENCY relaxation - adding all available faculty...');
+                 Object.keys(nonProfessorsByDept).forEach(dept => {
+                     const deptNonProfs = nonProfessorsByDept[dept];
+                     
+                     deptNonProfs.forEach(prof => {
+                         if (excludedProfIndexes.has(prof.originalIndex)) return;
+                         
+                         const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
+                         if (!alreadyIncluded) {
+                             availableNonProfs.push({
+                                 ...prof,
+                                 department: dept,
+                                 currentDeptAllocations: 0,
+                                 relaxedConstraint: 'emergency'
+                             });
+                             console.log(`EMERGENCY: Added ${prof.name} (all constraints relaxed)`);
+                         }
+                     });
+                 });
+             }
+             
+             // FINAL EMERGENCY: If we're still short, ignore consecutive day constraint completely
+             if (availableNonProfs.length < nonProfsNeeded) {
+                 console.log('Step 4: FINAL EMERGENCY - ignoring consecutive day constraint...');
+                 Object.keys(nonProfessorsByDept).forEach(dept => {
+                     const deptNonProfs = nonProfessorsByDept[dept];
+                     
+                     deptNonProfs.forEach(prof => {
+                         if (excludedProfIndexes.has(prof.originalIndex)) return;
+                         
+                         const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
+                         if (!alreadyIncluded) {
+                             availableNonProfs.push({
+                                 ...prof,
+                                 department: dept,
+                                 currentDeptAllocations: 0,
+                                 relaxedConstraint: 'final_emergency'
+                             });
+                             console.log(`FINAL EMERGENCY: Added ${prof.name} (consecutive day constraint ignored)`);
+                         }
+                     });
+                 });
+             }
+             
+             // ULTIMATE EMERGENCY: If we're STILL short, add faculty who worked yesterday
+             if (availableNonProfs.length < nonProfsNeeded) {
+                 console.log('Step 5: ULTIMATE EMERGENCY - adding faculty who worked yesterday...');
+                 Object.keys(nonProfessorsByDept).forEach(dept => {
+                     const deptNonProfs = nonProfessorsByDept[dept];
+                     
+                     deptNonProfs.forEach(prof => {
+                         if (excludedProfIndexes.has(prof.originalIndex)) return;
+                         
+                         const alreadyIncluded = availableNonProfs.some(p => p.originalIndex === prof.originalIndex);
+                         if (!alreadyIncluded) {
+                             // Add even if they worked yesterday - ignore consecutive day constraint
+                             availableNonProfs.push({
+                                 ...prof,
+                                 department: dept,
+                                 currentDeptAllocations: 0,
+                                 relaxedConstraint: 'ultimate_emergency'
+                             });
+                             console.log(`ULTIMATE EMERGENCY: Added ${prof.name} (allowing consecutive days)`);
+                         }
+                     });
+                 });
+             }
          }
          
          console.log(`Final available non-professors for ${session}: ${availableNonProfs.length}`);
          
-         // Sort by total allotments (least allocated first) then randomly
-         availableNonProfs.sort((a, b) => {
-             const profA = window.allNonProfessors[a.originalIndex];
-             const profB = window.allNonProfessors[b.originalIndex];
-             
-             if (profA.totalAllotments !== profB.totalAllotments) {
-                 return profA.totalAllotments - profB.totalAllotments;
-             }
-             return Math.random() - 0.5; // Random among equal
+         // Enhanced selection algorithm with department balance
+         const selectedNonProfs = [];
+         const sessionDepartmentAllocations = {}; // Track this session's allocations per department
+         
+         // Initialize session tracking
+         Object.keys(nonProfessorsByDept).forEach(dept => {
+             sessionDepartmentAllocations[dept] = 0;
          });
          
-         // Select non-professors ensuring STRICT equal distribution
-         const selectedNonProfs = [];
-         
          for (let i = 0; i < nonProfsNeeded && availableNonProfs.length > 0; i++) {
-             // Re-sort to get the most up-to-date least allocated non-professors
+             // Sort by multiple criteria for fair selection
              availableNonProfs.sort((a, b) => {
                  const profA = window.allNonProfessors[a.originalIndex];
                  const profB = window.allNonProfessors[b.originalIndex];
                  
+                 // Primary: Total allotments (fairness)
                  if (profA.totalAllotments !== profB.totalAllotments) {
-                     return profA.totalAllotments - profB.totalAllotments; // Least allocated first
+                     return profA.totalAllotments - profB.totalAllotments;
                  }
-                 return Math.random() - 0.5; // Random among equal
+                 
+                 // Secondary: Department balance (prefer departments with fewer allocations this session)
+                 const deptAAllocations = sessionDepartmentAllocations[a.department] || 0;
+                 const deptBAllocations = sessionDepartmentAllocations[b.department] || 0;
+                 if (deptAAllocations !== deptBAllocations) {
+                     return deptAAllocations - deptBAllocations;
+                 }
+                 
+                 // Tertiary: Prefer non-relaxed constraints
+                 if (a.relaxedConstraint && !b.relaxedConstraint) return 1;
+                 if (!a.relaxedConstraint && b.relaxedConstraint) return -1;
+                 
+                 // Final: Random
+                 return Math.random() - 0.5;
              });
              
-             // Get the minimum allotment count among available non-professors
+             // Get candidates with minimum allotments and good department balance
              const minAllotments = Math.min(...availableNonProfs.map(prof => window.allNonProfessors[prof.originalIndex].totalAllotments));
+             const minDeptAllocations = Math.min(...Object.values(sessionDepartmentAllocations));
              
-             // Get the global minimum allotments across ALL non-professors to ensure strict fairness
-             const globalMinAllotments = Math.min(...window.allNonProfessors.map(prof => prof.totalAllotments));
-             const globalMaxAllotments = Math.max(...window.allNonProfessors.map(prof => prof.totalAllotments));
-             
-             // If the difference is already 2 or more, only select from non-professors with global minimum
-             const strictMinAllotments = (globalMaxAllotments - globalMinAllotments >= 2) ? globalMinAllotments : minAllotments;
-             
-             // Only select from non-professors with the strictest minimum allotments
-             const leastAllocatedNonProfs = availableNonProfs.filter(prof => 
-                 window.allNonProfessors[prof.originalIndex].totalAllotments === strictMinAllotments
-             );
-             
-             console.log(`Global range: ${globalMinAllotments}-${globalMaxAllotments}, Using threshold: ${strictMinAllotments}`);
-             
-             if (leastAllocatedNonProfs.length > 0) {
-                 // Randomly select from non-professors with least allotments
-                 const randomIndex = Math.floor(Math.random() * leastAllocatedNonProfs.length);
-                 const selectedNonProf = leastAllocatedNonProfs[randomIndex];
+             const bestCandidates = availableNonProfs.filter(prof => {
+                 const profData = window.allNonProfessors[prof.originalIndex];
+                 const deptAllocations = sessionDepartmentAllocations[prof.department] || 0;
                  
-                 // STRICT fairness check: Don't allow selection if it would create unfair distribution
-                 const newAllotmentCount = window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments + 1;
-                 const currentGlobalMin = Math.min(...window.allNonProfessors.map(prof => prof.totalAllotments));
-                 const currentGlobalMax = Math.max(...window.allNonProfessors.map(prof => prof.totalAllotments));
+                 // Must have minimum allotments
+                 if (profData.totalAllotments > minAllotments) return false;
                  
-                 // Calculate what the new range would be after this assignment
-                 const potentialNewMax = Math.max(currentGlobalMax, newAllotmentCount);
-                 const potentialRange = potentialNewMax - currentGlobalMin;
+                 // Prefer departments with fewer allocations this session
+                 if (deptAllocations > minDeptAllocations + 1) return false;
                  
-                 // BLOCK if this would create a range > 1 (strict fairness)
-                 if (potentialRange > 1) {
-                     console.log(`🚫 BLOCKED ${selectedNonProf.name} - would create unfair range ${potentialRange} (${newAllotmentCount} vs min:${currentGlobalMin})`);
+                 return true;
+             });
+             
+             if (bestCandidates.length === 0) {
+                 console.log('No suitable candidates available with current criteria');
+                 
+                 // Emergency fallback: if we're short of target, relax all criteria
+                 const shortfall = nonProfsNeeded - selectedNonProfs.length;
+                 if (shortfall >= 1 && availableNonProfs.length > 0) {
+                     console.log(`🚨 EMERGENCY: ${shortfall} short of target, relaxing all criteria...`);
                      
-                     // Remove this non-professor from available pool and try next
-                     const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === selectedNonProf.originalIndex);
+                     // Just pick from any available non-professors, ignore fairness temporarily
+                     const emergencyCandidate = availableNonProfs[0];
+                     console.log(`Emergency selection: ${emergencyCandidate.name}`);
+                     
+                     // Allocate the emergency candidate
+                     selectedNonProfs.push(emergencyCandidate);
+                     
+                     // Mark checkbox
+                     const checkbox = $(`.form-check-input[data-professor="${emergencyCandidate.originalIndex}"][data-date="${dateStr}"][data-session="${session}"][data-faculty-type="non-professor"]`);
+                     checkbox.prop('checked', true);
+                     checkbox.parent().append('<div class="allocation-number">1</div>');
+                     
+                     // Update totals
+                     window.allNonProfessors[emergencyCandidate.originalIndex].totalAllotments++;
+                     sessionDepartmentAllocations[emergencyCandidate.department]++;
+                     
+                     console.log(`✅ Emergency Selected: ${emergencyCandidate.name} (${emergencyCandidate.department}) - Total: ${window.allNonProfessors[emergencyCandidate.originalIndex].totalAllotments}`);
+                     
+                     // Remove from available pool
+                     const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === emergencyCandidate.originalIndex);
                      if (indexToRemove !== -1) {
                          availableNonProfs.splice(indexToRemove, 1);
                      }
                      
-                     // Re-filter to only non-professors with absolute minimum
-                     const absoluteMin = Math.min(...availableNonProfs.map(prof => window.allNonProfessors[prof.originalIndex].totalAllotments));
-                     availableNonProfs = availableNonProfs.filter(prof => 
-                         window.allNonProfessors[prof.originalIndex].totalAllotments === absoluteMin
-                     );
-                     
-                     if (availableNonProfs.length === 0) {
-                         console.log('❌ No fair non-professors available - breaking');
-                         break;
-                     }
-                     
-                     i--; // Retry this iteration with updated pool
-                     continue;
+                     continue; // Continue the loop
                  }
                  
-                 selectedNonProfs.push(selectedNonProf);
+                 console.log('Breaking allocation loop - no more candidates available');
+                 break;
+             }
+             
+             // Select from best candidates
+             const selectedNonProf = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+             
+             // Adaptive fairness check - more flexible when we need to meet allocation requirements
+             const newAllotmentCount = window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments + 1;
+             const currentGlobalMin = Math.min(...window.allNonProfessors.map(prof => prof.totalAllotments));
+             const currentGlobalMax = Math.max(...window.allNonProfessors.map(prof => prof.totalAllotments));
+             const potentialNewMax = Math.max(currentGlobalMax, newAllotmentCount);
+             const potentialRange = potentialNewMax - currentGlobalMin;
+             
+             // Progressive fairness relaxation based on allocation progress
+             const allocationProgress = selectedNonProfs.length / nonProfsNeeded;
+             let maxAllowedRange;
+             
+             if (allocationProgress < 0.3) {
+                 maxAllowedRange = 1; // Strict fairness for first 30%
+             } else if (allocationProgress < 0.7) {
+                 maxAllowedRange = 2; // Allow range of 2 for middle 40%
+             } else {
+                 maxAllowedRange = 3; // Allow range of 3 for final 30% to ensure completion
+             }
+             
+             // Emergency override: if we're running out of candidates, allow much higher range
+             if (availableNonProfs.length <= (nonProfsNeeded - selectedNonProfs.length) * 1.5) {
+                 maxAllowedRange = Math.max(maxAllowedRange, 10); // Allow much higher range
+                 console.log(`🚨 Emergency fairness override: allowing range up to ${maxAllowedRange}`);
+             }
+             
+             // Critical override: if we're short, ignore fairness completely
+             if (selectedNonProfs.length < nonProfsNeeded * 0.9) {
+                 maxAllowedRange = 999; // Effectively disable fairness check
+                 console.log(`🚨 CRITICAL: Only ${selectedNonProfs.length}/${nonProfsNeeded} allocated, disabling fairness check`);
+             }
+             
+             if (potentialRange > maxAllowedRange) {
+                 console.log(`🚫 BLOCKED ${selectedNonProf.name} - would create unfair range ${potentialRange} (max allowed: ${maxAllowedRange}, progress: ${Math.round(allocationProgress*100)}%)`);
                  
-                 // Mark checkbox
-                 const checkbox = $(`.form-check-input[data-professor="${selectedNonProf.originalIndex}"][data-date="${dateStr}"][data-session="${session}"][data-faculty-type="non-professor"]`);
-                     checkbox.prop('checked', true);
-                     checkbox.parent().append('<div class="allocation-number">1</div>');
-                     
-                 // Update non-professor's total allotments
-                 window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments++;
-                 
-                 console.log(`✅ Selected: ${selectedNonProf.name} (${selectedNonProf.department}) - Total allotments: ${window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments}`);
-                 
-                 // Remove selected non-professor from available pool for this session
+                 // Remove and try next
                  const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === selectedNonProf.originalIndex);
                  if (indexToRemove !== -1) {
                      availableNonProfs.splice(indexToRemove, 1);
                  }
-             } else {
-                 console.log('No non-professors available for selection');
-                 break;
+                 i--; // Retry
+                 continue;
+             }
+             
+             // Allocate the selected non-professor
+             selectedNonProfs.push(selectedNonProf);
+             
+             // Mark checkbox
+             const checkbox = $(`.form-check-input[data-professor="${selectedNonProf.originalIndex}"][data-date="${dateStr}"][data-session="${session}"][data-faculty-type="non-professor"]`);
+             checkbox.prop('checked', true);
+             checkbox.parent().append('<div class="allocation-number">1</div>');
+             
+             // Update totals
+             window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments++;
+             sessionDepartmentAllocations[selectedNonProf.department]++;
+             
+             console.log(`✅ Selected: ${selectedNonProf.name} (${selectedNonProf.department}) - Total: ${window.allNonProfessors[selectedNonProf.originalIndex].totalAllotments}, Dept this session: ${sessionDepartmentAllocations[selectedNonProf.department]}`);
+             
+             // Remove from available pool
+             const indexToRemove = availableNonProfs.findIndex(prof => prof.originalIndex === selectedNonProf.originalIndex);
+             if (indexToRemove !== -1) {
+                 availableNonProfs.splice(indexToRemove, 1);
              }
          }
          
+         // Log final department distribution for this session
+         console.log('Final department distribution for this session:', sessionDepartmentAllocations);
+         
          return selectedNonProfs;
+     }
+     
+     // New helper function to calculate department allocation limits
+     function calculateDepartmentAllocationLimits(nonProfessorsByDept, totalNeeded, dateStr, session) {
+         const limits = {};
+         const departments = Object.keys(nonProfessorsByDept);
+         const totalFaculty = Object.values(nonProfessorsByDept).reduce((sum, dept) => sum + dept.length, 0);
+         
+         if (totalFaculty === 0 || totalNeeded === 0) {
+             departments.forEach(dept => limits[dept] = 0);
+             return limits;
+         }
+         
+         // First pass: Calculate proportional allocations
+         let totalProportionalAllocations = 0;
+         const proportionalAllocations = {};
+         
+         departments.forEach(dept => {
+             const deptSize = nonProfessorsByDept[dept].length;
+             if (deptSize === 0) {
+                 proportionalAllocations[dept] = 0;
+                 return;
+             }
+             
+             // Calculate fair proportional allocation
+             const proportional = Math.floor((deptSize / totalFaculty) * totalNeeded);
+             proportionalAllocations[dept] = proportional;
+             totalProportionalAllocations += proportional;
+         });
+         
+         // Distribute remaining allocations to ensure we meet totalNeeded
+         let remainingToAllocate = totalNeeded - totalProportionalAllocations;
+         
+         // Sort departments by size (larger departments get priority for remaining allocations)
+         const sortedDepts = departments.sort((a, b) => 
+             nonProfessorsByDept[b].length - nonProfessorsByDept[a].length
+         );
+         
+         // Distribute remaining allocations
+         for (const dept of sortedDepts) {
+             if (remainingToAllocate <= 0) break;
+             
+             const deptSize = nonProfessorsByDept[dept].length;
+             if (deptSize === 0) continue;
+             
+             // Can we give one more to this department?
+             const currentAllocation = proportionalAllocations[dept];
+             const maxSafeAllocation = Math.floor(deptSize * 0.7); // Allow up to 70% allocation
+             
+             if (currentAllocation < maxSafeAllocation) {
+                 proportionalAllocations[dept]++;
+                 remainingToAllocate--;
+             }
+         }
+         
+         // Second pass: Apply department-specific limits with flexibility
+         departments.forEach(dept => {
+             const deptSize = nonProfessorsByDept[dept].length;
+             
+             if (deptSize === 0) {
+                 limits[dept] = 0;
+                 return;
+             }
+             
+             const baseAllocation = proportionalAllocations[dept];
+             let departmentLimit;
+             
+             // More flexible department limits based on size - accounting for both AM and PM sessions
+             if (deptSize === 1) {
+                 // Single person departments: can allocate if really needed
+                 departmentLimit = totalNeeded > totalFaculty * 0.5 ? 1 : 0;
+             } else if (deptSize === 2) {
+                 // Two person departments: maximum 1 person per session (2 total per day)
+                 departmentLimit = Math.min(1, baseAllocation);
+             } else if (deptSize <= 4) {
+                 // Small departments (3-4 people): maximum 2 people per session (up to 4 total per day)
+                 departmentLimit = Math.min(Math.ceil(deptSize * 0.6), baseAllocation + 1);
+             } else if (deptSize <= 8) {
+                 // Medium departments (5-8 people): maximum 70% allocation per session
+                 departmentLimit = Math.min(Math.floor(deptSize * 0.7), baseAllocation + 2);
+             } else {
+                 // Large departments (>8 people): maximum 80% allocation per session
+                 departmentLimit = Math.min(Math.floor(deptSize * 0.8), baseAllocation + 3);
+             }
+             
+             // Ensure minimum allocation if needed and department can spare
+             if (departmentLimit === 0 && deptSize > 1 && totalNeeded > 0) {
+                 departmentLimit = 1;
+             }
+             
+             // Final safety check: never exceed 80% of any department
+             departmentLimit = Math.min(departmentLimit, Math.floor(deptSize * 0.8));
+             
+             limits[dept] = departmentLimit;
+             console.log(`${dept}: ${deptSize} faculty, base: ${baseAllocation}, limit: ${departmentLimit} (${Math.round((departmentLimit/deptSize)*100)}% of dept)`);
+         });
+         
+         // Verify total limits can meet demand
+         const totalLimits = Object.values(limits).reduce((sum, limit) => sum + limit, 0);
+         console.log(`Total allocation limits: ${totalLimits}, Required: ${totalNeeded}`);
+         
+         // If limits are still too restrictive, increase them proportionally
+         if (totalLimits < totalNeeded * 0.8) {
+             console.log('⚠️ Department limits too restrictive, increasing flexibility...');
+             
+             departments.forEach(dept => {
+                 const deptSize = nonProfessorsByDept[dept].length;
+                 if (deptSize > 1) {
+                     // Increase limit but never exceed 80% of department
+                     const currentLimit = limits[dept];
+                     const maxPossible = Math.floor(deptSize * 0.8);
+                     const increased = Math.min(maxPossible, currentLimit + 1);
+                     limits[dept] = increased;
+                     console.log(`Increased ${dept} limit from ${currentLimit} to ${increased}`);
+                 }
+             });
+         }
+         
+         return limits;
      }
 
      function workedYesterdayNonProf(nonProfessorIndex, currentDateStr) {
