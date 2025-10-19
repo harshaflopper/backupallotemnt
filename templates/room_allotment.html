@@ -4,11 +4,48 @@
 
 {% block extra_css %}
 <style>
+    body {
+        background: linear-gradient(135deg, #eef5ff 0%, #f8fbff 100%);
+        min-height: 100vh;
+    }
+    
     .upload-card {
-        background: linear-gradient(135deg, #1f3c88 0%, #3f72af 100%);
+        background: linear-gradient(135deg, #06457F 0%, #0474C4 100%);
         border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 30px rgba(6, 69, 127, 0.2);
         border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .upload-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #A8C4EC, #0474C4, #06457F, #A8C4EC);
+        background-size: 200% 200%;
+        animation: gradient 2s ease infinite;
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .card-header {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
     }
     
     .upload-area {
@@ -19,6 +56,31 @@
         background: rgba(255, 255, 255, 0.95);
         transition: all 0.3s ease;
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .upload-area::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(168, 196, 236, 0.1), transparent);
+        transform: rotate(-45deg);
+        transition: all 0.6s;
+        opacity: 0;
+    }
+    
+    .upload-area:hover::before {
+        animation: shimmer 1.5s ease-in-out;
+        opacity: 1;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(-45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(-45deg); }
     }
     
     .upload-area:hover {
@@ -37,47 +99,46 @@
         font-size: 3rem;
         color: #5379AE;
         margin-bottom: 1rem;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
     }
     
     .btn-randomize {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #06457F 0%, #0474C4 100%);
         border: none;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+        box-shadow: 0 4px 15px rgba(6, 69, 127, 0.25);
         transition: all 0.3s ease;
         border-radius: 8px;
         padding: 12px 24px;
         font-weight: 600;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-randomize::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .btn-randomize:hover::before {
+        left: 100%;
     }
     
     .btn-randomize:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-    }
-    
-    .results-table {
-        background: #1a202c;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-    }
-    
-    .table-dark {
-        background: #1a202c !important;
-        color: #e2e8f0 !important;
-        border-color: #2d3748;
-    }
-    
-    .invigilator-row {
-        background: #1a202c;
-        color: #e2e8f0;
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #2d3748;
-    }
-    
-    .invigilator-row:hover {
-        background: #2d3748 !important;
-        color: #ffffff !important;
-        border-left: 3px solid #4299e1;
+        box-shadow: 0 6px 20px rgba(6, 69, 127, 0.4);
+        background: linear-gradient(135deg, #0474C4 0%, #06457F 100%);
     }
     
     .file-info {
@@ -89,18 +150,104 @@
     }
     
     .btn-export {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        background: linear-gradient(135deg, #5379AE 0%, #06457F 100%);
         border: none;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        box-shadow: 0 4px 15px rgba(83, 121, 174, 0.25);
         transition: all 0.3s ease;
         border-radius: 8px;
         padding: 10px 20px;
         font-weight: 500;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-export::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .btn-export:hover::before {
+        left: 100%;
     }
     
     .btn-export:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        box-shadow: 0 6px 20px rgba(83, 121, 174, 0.4);
+        background: linear-gradient(135deg, #06457F 0%, #5379AE 100%);
+    }
+    
+    .form-check {
+        transition: all 0.3s ease;
+        border-radius: 8px !important;
+        background: rgba(168, 196, 236, 0.1) !important;
+        border: 1px solid rgba(168, 196, 236, 0.3) !important;
+        padding: 15px !important;
+    }
+    
+    .form-check:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(6, 69, 127, 0.15);
+        background: rgba(168, 196, 236, 0.15) !important;
+    }
+    
+    .form-check-input:checked {
+        background-color: #06457F;
+        border-color: #06457F;
+        box-shadow: 0 0 0 0.2rem rgba(6, 69, 127, 0.25);
+    }
+    
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3em;
+        color: #06457F;
+    }
+    
+    h4, h5, h6 {
+        color: #ffffff;
+        font-weight: 600;
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid #06457F;
+        color: #06457F;
+        background: transparent;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #06457F;
+        border-color: #06457F;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(6, 69, 127, 0.3);
+    }
+    
+    .form-check-label {
+        color: #2c3e50 !important;
+        font-weight: 600 !important;
+    }
+    
+    .text-center p {
+        color: #34495e;
+    }
+    
+    .card-body h5, .card-body h6 {
+        color: #2c3e50;
+    }
+    
+    .card-body p {
+        color: #34495e;
     }
 </style>
 {% endblock %}
@@ -554,6 +701,42 @@ $(document).ready(function() {
         exportSelectedSessions(selectedSessions);
     });
     
+    function formatDateToFullFormat(dateStr) {
+        console.log('Formatting date:', dateStr);
+        
+        // Handle different date formats
+        let day, month, year;
+        
+        // Try DD/MM/YYYY or DD-MM-YYYY format
+        let parts = dateStr.split(/[\/\-]/);
+        if (parts.length === 3) {
+            day = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10);
+            year = parseInt(parts[2], 10);
+        } else {
+            // If it's just a number like "22", assume current month/year
+            const currentDate = new Date();
+            day = parseInt(dateStr, 10);
+            month = currentDate.getMonth() + 1; // Current month
+            year = currentDate.getFullYear(); // Current year
+        }
+        
+        // Validate and create date
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            const formattedDate = `${day} ${monthNames[month - 1]} ${year}`;
+            console.log('Formatted date result:', formattedDate);
+            return formattedDate;
+        }
+        
+        console.log('Date formatting failed, returning original:', dateStr);
+        return dateStr; // Return original if parsing fails
+    }
+    
     function exportSelectedSessions(selectedSessions) {
         let documentContent = '';
         
@@ -565,10 +748,13 @@ $(document).ready(function() {
             
             console.log(`Exporting ${date} ${session}:`, sessionInfo.invigilators?.map(inv => `${inv.name}: ${inv.room}`));
             
+            // Format date to full format (e.g., "22 October 2025")
+            const formattedDate = formatDateToFullFormat(date);
+            
             documentContent += `
                 <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
                 <div class="exam-info">
-                    <span><strong>Date of Exam:</strong> ${date} ${sessionCode}</span>
+                    <span><strong>Date of Exam:</strong> ${formattedDate} ${sessionCode}</span>
                     <span><strong>Number of Rooms:</strong> ${sessionInfo.examInfo.rooms || ''}</span>
                     <span><strong>Reliever:</strong> ${sessionInfo.examInfo.reliever || ''}</span>
                     <span><strong>Total Invigilators:</strong> ${sessionInfo.invigilators ? sessionInfo.invigilators.length : 0}</span>
