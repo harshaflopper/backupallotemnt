@@ -66,6 +66,10 @@ def api_faculty_all(department_id):
 def exam_allotment():
     return render_template('exam_allotment.html')
 
+@app.route('/room-allotment')
+def room_allotment():
+    return render_template('room_allotment.html')
+
 @app.route('/api/faculty/<department_id>/add', methods=['POST'])
 def add_faculty(department_id):
     try:

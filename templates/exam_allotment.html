@@ -592,6 +592,11 @@
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
+                                 <button type="button" id="exportDocumentBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                     <i class="bi bi-file-earmark-text me-1"></i>Export Doc
+                                 </button>
+                             </div>
+                             <div class="col-md-4 col-lg-2">
                                  <button type="button" id="exportByDeptBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                                      <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export by Dept
                                  </button>
@@ -740,6 +745,349 @@ $(document).ready(function() {
             alert('Export failed. Please try again.');
         }
     });
+
+    // Export Document button handler - exports by date in document format (same as Export by Date but as DOC)
+    $('#exportDocumentBtn').on('click', function() {
+        exportByDateAsDocument('both');
+    });
+
+    // Export by Date as Document - generates SIT Tumkur formatted documents grouped by date & session
+    function exportByDateAsDocument(sessionFilter = 'both') {
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before exporting.');
+            return;
+        }
+
+        const $table = $('#professorsTable');
+        if ($table.length === 0) {
+            alert('Table not found.');
+            return;
+        }
+
+        const fixedCols = 7; // Name..Total Allotments
+        const dateSessionMap = {}; // { displayDate: { isoDate, am: [], pm: [] } }
+
+        // Build lookup for each actual column index -> date info
+        const headerMeta = [];
+        let headerPointer = 0;
+        $('#tableHeader th').each(function() {
+            const span = parseInt($(this).attr('colspan') || '1', 10) || 1;
+            const text = $(this).text().trim();
+            const match = text.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+            const displayDate = match ? match[0] : null;
+            const isoDate = displayDate ? convertDisplayDateToIso(displayDate) : null;
+
+            for (let i = 0; i < span; i++) {
+                headerMeta[headerPointer++] = {
+                    displayDate,
+                    isoDate
+                };
+            }
+        });
+
+        let columnPointer = 0;
+        $('#sessionHeader th').each(function() {
+            const span = parseInt($(this).attr('colspan') || '1', 10) || 1;
+            const sessionLabel = ($(this).text() || '').trim();
+
+            for (let i = 0; i < span; i++) {
+                if (columnPointer < fixedCols) {
+                    columnPointer += 1;
+                    continue;
+                }
+
+                const headerIndex = columnPointer;
+                const meta = headerMeta[headerIndex] || {};
+                const displayDate = meta.displayDate;
+                const isoDate = meta.isoDate;
+
+                if (displayDate && isoDate) {
+                    if (!dateSessionMap[displayDate]) {
+                        dateSessionMap[displayDate] = {
+                            isoDate,
+                            am: [],
+                            pm: []
+                        };
+                    }
+
+                    const sessionKey = sessionLabel.toLowerCase().includes('pm') ? 'pm' : 'am';
+                    dateSessionMap[displayDate][sessionKey].push({
+                        headerIndex,
+                        headerText: `${displayDate} ${sessionLabel}`.trim()
+                    });
+                }
+
+                columnPointer += 1;
+            }
+        });
+
+        const dateKeys = Object.keys(dateSessionMap).sort(function(a, b) {
+            return parseDisplayDate(a) - parseDisplayDate(b);
+        });
+
+        if (dateKeys.length === 0) {
+            alert('No date data found to export.');
+            return;
+        }
+
+        let documentsCreated = 0;
+        const allowedSessions = sessionFilter === 'both' ? ['am', 'pm'] : [sessionFilter];
+        let allDocumentContent = '';
+
+        dateKeys.forEach(function(displayDate) {
+            const dateInfo = dateSessionMap[displayDate];
+            if (!dateInfo) {
+                return;
+            }
+
+            allowedSessions.forEach(function(sessionKey) {
+                const sessionHeaders = dateInfo[sessionKey];
+                if (!sessionHeaders || sessionHeaders.length === 0) {
+                    return;
+                }
+
+                const sessionDocument = buildSessionDocument(displayDate, dateInfo.isoDate, sessionKey, sessionHeaders);
+                if (!sessionDocument) {
+                    return;
+                }
+
+                allDocumentContent += sessionDocument + '<div style="page-break-after: always;"></div>';
+                documentsCreated += 1;
+            });
+        });
+
+        if (documentsCreated === 0) {
+            alert('No session allocations found to export.');
+            return;
+        }
+
+        try {
+            const fileSuffix = dateKeys.length === 1
+                ? dateKeys[0].replace(/\//g, '-')
+                : `${dateKeys[0].replace(/\//g, '-')}_to_${dateKeys[dateKeys.length - 1].replace(/\//g, '-')}`;
+            const prefix = sessionFilter === 'both'
+                ? 'SIT_Tumkur_Exam_Allotment'
+                : sessionFilter === 'pm'
+                    ? 'SIT_Tumkur_PM_Allotment'
+                    : 'SIT_Tumkur_AM_Allotment';
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>SIT Tumkur Exam Allotment</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                        .exam-info { margin-bottom: 15px; }
+                        .exam-info span { display: inline-block; margin-right: 30px; }
+                        .session-title { font-weight: bold; font-size: 14px; margin: 20px 0 10px 0; text-align: center; }
+                        .section-title { font-weight: bold; margin: 15px 0 5px 0; }
+                        table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+                        th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; }
+                        th { background-color: #f0f0f0; font-weight: bold; }
+                        .page-break { page-break-after: always; }
+                    </style>
+                </head>
+                <body>
+                    ${allDocumentContent}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${prefix}_${fileSuffix}.doc`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+        } catch (e) {
+            console.error('Document export failed:', e);
+            alert('Document export failed. Please try again.');
+        }
+
+        function buildSessionDocument(displayDate, isoDate, sessionKey, sessionHeaders) {
+            const sessionLabel = sessionKey === 'am' ? 'Morning' : 'Afternoon';
+            const sessionCode = sessionKey.toUpperCase();
+
+            const professorsSection = collectFacultyRowsForDoc(sessionHeaders, 'professor');
+            const nonProfessorSection = collectFacultyRowsForDoc(sessionHeaders, 'non-professor');
+
+            if (professorsSection.rows.length === 0 && nonProfessorSection.rows.length === 0) {
+                return null;
+            }
+
+            const rooms = parseInt($(`.session-rooms[data-date="${isoDate}"][data-session="${sessionCode}"]`).val(), 10);
+            const relievers = parseInt($(`.relievers[data-date="${isoDate}"][data-session="${sessionCode}"]`).val(), 10);
+            const totalInvigilators = nonProfessorSection.count || 0;
+
+            let documentContent = `
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div class="exam-info">
+                    <span><strong>Date of Exam:</strong> ${formatDisplayDate(displayDate)} ${sessionCode}</span>
+                    <span><strong>Number of Rooms:</strong> ${Number.isFinite(rooms) ? rooms : ''}</span>
+                    <span><strong>Reliever:</strong> ${Number.isFinite(relievers) ? relievers : ''}</span>
+                    <span><strong>Total Invigilators:</strong> ${totalInvigilators}</span>
+                </div>
+                <div class="session-title">${sessionLabel.toUpperCase()} SESSION</div>
+                
+                <div class="section-title">List of Deputy Superintendents</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                    </tr>
+            `;
+
+            professorsSection.rows.forEach(function(row) {
+                documentContent += '<tr>';
+                row.forEach(function(cell) {
+                    documentContent += `<td>${cell}</td>`;
+                });
+                documentContent += '</tr>';
+            });
+
+            documentContent += `
+                </table>
+                
+                <div class="section-title">List of Invigilators</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                        <th>Alloted Room / Relieving ( R )</th>
+                    </tr>
+            `;
+
+            nonProfessorSection.rows.forEach(function(row) {
+                documentContent += '<tr>';
+                row.forEach(function(cell) {
+                    documentContent += `<td>${cell}</td>`;
+                });
+                documentContent += '</tr>';
+            });
+
+            documentContent += '</table>';
+
+            return documentContent;
+        }
+
+        function collectFacultyRowsForDoc(sessionHeaders, targetType) {
+            const rows = [];
+            let serial = 1;
+
+            $('#professorsTableBody tr').each(function() {
+                const $row = $(this);
+                const facultyType = $row.data('facultyType');
+                if (!facultyType) {
+                    return;
+                }
+
+                const isProfessorRow = facultyType === 'professor';
+                if ((targetType === 'professor' && !isProfessorRow) || (targetType === 'non-professor' && isProfessorRow)) {
+                    return;
+                }
+
+                const $cells = $row.children('td');
+                if ($cells.length === 0) {
+                    return;
+                }
+
+                let hasAllocation = false;
+
+                sessionHeaders.forEach(function(session) {
+                    const $sessionCell = $cells.eq(session.headerIndex);
+                    if ($sessionCell.find('input[type="checkbox"]:checked').length > 0 || $sessionCell.hasClass('allocated')) {
+                        hasAllocation = true;
+                    }
+                });
+
+                if (!hasAllocation) {
+                    return;
+                }
+
+                const baseRow = [
+                    serial++,
+                    $cells.eq(0).text().trim(),
+                    $cells.eq(2).text().trim(),
+                    $cells.eq(1).text().trim(),
+                    $cells.eq(4).text().trim(),
+                    $cells.eq(3).text().trim()
+                ];
+
+                if (targetType === 'non-professor') {
+                    baseRow.push('');
+                }
+
+                rows.push(baseRow);
+            });
+
+            if (rows.length === 0) {
+                const placeholderLabel = 'No allocations found for this session.';
+                const placeholder = [placeholderLabel];
+                const targetLength = targetType === 'non-professor' ? 7 : 6;
+                while (placeholder.length < targetLength) {
+                    placeholder.push('');
+                }
+                rows.push(placeholder);
+            }
+
+            return {
+                rows,
+                count: rows[0][0] === 'No allocations found for this session.' ? 0 : rows.length
+            };
+        }
+
+        function convertDisplayDateToIso(displayDate) {
+            const parts = displayDate.split('/');
+            if (parts.length !== 3) {
+                return null;
+            }
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) {
+                return null;
+            }
+            const twoDigit = (value) => value.toString().padStart(2, '0');
+            return `${year}-${twoDigit(month + 1)}-${twoDigit(day)}`;
+        }
+
+        function parseDisplayDate(displayDate) {
+            const iso = convertDisplayDateToIso(displayDate);
+            if (!iso) {
+                return Number.POSITIVE_INFINITY;
+            }
+            return new Date(iso).getTime();
+        }
+
+        function formatDisplayDate(displayDate) {
+            const iso = convertDisplayDateToIso(displayDate);
+            if (!iso) {
+                return displayDate;
+            }
+            const jsDate = new Date(iso);
+            return jsDate.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+    }
 
     // Export by Date helpers
     function exportByDate(sessionFilter = 'both') {

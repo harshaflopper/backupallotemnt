@@ -1,0 +1,685 @@
+{% extends "base.html" %}
+
+{% block title %}Room Allotment - Faculty Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-card {
+        background: linear-gradient(135deg, #1f3c88 0%, #3f72af 100%);
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    
+    .upload-area {
+        border: 2px dashed #A8C4EC;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-area:hover {
+        border-color: #06457F;
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(6, 69, 127, 0.15);
+    }
+    
+    .upload-area.dragover {
+        border-color: #0474C4;
+        background: rgba(168, 196, 236, 0.1);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: #5379AE;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-randomize {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+    }
+    
+    .btn-randomize:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .results-table {
+        background: #1a202c;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    
+    .table-dark {
+        background: #1a202c !important;
+        color: #e2e8f0 !important;
+        border-color: #2d3748;
+    }
+    
+    .invigilator-row {
+        background: #1a202c;
+        color: #e2e8f0;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #2d3748;
+    }
+    
+    .invigilator-row:hover {
+        background: #2d3748 !important;
+        color: #ffffff !important;
+        border-left: 3px solid #4299e1;
+    }
+    
+    .file-info {
+        background: rgba(168, 196, 236, 0.1);
+        border: 1px solid rgba(168, 196, 236, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-export {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        border: none;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+    
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card upload-card">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #1f3c88 0%, #3f72af 100%);">
+            <h4 class="mb-0"><i class="bi bi-door-open me-2"></i>Room Allotment Randomizer</h4>
+        </div>
+        <div class="card-body">
+            <!-- File Upload Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5 class="mb-3" style="color: #06457F; font-weight: 600;">
+                        <i class="bi bi-cloud-upload me-2"></i>Upload Exam Allotment Document
+                    </h5>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <h6 style="color: #06457F; font-weight: 600;">Drop your document here or click to browse</h6>
+                        <p style="color: #5379AE; margin-bottom: 1rem;">Supports .doc, .docx, .html files</p>
+                        <input type="file" id="fileInput" accept=".doc,.docx,.html" style="display: none;">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click();">
+                            <i class="bi bi-folder2-open me-1"></i>Choose File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Information -->
+            <div id="fileInfo" class="file-info d-none">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1" style="color: #06457F;"><i class="bi bi-file-check me-1"></i>File Uploaded</h6>
+                        <p class="mb-0" id="fileName" style="color: #5379AE;"></p>
+                    </div>
+                    <button type="button" class="btn btn-randomize" id="randomizeBtn">
+                        <i class="bi bi-shuffle me-1"></i>Randomize Invigilators
+                    </button>
+                </div>
+            </div>
+
+            <!-- Date Selection Section -->
+            <div id="dateSelectionSection" class="d-none mb-4">
+                <h5 class="mb-3" style="color: #06457F; font-weight: 600;">
+                    <i class="bi bi-calendar-check me-2"></i>Select Date(s) to Export
+                </h5>
+                <div class="row" id="dateCheckboxes">
+                    <!-- Date checkboxes will be added here dynamically -->
+                </div>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-export" id="exportSelectedBtn">
+                        <i class="bi bi-download me-1"></i>Export Selected Dates
+                    </button>
+                </div>
+            </div>
+
+            <!-- Processing Status -->
+            <div id="processingStatus" class="d-none">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-2" style="color: #06457F;">Processing document and randomizing sessions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    console.log('Room Allotment page loaded');
+    
+    let sessionData = {}; // { "date": { "morning": {...}, "afternoon": {...} } }
+    let uploadedFileName = '';
+    
+    // File upload handling
+    const uploadArea = $('#uploadArea');
+    const fileInput = $('#fileInput');
+    
+    // Click to upload
+    uploadArea.on('click', function() {
+        fileInput.click();
+    });
+    
+    // Drag and drop functionality
+    uploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        $(this).addClass('dragover');
+    });
+    
+    uploadArea.on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+    });
+    
+    uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.on('change', function() {
+        if (this.files.length > 0) {
+            handleFile(this.files[0]);
+        }
+    });
+    
+    function handleFile(file) {
+        uploadedFileName = file.name;
+        $('#fileName').text(file.name);
+        $('#fileInfo').removeClass('d-none');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            parseSessionData(content);
+        };
+        reader.readAsText(file);
+    }
+    
+    function parseSessionData(content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        sessionData = {};
+        
+        // Find all sections in the document
+        const allElements = doc.querySelectorAll('*');
+        let currentDate = '';
+        let currentSession = '';
+        let currentExamInfo = {};
+        
+        for (let i = 0; i < allElements.length; i++) {
+            const element = allElements[i];
+            const text = element.textContent.trim();
+            
+            // Look for date information
+            if (text.includes('Date of Exam')) {
+                const dateMatch = text.match(/Date of Exam\s*:\s*(.+?)(?:AM|PM|$)/i);
+                if (dateMatch) {
+                    const fullDateText = dateMatch[1].trim();
+                    // Extract just the date part (before AM/PM)
+                    const dateParts = fullDateText.split(' ');
+                    currentDate = dateParts[0]; // Get just the date part
+                    
+                    // Determine session
+                    if (text.includes('AM')) {
+                        currentSession = 'morning';
+                    } else if (text.includes('PM')) {
+                        currentSession = 'afternoon';
+                    }
+                }
+            }
+            
+            // Look for exam info (rooms, reliever, total) - can be in same or different elements
+            if (text.includes('Number of Rooms') || text.includes('Reliever') || text.includes('Total Invigilators')) {
+                const roomsMatch = text.match(/Number of Rooms\s*:\s*(\d+)/i);
+                const relieverMatch = text.match(/Reliever\s*:\s*(\d+)/i);
+                const totalMatch = text.match(/Total Invigilators\s*:\s*(\d+)/i);
+                
+                if (roomsMatch || relieverMatch || totalMatch) {
+                    currentExamInfo = {
+                        rooms: roomsMatch ? roomsMatch[1] : (currentExamInfo.rooms || ''),
+                        reliever: relieverMatch ? relieverMatch[1] : (currentExamInfo.reliever || ''),
+                        totalInvigilators: totalMatch ? totalMatch[1] : (currentExamInfo.totalInvigilators || '')
+                    };
+                    console.log('Found exam info:', currentExamInfo);
+                }
+            }
+            
+            // Look for session titles
+            if (text.match(/^(MORNING|AFTERNOON)\s+SESSION$/i)) {
+                currentSession = text.toLowerCase().includes('morning') ? 'morning' : 'afternoon';
+            }
+            
+            // Look for tables (Deputy Superintendents and Invigilators)
+            if (element.tagName === 'TABLE') {
+                const rows = element.querySelectorAll('tr');
+                let isDeputyTable = false;
+                let isInvigilatorTable = false;
+                let deputies = [];
+                let invigilators = [];
+                
+                for (let j = 0; j < rows.length; j++) {
+                    const row = rows[j];
+                    const cells = row.querySelectorAll('td, th');
+                    
+                    if (cells.length > 0) {
+                        const headerText = Array.from(cells).map(cell => cell.textContent.trim().toLowerCase()).join(' ');
+                        
+                        // Check if this is a deputy superintendents table header
+                        if (headerText.includes('sl no') && headerText.includes('name') && 
+                            headerText.includes('dept') && headerText.includes('contact') &&
+                            !headerText.includes('alloted room')) {
+                            isDeputyTable = true;
+                            isInvigilatorTable = false;
+                            continue; // Skip header row
+                        }
+                        
+                        // Check if this is an invigilator table header
+                        if (headerText.includes('sl no') && headerText.includes('name') && 
+                            headerText.includes('dept') && headerText.includes('contact') &&
+                            headerText.includes('alloted room')) {
+                            isInvigilatorTable = true;
+                            isDeputyTable = false;
+                            continue; // Skip header row
+                        }
+                        
+                        // Collect deputy superintendent data
+                        if (isDeputyTable && cells.length >= 6) {
+                            const name = cells[1].textContent.trim();
+                            
+                            if (name && name.toLowerCase() !== 'name' && 
+                                name.toLowerCase() !== 'no allocations found' &&
+                                !name.toLowerCase().includes('list of')) {
+                                
+                                deputies.push({
+                                    slNo: cells[0].textContent.trim(),
+                                    name: name,
+                                    designation: cells[2].textContent.trim(),
+                                    initials: cells[3].textContent.trim(),
+                                    contact: cells[4].textContent.trim(),
+                                    dept: cells[5].textContent.trim()
+                                });
+                            }
+                        }
+                        
+                        // Collect invigilator data
+                        if (isInvigilatorTable && cells.length >= 6) {
+                            const name = cells[1].textContent.trim();
+                            
+                            if (name && name.toLowerCase() !== 'name' && 
+                                name.toLowerCase() !== 'no allocations found' &&
+                                !name.toLowerCase().includes('list of')) {
+                                
+                                invigilators.push({
+                                    slNo: cells[0].textContent.trim(),
+                                    name: name,
+                                    designation: cells[2].textContent.trim(),
+                                    initials: cells[3].textContent.trim(),
+                                    contact: cells[4].textContent.trim(),
+                                    dept: cells[5].textContent.trim(),
+                                    room: cells.length > 6 ? cells[6].textContent.trim() : ''
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                // Store data if we found any and have current date/session info
+                if (currentDate && currentSession) {
+                    if (!sessionData[currentDate]) {
+                        sessionData[currentDate] = {};
+                    }
+                    if (!sessionData[currentDate][currentSession]) {
+                        sessionData[currentDate][currentSession] = {
+                            examInfo: currentExamInfo,
+                            deputies: [],
+                            invigilators: []
+                        };
+                    }
+                    
+                    if (deputies.length > 0) {
+                        sessionData[currentDate][currentSession].deputies = deputies;
+                    }
+                    if (invigilators.length > 0) {
+                        sessionData[currentDate][currentSession].invigilators = invigilators;
+                    }
+                }
+            }
+        }
+        
+        console.log('Parsed session data:', sessionData);
+        
+        if (Object.keys(sessionData).length === 0) {
+            alert('No session data found in the uploaded document. Please make sure the document contains date-wise exam sessions.');
+            return;
+        }
+    }
+    
+    // Randomize button click
+    $('#randomizeBtn').on('click', function() {
+        if (Object.keys(sessionData).length === 0) {
+            alert('Please upload a document first.');
+            return;
+        }
+        
+        $('#processingStatus').removeClass('d-none');
+        
+        // Randomize each session separately
+        setTimeout(() => {
+            randomizeAllSessions();
+            showDateSelection();
+            $('#processingStatus').addClass('d-none');
+        }, 1000);
+    });
+    
+    function randomizeAllSessions() {
+        // Predefined room list
+        const roomList = [
+            'GJCB101', 'GJCB102', 'GJCB105', 'GJCB106', 'GJCB107', 'GJCB201', 'GJCB202', 'GJCB205', 'GJCB207', 'GJCB208', 
+            'GJCB301', 'GJCB302', 'GJCB305', 'GJCB307', 'GJCB308', 'GJCB401', 'GJCB402', 'GJCB405', 'GJCB407', 'GJCB408',
+            'CSL001', 'CSL002', 'CSL003', 'CSL101', 'CSL102', 'CSL103', 'CSL104', 'CSL105',
+            'ISE301', 'ISE302', 'ISE303', 'ISE304', 'ISE305', 'ISE306',
+            'E&C201A', 'E&C201B', 'E&C301A', 'E&C301B', 'E&C302', 'E&C402', 'E&C403', 'E&C404', 'E&C405', 'E&C406', 'E&C407',
+            'TEL101A', 'TEL101B',
+            'MEL102', 'MEL103', 'MEL301', 'MEL302', 'MEL303', 'MEL306', 'MEL307',
+            'CHL201', 'CHL202', 'CHL203', 'CHL204'
+        ];
+        
+        Object.keys(sessionData).forEach(date => {
+            Object.keys(sessionData[date]).forEach(session => {
+                const sessionInfo = sessionData[date][session];
+                
+                // Only randomize invigilators, keep deputies as-is
+                if (sessionInfo.invigilators && sessionInfo.invigilators.length > 0) {
+                    // Fisher-Yates shuffle for invigilators only
+                    const invigilators = [...sessionInfo.invigilators];
+                    for (let i = invigilators.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [invigilators[i], invigilators[j]] = [invigilators[j], invigilators[i]];
+                    }
+                    
+                    // Renumber serial numbers for invigilators
+                    invigilators.forEach((invigilator, index) => {
+                        invigilator.slNo = (index + 1).toString();
+                    });
+                    
+                    // Allocate rooms based on Number of Rooms
+                    const numberOfRooms = parseInt(sessionInfo.examInfo.rooms) || 0;
+                    console.log(`Allocating rooms for ${date} ${session}: ${numberOfRooms} rooms`);
+                    allocateRooms(invigilators, roomList, numberOfRooms);
+                    console.log('Room allocation completed:', invigilators.map(inv => `${inv.name}: ${inv.room}`));
+                    
+                    sessionInfo.invigilators = invigilators;
+                }
+                
+                // Keep deputies unchanged (no randomization)
+                // Deputies serial numbers remain as they were in the original document
+            });
+        });
+    }
+    
+    function allocateRooms(invigilators, roomList, numberOfRooms) {
+        console.log(`Starting room allocation: ${numberOfRooms} rooms for ${invigilators.length} invigilators`);
+        
+        let roomIndex = 0;
+        let invigilatorIndex = 0;
+        let roomsAllocated = 0;
+        
+        // If numberOfRooms is 0 or invalid, mark all as Extra
+        if (numberOfRooms <= 0) {
+            console.log('No rooms to allocate, marking all as Extra');
+            invigilators.forEach(inv => inv.room = 'Extra');
+            return;
+        }
+        
+        while (roomsAllocated < numberOfRooms && roomIndex < roomList.length && invigilatorIndex < invigilators.length) {
+            // Allocate 5 rooms
+            for (let i = 0; i < 5 && roomsAllocated < numberOfRooms && roomIndex < roomList.length && invigilatorIndex < invigilators.length; i++) {
+                invigilators[invigilatorIndex].room = roomList[roomIndex];
+                console.log(`Assigned ${roomList[roomIndex]} to ${invigilators[invigilatorIndex].name}`);
+                roomIndex++;
+                invigilatorIndex++;
+                roomsAllocated++;
+            }
+            
+            // Add reliever after every 5 rooms (if we still have rooms to allocate and invigilators available)
+            if (roomsAllocated < numberOfRooms && invigilatorIndex < invigilators.length) {
+                invigilators[invigilatorIndex].room = 'Reliever';
+                console.log(`Assigned Reliever to ${invigilators[invigilatorIndex].name}`);
+                invigilatorIndex++;
+            }
+        }
+        
+        // Mark remaining invigilators as "Extra"
+        while (invigilatorIndex < invigilators.length) {
+            invigilators[invigilatorIndex].room = 'Extra';
+            console.log(`Marked ${invigilators[invigilatorIndex].name} as Extra`);
+            invigilatorIndex++;
+        }
+        
+        console.log(`Room allocation completed: ${roomsAllocated} rooms allocated, ${invigilators.length - invigilatorIndex + (invigilatorIndex - roomsAllocated)} extras`);
+    }
+    
+    function showDateSelection() {
+        const dateCheckboxes = $('#dateCheckboxes');
+        dateCheckboxes.empty();
+        
+        const sortedDates = Object.keys(sessionData).sort((a, b) => {
+            return new Date(convertDateFormat(a)) - new Date(convertDateFormat(b));
+        });
+        
+        sortedDates.forEach(date => {
+            const sessions = Object.keys(sessionData[date]);
+            
+            sessions.forEach(session => {
+                const sessionLabel = session === 'morning' ? 'AM' : 'PM';
+                const sessionData_item = sessionData[date][session];
+                const deputyCount = sessionData_item.deputies ? sessionData_item.deputies.length : 0;
+                const invigilatorCount = sessionData_item.invigilators ? sessionData_item.invigilators.length : 0;
+                
+                const checkbox = `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="form-check" style="background: rgba(168, 196, 236, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(168, 196, 236, 0.3);">
+                            <input class="form-check-input" type="checkbox" value="${date}|${session}" id="date_${date.replace(/\//g, '_')}_${session}">
+                            <label class="form-check-label" for="date_${date.replace(/\//g, '_')}_${session}" style="color: #06457F; font-weight: 500;">
+                                <strong>${date} ${sessionLabel}</strong><br>
+                                <small>Deputies: ${deputyCount}, Invigilators: ${invigilatorCount}</small>
+                            </label>
+                        </div>
+                    </div>
+                `;
+                dateCheckboxes.append(checkbox);
+            });
+        });
+        
+        $('#dateSelectionSection').removeClass('d-none');
+    }
+    
+    function convertDateFormat(dateStr) {
+        // Convert DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
+        const parts = dateStr.split(/[\/\-]/);
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return dateStr;
+    }
+    
+    // Export selected dates
+    $('#exportSelectedBtn').on('click', function() {
+        const selectedSessions = [];
+        $('#dateCheckboxes input[type="checkbox"]:checked').each(function() {
+            selectedSessions.push($(this).val());
+        });
+        
+        if (selectedSessions.length === 0) {
+            alert('Please select at least one session to export.');
+            return;
+        }
+        
+        exportSelectedSessions(selectedSessions);
+    });
+    
+    function exportSelectedSessions(selectedSessions) {
+        let documentContent = '';
+        
+        selectedSessions.forEach((sessionKey, index) => {
+            const [date, session] = sessionKey.split('|');
+            const sessionInfo = sessionData[date][session];
+            const sessionLabel = session === 'morning' ? 'MORNING' : 'AFTERNOON';
+            const sessionCode = session === 'morning' ? 'AM' : 'PM';
+            
+            console.log(`Exporting ${date} ${session}:`, sessionInfo.invigilators?.map(inv => `${inv.name}: ${inv.room}`));
+            
+            documentContent += `
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div class="exam-info">
+                    <span><strong>Date of Exam:</strong> ${date} ${sessionCode}</span>
+                    <span><strong>Number of Rooms:</strong> ${sessionInfo.examInfo.rooms || ''}</span>
+                    <span><strong>Reliever:</strong> ${sessionInfo.examInfo.reliever || ''}</span>
+                    <span><strong>Total Invigilators:</strong> ${sessionInfo.invigilators ? sessionInfo.invigilators.length : 0}</span>
+                </div>
+                <div class="session-title">${sessionLabel} SESSION</div>
+                
+                <div class="section-title">List of Deputy Superintendents</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                    </tr>
+                    ${sessionInfo.deputies && sessionInfo.deputies.length > 0 ? 
+                        sessionInfo.deputies.map(deputy => `
+                            <tr>
+                                <td>${deputy.slNo}</td>
+                                <td>${deputy.name}</td>
+                                <td>${deputy.designation}</td>
+                                <td>${deputy.initials}</td>
+                                <td>${deputy.contact}</td>
+                                <td>${deputy.dept}</td>
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="6">No Deputy Superintendents found for this session.</td></tr>'
+                    }
+                </table>
+                
+                <div class="section-title">List of Invigilators</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                        <th>Alloted Room / Relieving ( R )</th>
+                    </tr>
+                    ${sessionInfo.invigilators && sessionInfo.invigilators.length > 0 ? 
+                        sessionInfo.invigilators.map(invigilator => `
+                            <tr>
+                                <td>${invigilator.slNo}</td>
+                                <td>${invigilator.name}</td>
+                                <td>${invigilator.designation}</td>
+                                <td>${invigilator.initials}</td>
+                                <td>${invigilator.contact}</td>
+                                <td>${invigilator.dept}</td>
+                                <td>${invigilator.room || ''}</td>
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="7">No Invigilators found for this session.</td></tr>'
+                    }
+                </table>
+                <div style="page-break-after: always;"></div>
+            `;
+        });
+        
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Randomized Room Allotment</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                    .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                    .exam-info { margin-bottom: 15px; }
+                    .exam-info span { display: inline-block; margin-right: 30px; }
+                    .session-title { font-weight: bold; font-size: 14px; margin: 20px 0 10px 0; text-align: center; }
+                    .section-title { font-weight: bold; margin: 15px 0 5px 0; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+                    th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; }
+                    th { background-color: #f0f0f0; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                ${documentContent}
+            </body>
+            </html>
+        `;
+        
+        const blob = new Blob([htmlContent], { type: 'application/msword' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        
+        // Generate filename based on selected sessions
+        let filename;
+        if (selectedSessions.length === 1) {
+            const [date, session] = selectedSessions[0].split('|');
+            const sessionCode = session === 'morning' ? 'AM' : 'PM';
+            filename = `Randomized_Room_Allotment_${date.replace(/\//g, '-')}_${sessionCode}_${timestamp}.doc`;
+        } else {
+            // Multiple sessions selected
+            const firstSession = selectedSessions[0].split('|');
+            const lastSession = selectedSessions[selectedSessions.length - 1].split('|');
+            filename = `Randomized_Room_Allotment_${firstSession[0].replace(/\//g, '-')}_to_${lastSession[0].replace(/\//g, '-')}_${timestamp}.doc`;
+        }
+        a.download = filename;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+});
+</script>
+{% endblock %}
