@@ -334,8 +334,11 @@
                     <!-- Department checkboxes will be added here dynamically -->
                 </div>
                 <div class="text-center mt-3">
-                    <button type="button" class="btn btn-export" id="exportDeptBtn">
-                        <i class="bi bi-download me-1"></i>Export Selected Departments
+                    <button type="button" class="btn btn-export me-3" id="exportDeptBtn">
+                        <i class="bi bi-download me-1"></i>Export as DOC
+                    </button>
+                    <button type="button" class="btn btn-export" id="exportDeptPdfBtn">
+                        <i class="bi bi-file-pdf me-1"></i>Export as PDF
                     </button>
                 </div>
             </div>
@@ -349,8 +352,11 @@
                     <!-- Date checkboxes will be added here dynamically -->
                 </div>
                 <div class="text-center mt-3">
-                    <button type="button" class="btn btn-export" id="exportSelectedBtn">
-                        <i class="bi bi-download me-1"></i>Export Selected Dates
+                    <button type="button" class="btn btn-export me-3" id="exportSelectedBtn">
+                        <i class="bi bi-download me-1"></i>Export as DOC
+                    </button>
+                    <button type="button" class="btn btn-export" id="exportSelectedPdfBtn">
+                        <i class="bi bi-file-pdf me-1"></i>Export as PDF
                     </button>
                 </div>
             </div>
@@ -1199,6 +1205,137 @@ $(document).ready(function() {
         window.URL.revokeObjectURL(url);
     }
     
+    // Export selected dates as PDF
+    $('#exportSelectedPdfBtn').on('click', function() {
+        const selectedSessions = [];
+        $('#dateCheckboxes input[type="checkbox"]:checked').each(function() {
+            selectedSessions.push($(this).val());
+        });
+        
+        if (selectedSessions.length === 0) {
+            alert('Please select at least one date/session to export.');
+            return;
+        }
+        
+        exportSelectedSessionsPDF(selectedSessions);
+    });
+    
+    function exportSelectedSessionsPDF(selectedSessions) {
+        let documentContent = '';
+        
+        selectedSessions.forEach((sessionKey, index) => {
+            const [date, session] = sessionKey.split('|');
+            const sessionInfo = sessionData[date][session];
+            const sessionLabel = session === 'morning' ? 'MORNING' : 'AFTERNOON';
+            const sessionCode = session === 'morning' ? 'AM' : 'PM';
+            
+            // Format date to full format (e.g., "22 October 2025")
+            const formattedDate = formatDateToFullFormat(date);
+            
+            documentContent += `
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div class="exam-info">
+                    <span><strong>Date of Exam:</strong> ${formattedDate} ${sessionCode}</span>
+                    <span><strong>Number of Rooms:</strong> ${sessionInfo.examInfo.rooms || ''}</span>
+                    <span><strong>Reliever:</strong> ${sessionInfo.examInfo.reliever || ''}</span>
+                    <span><strong>Total Invigilators:</strong> ${sessionInfo.invigilators ? sessionInfo.invigilators.length : 0}</span>
+                </div>
+                <div class="session-title">${sessionLabel} SESSION</div>
+                
+                <div class="section-title">List of Deputy Superintendents</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                    </tr>
+                    ${sessionInfo.deputies && sessionInfo.deputies.length > 0 ? 
+                        sessionInfo.deputies.map(deputy => `
+                            <tr>
+                                <td>${deputy.slNo}</td>
+                                <td>${deputy.name}</td>
+                                <td>${deputy.designation}</td>
+                                <td>${deputy.initials}</td>
+                                <td>${deputy.contact}</td>
+                                <td>${deputy.dept}</td>
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="6">No Deputy Superintendents found for this session.</td></tr>'
+                    }
+                </table>
+                
+                <div class="section-title">List of Invigilators</div>
+                <table>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Initials</th>
+                        <th>Contact No</th>
+                        <th>Dept</th>
+                        <th>Alloted Room / Relieving ( R )</th>
+                    </tr>
+                    ${sessionInfo.invigilators && sessionInfo.invigilators.length > 0 ? 
+                        sessionInfo.invigilators.map(invigilator => `
+                            <tr>
+                                <td>${invigilator.slNo}</td>
+                                <td>${invigilator.name}</td>
+                                <td>${invigilator.designation}</td>
+                                <td>${invigilator.initials}</td>
+                                <td>${invigilator.contact}</td>
+                                <td>${invigilator.dept}</td>
+                                <td>${invigilator.room || ''}</td>
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="7">No Invigilators found for this session.</td></tr>'
+                    }
+                </table>
+                <div style="page-break-after: always;"></div>
+            `;
+        });
+        
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Randomized Room Allotment</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                    .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                    .exam-info { margin-bottom: 15px; }
+                    .exam-info span { display: inline-block; margin-right: 30px; }
+                    .session-title { font-weight: bold; font-size: 14px; margin: 20px 0 10px 0; text-align: center; }
+                    .section-title { font-weight: bold; margin: 15px 0 5px 0; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+                    th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; }
+                    th { background-color: #f0f0f0; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                ${documentContent}
+            </body>
+            </html>
+        `;
+        
+        // Create PDF using browser's print functionality
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait for content to load then trigger print dialog
+        printWindow.onload = function() {
+            printWindow.print();
+            // Close the window after printing
+            setTimeout(() => {
+                printWindow.close();
+            }, 1000);
+        };
+    }
+    
     // Export selected departments
     $('#exportDeptBtn').on('click', function() {
         const selectedDepartments = [];
@@ -1240,13 +1377,16 @@ $(document).ready(function() {
             
             // Professors table - Always create this table
             documentContent += `
-                <div class="section-title">Professors</div>
+                <div class="section-title">Deputy chief Suptds</div>
                 <table>
                     <tr>
                         <th>Name</th>
                         <th>Initials</th>
                         <th>Designation</th>
-                        <th>Allocated Dates</th>
+                        ${deptInfo.professors.length > 0 && deptInfo.professors[0].allocatedDates.length > 0 ? 
+                            deptInfo.professors[0].allocatedDates.map(() => `<th></th>`).join('') : 
+                            '<th>Allocated Dates</th>'
+                        }
                     </tr>
                     ${deptInfo.professors.length > 0 ? 
                         deptInfo.professors.map(prof => `
@@ -1254,7 +1394,10 @@ $(document).ready(function() {
                                 <td>${prof.name}</td>
                                 <td>${prof.initials}</td>
                                 <td>${prof.designation}</td>
-                                <td>${prof.allocatedDates.join(', ')}</td>
+                                ${prof.allocatedDates.length > 0 ? 
+                                    prof.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
+                                    '<td>No dates allocated</td>'
+                                }
                             </tr>
                         `).join('') : 
                         '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No professors found in this department</td></tr>'
@@ -1270,7 +1413,10 @@ $(document).ready(function() {
                         <th>Name</th>
                         <th>Initials</th>
                         <th>Designation</th>
-                        <th>Allocated Dates</th>
+                        ${deptInfo.nonProfessors.length > 0 && deptInfo.nonProfessors[0].allocatedDates.length > 0 ? 
+                            deptInfo.nonProfessors[0].allocatedDates.map(() => `<th></th>`).join('') : 
+                            '<th>Allocated Dates</th>'
+                        }
                     </tr>
                     ${deptInfo.nonProfessors.length > 0 ? 
                         deptInfo.nonProfessors.map(person => `
@@ -1278,7 +1424,170 @@ $(document).ready(function() {
                                 <td>${person.name}</td>
                                 <td>${person.initials}</td>
                                 <td>${person.designation}</td>
-                                <td>${person.allocatedDates.join(', ')}</td>
+                                ${person.allocatedDates.length > 0 ? 
+                                    person.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
+                                    '<td>No dates allocated</td>'
+                                }
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="' + (deptInfo.nonProfessors.length > 0 && deptInfo.nonProfessors[0].allocatedDates.length > 0 ? deptInfo.nonProfessors[0].allocatedDates.length + 3 : 4) + '" style="text-align: center; font-style: italic; color: #666;">No invigilators found in this department</td></tr>'
+                    }
+                </table>
+                
+                <div class="footer-section">
+                    <div class="timing-info">
+                        <div>AM: 09:30 AM TO 12:30PM</div>
+                        <div>PM: 02:00 PM TO 05:00PM</div>
+                    </div>
+                    <div class="signature-text">Principal</div>
+                </div>
+            `;
+            
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${deptName} - Exam Allotment</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+                        .sub-header { text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-decoration: underline; }
+                        .department-title { text-align: center; font-weight: bold; font-size: 14px; margin: 20px 0; color: #06457F; }
+                        .instructions-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9; }
+                        .instructions-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; text-decoration: underline; }
+                        .instructions-list { margin: 10px 0; padding-left: 20px; }
+                        .instructions-list li { margin-bottom: 5px; font-size: 12px; }
+                        .cooperation-note { font-weight: bold; text-align: center; margin-top: 15px; font-style: italic; }
+                        .section-title { font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F; }
+                        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
+                        th { background-color: #f0f0f0; font-weight: bold; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .footer-section { margin-top: 80px; position: relative; overflow: hidden; }
+                        .timing-info { font-size: 12px; font-weight: bold; float: left; }
+                        .timing-info div { margin-bottom: 5px; }
+                        .signature-text { font-weight: bold; font-size: 14px; float: right; text-align: right; }
+                        .footer-section::after { content: ""; display: table; clear: both; }
+                    </style>
+                </head>
+                <body>
+                    ${documentContent}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `${deptName}_Exam_Allotment_${timestamp}.doc`;
+            a.download = filename;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Small delay between downloads to avoid browser blocking
+            setTimeout(() => {}, 100);
+        });
+    }
+    
+    // Export selected departments as PDF
+    $('#exportDeptPdfBtn').on('click', function() {
+        const selectedDepartments = [];
+        $('#deptCheckboxes input[type="checkbox"]:checked').each(function() {
+            selectedDepartments.push($(this).val());
+        });
+        
+        if (selectedDepartments.length === 0) {
+            alert('Please select at least one department to export.');
+            return;
+        }
+        
+        exportSelectedDepartmentsPDF(selectedDepartments);
+    });
+    
+    function exportSelectedDepartmentsPDF(selectedDepartments) {
+        selectedDepartments.forEach(deptName => {
+            const deptInfo = departmentData[deptName];
+            let documentContent = '';
+            
+            // Generate document for this department (same content as DOC)
+            documentContent += `
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMAKURU - 572103</div>
+                <div class="sub-header">ALLOTMENT OF INVIGILATION DUTY FOR SEMESTER EXAMINATIONS</div>
+                <div class="department-title">${deptName} - Exam Allotment</div>
+                
+                <div class="instructions-section">
+                    <div class="instructions-title">General Instructions :</div>
+                    <ol class="instructions-list">
+                        <li>Deputy chief Supdts are requested to report to duty one hour before the schedule time of the commencement of examinations.</li>
+                        <li>Room Supdts/Relieving Supdts are requested to report to duty HALF an hour before the scheduled time of the start of the examinations.</li>
+                        <li>Request letter for mutual exchange of duty should be sent through Heads of the concerned Depts to the principal.</li>
+                        <li>Mutual exchange is permitted in the same cadre and block transfer of invigilation work is not permitted.</li>
+                        <li>Deputy Supdts/Relieving Supdts are requested to refer to the circular issued by VTU on the DUTIES and RESPONSIBILITIES and follow the same.</li>
+                    </ol>
+                    <div class="cooperation-note">Kind cooperation & involvement of every one is solicited for the Smooth conduct of examinations.</div>
+                </div>
+            `;
+            
+            // Deputy chief Suptds table
+            documentContent += `
+                <div class="section-title">Deputy chief Suptds</div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Initials</th>
+                        <th>Designation</th>
+                        ${deptInfo.professors.length > 0 && deptInfo.professors[0].allocatedDates.length > 0 ? 
+                            deptInfo.professors[0].allocatedDates.map(() => `<th></th>`).join('') : 
+                            '<th>Allocated Dates</th>'
+                        }
+                    </tr>
+                    ${deptInfo.professors.length > 0 ? 
+                        deptInfo.professors.map(prof => `
+                            <tr>
+                                <td>${prof.name}</td>
+                                <td>${prof.initials}</td>
+                                <td>${prof.designation}</td>
+                                ${prof.allocatedDates.length > 0 ? 
+                                    prof.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
+                                    '<td>No dates allocated</td>'
+                                }
+                            </tr>
+                        `).join('') : 
+                        '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No deputy chief superintendents found in this department</td></tr>'
+                    }
+                </table>
+            `;
+            
+            // Invigilators table
+            documentContent += `
+                <div class="section-title">Invigilators</div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Initials</th>
+                        <th>Designation</th>
+                        ${deptInfo.nonProfessors.length > 0 && deptInfo.nonProfessors[0].allocatedDates.length > 0 ? 
+                            deptInfo.nonProfessors[0].allocatedDates.map(() => `<th></th>`).join('') : 
+                            '<th>Allocated Dates</th>'
+                        }
+                    </tr>
+                    ${deptInfo.nonProfessors.length > 0 ? 
+                        deptInfo.nonProfessors.map(person => `
+                            <tr>
+                                <td>${person.name}</td>
+                                <td>${person.initials}</td>
+                                <td>${person.designation}</td>
+                                ${person.allocatedDates.length > 0 ? 
+                                    person.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
+                                    '<td>No dates allocated</td>'
+                                }
                             </tr>
                         `).join('') : 
                         '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No invigilators found in this department</td></tr>'
@@ -1315,10 +1624,11 @@ $(document).ready(function() {
                         th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
                         th { background-color: #f0f0f0; font-weight: bold; }
                         tr:nth-child(even) { background-color: #f9f9f9; }
-                        .footer-section { margin-top: 80px; position: relative; }
+                        .footer-section { margin-top: 80px; position: relative; overflow: hidden; }
                         .timing-info { font-size: 12px; font-weight: bold; float: left; }
                         .timing-info div { margin-bottom: 5px; }
-                        .signature-text { font-weight: bold; font-size: 14px; float: right; }
+                        .signature-text { font-weight: bold; font-size: 14px; float: right; text-align: right; }
+                        .footer-section::after { content: ""; display: table; clear: both; }
                     </style>
                 </head>
                 <body>
@@ -1327,22 +1637,22 @@ $(document).ready(function() {
                 </html>
             `;
             
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
+            // Create PDF using browser's print functionality
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
             
-            const timestamp = new Date().toISOString().split('T')[0];
-            const filename = `${deptName}_Exam_Allotment_${timestamp}.doc`;
-            a.download = filename;
+            // Wait for content to load then trigger print dialog
+            printWindow.onload = function() {
+                printWindow.print();
+                // Close the window after printing
+                setTimeout(() => {
+                    printWindow.close();
+                }, 1000);
+            };
             
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            // Small delay between downloads to avoid browser blocking
-            setTimeout(() => {}, 100);
+            // Small delay between windows to avoid browser blocking
+            setTimeout(() => {}, 500);
         });
     }
 });
