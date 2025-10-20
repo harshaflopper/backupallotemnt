@@ -785,8 +785,18 @@ $(document).ready(function() {
                     allocatedDates: allocatedDates
                 };
                 
-                // Separate professors from non-professors
-                if (designation.toLowerCase().includes('professor')) {
+                // Separate professors from non-professors based ONLY on designation column
+                const designationLower = designation.toLowerCase().trim();
+                
+                // Professors: Only "Professor" (exact match)
+                const isProfessor = designationLower === 'professor';
+                
+                // Invigilators: Everything else (Associate Professor, Assistant Professor, etc.)
+                const finalClassification = isProfessor ? 'professor' : 'invigilator';
+                
+                console.log(`${name} - Designation: "${designation}" - Classification: ${finalClassification}`);
+                
+                if (finalClassification === 'professor') {
                     professors.push(personData);
                 } else {
                     nonProfessors.push(personData);
@@ -812,7 +822,7 @@ $(document).ready(function() {
         }
         
         // Show success message with count
-        alert(`Successfully parsed ${Object.keys(departmentData).length} departments: ${Object.keys(departmentData).join(', ')}`);
+        //alert(`Successfully parsed ${Object.keys(departmentData).length} departments: ${Object.keys(departmentData).join(', ')}`);
     }
     
     // Randomize button click
@@ -1211,51 +1221,78 @@ $(document).ready(function() {
             
             // Generate document for this department
             documentContent += `
-                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMAKURU - 572103</div>
+                <div class="sub-header">ALLOTMENT OF INVIGILATION DUTY FOR SEMESTER EXAMINATIONS</div>
                 <div class="department-title">${deptName} - Exam Allotment</div>
+                
+                <div class="instructions-section">
+                    <div class="instructions-title">General Instructions :</div>
+                    <ol class="instructions-list">
+                        <li>Deputy chief Supdts are requested to report to duty one hour before the schedule time of the commencement of examinations.</li>
+                        <li>Room Supdts/Relieving Supdts are requested to report to duty HALF an hour before the scheduled time of the start of the examinations.</li>
+                        <li>Request letter for mutual exchange of duty should be sent through Heads of the concerned Depts to the principal.</li>
+                        <li>Mutual exchange is permitted in the same cadre and block transfer of invigilation work is not permitted.</li>
+                        <li>Deputy Supdts/Relieving Supdts are requested to refer to the circular issued by VTU on the DUTIES and RESPONSIBILITIES and follow the same.</li>
+                    </ol>
+                    <div class="cooperation-note">Kind cooperation & involvement of every one is solicited for the Smooth conduct of examinations.</div>
+                </div>
             `;
             
-            // Professors table
-            if (deptInfo.professors.length > 0) {
-                documentContent += `
-                    <div class="section-title">Professors</div>
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Initials</th>
-                            <th>Allocated Dates</th>
-                        </tr>
-                        ${deptInfo.professors.map(prof => `
+            // Professors table - Always create this table
+            documentContent += `
+                <div class="section-title">Professors</div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Initials</th>
+                        <th>Designation</th>
+                        <th>Allocated Dates</th>
+                    </tr>
+                    ${deptInfo.professors.length > 0 ? 
+                        deptInfo.professors.map(prof => `
                             <tr>
                                 <td>${prof.name}</td>
                                 <td>${prof.initials}</td>
+                                <td>${prof.designation}</td>
                                 <td>${prof.allocatedDates.join(', ')}</td>
                             </tr>
-                        `).join('')}
-                    </table>
-                `;
-            }
+                        `).join('') : 
+                        '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No professors found in this department</td></tr>'
+                    }
+                </table>
+            `;
             
-            // Non-professors table
-            if (deptInfo.nonProfessors.length > 0) {
-                documentContent += `
-                    <div class="section-title">Non-Professors</div>
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Initials</th>
-                            <th>Allocated Dates</th>
-                        </tr>
-                        ${deptInfo.nonProfessors.map(person => `
+            // Non-professors table (Invigilators) - Always create this table
+            documentContent += `
+                <div class="section-title">Invigilators</div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Initials</th>
+                        <th>Designation</th>
+                        <th>Allocated Dates</th>
+                    </tr>
+                    ${deptInfo.nonProfessors.length > 0 ? 
+                        deptInfo.nonProfessors.map(person => `
                             <tr>
                                 <td>${person.name}</td>
                                 <td>${person.initials}</td>
+                                <td>${person.designation}</td>
                                 <td>${person.allocatedDates.join(', ')}</td>
                             </tr>
-                        `).join('')}
-                    </table>
-                `;
-            }
+                        `).join('') : 
+                        '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No invigilators found in this department</td></tr>'
+                    }
+                </table>
+                
+                <div class="footer-section">
+                    <div class="timing-info">
+                        <div>AM: 09:30 AM TO 12:30PM</div>
+                        <div>PM: 02:00 PM TO 05:00PM</div>
+                    </div>
+                    <div class="signature-text">Principal</div>
+                </div>
+            `;
             
             const htmlContent = `
                 <!DOCTYPE html>
@@ -1265,13 +1302,23 @@ $(document).ready(function() {
                     <title>${deptName} - Exam Allotment</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
-                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+                        .sub-header { text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-decoration: underline; }
                         .department-title { text-align: center; font-weight: bold; font-size: 14px; margin: 20px 0; color: #06457F; }
+                        .instructions-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9; }
+                        .instructions-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; text-decoration: underline; }
+                        .instructions-list { margin: 10px 0; padding-left: 20px; }
+                        .instructions-list li { margin-bottom: 5px; font-size: 12px; }
+                        .cooperation-note { font-weight: bold; text-align: center; margin-top: 15px; font-style: italic; }
                         .section-title { font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F; }
                         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
                         th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
                         th { background-color: #f0f0f0; font-weight: bold; }
                         tr:nth-child(even) { background-color: #f9f9f9; }
+                        .footer-section { margin-top: 80px; position: relative; }
+                        .timing-info { font-size: 12px; font-weight: bold; float: left; }
+                        .timing-info div { margin-bottom: 5px; }
+                        .signature-text { font-weight: bold; font-size: 14px; float: right; }
                     </style>
                 </head>
                 <body>
