@@ -292,6 +292,54 @@
                 </div>
             </div>
 
+            <!-- Department-wise Processing Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5 class="mb-3" style="color: #06457F; font-weight: 600;">
+                        <i class="bi bi-building me-2"></i>Department-wise Document Processing
+                    </h5>
+                    <div class="upload-area" id="deptUploadArea">
+                        <div class="upload-icon">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>
+                        </div>
+                        <h6 style="color: #06457F; font-weight: 600;">Upload Department-wise Allotment Document</h6>
+                        <p style="color: #5379AE; margin-bottom: 1rem;">Process department-wise exam allotments with separate professor/non-professor tables</p>
+                        <input type="file" id="deptFileInput" accept=".doc,.docx,.html" style="display: none;">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('deptFileInput').click();">
+                            <i class="bi bi-folder2-open me-1"></i>Choose Department File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department File Information -->
+            <div id="deptFileInfo" class="file-info d-none">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1" style="color: #06457F;"><i class="bi bi-file-check me-1"></i>Department File Uploaded</h6>
+                        <p class="mb-0" id="deptFileName" style="color: #5379AE;"></p>
+                    </div>
+                    <button type="button" class="btn btn-randomize" id="processDeptBtn">
+                        <i class="bi bi-gear me-1"></i>Process Department Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Department Selection Section -->
+            <div id="deptSelectionSection" class="d-none mb-4">
+                <h5 class="mb-3" style="color: #06457F; font-weight: 600;">
+                    <i class="bi bi-list-check me-2"></i>Select Departments to Export
+                </h5>
+                <div class="row" id="deptCheckboxes">
+                    <!-- Department checkboxes will be added here dynamically -->
+                </div>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-export" id="exportDeptBtn">
+                        <i class="bi bi-download me-1"></i>Export Selected Departments
+                    </button>
+                </div>
+            </div>
+
             <!-- Date Selection Section -->
             <div id="dateSelectionSection" class="d-none mb-4">
                 <h5 class="mb-3" style="color: #06457F; font-weight: 600;">
@@ -328,6 +376,8 @@ $(document).ready(function() {
     
     let sessionData = {}; // { "date": { "morning": {...}, "afternoon": {...} } }
     let uploadedFileName = '';
+    let departmentData = {}; // { "DEPT_NAME": { "professors": [...], "nonProfessors": [...], "dates": [...] } }
+    let deptUploadedFileName = '';
     
     // File upload handling
     const uploadArea = $('#uploadArea');
@@ -362,6 +412,42 @@ $(document).ready(function() {
     fileInput.on('change', function() {
         if (this.files.length > 0) {
             handleFile(this.files[0]);
+        }
+    });
+    
+    // Department file upload handling
+    const deptUploadArea = $('#deptUploadArea');
+    const deptFileInput = $('#deptFileInput');
+    
+    // Click to upload department file
+    deptUploadArea.on('click', function() {
+        deptFileInput.click();
+    });
+    
+    // Department drag and drop functionality
+    deptUploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        $(this).addClass('dragover');
+    });
+    
+    deptUploadArea.on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+    });
+    
+    deptUploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            handleDeptFile(files[0]);
+        }
+    });
+    
+    // Department file input change
+    deptFileInput.on('change', function() {
+        if (this.files.length > 0) {
+            handleDeptFile(this.files[0]);
         }
     });
     
@@ -537,6 +623,198 @@ $(document).ready(function() {
         }
     }
     
+    function handleDeptFile(file) {
+        deptUploadedFileName = file.name;
+        $('#deptFileName').text(file.name);
+        $('#deptFileInfo').removeClass('d-none');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            parseDepartmentData(content);
+        };
+        reader.readAsText(file);
+    }
+    
+    function parseDepartmentData(content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        departmentData = {};
+        
+        // Find all department sections - try multiple selectors
+        let departmentSections = doc.querySelectorAll('.department-section');
+        
+        // If no sections found with class, try finding by h4 elements that contain department info
+        if (departmentSections.length === 0) {
+            const allH4s = doc.querySelectorAll('h4');
+            departmentSections = [];
+            allH4s.forEach(h4 => {
+                const text = h4.textContent.trim();
+                if (text.match(/^[A-Z&]+\s*-.*Exam Allotment/i)) {
+                    // Find the parent container or create a virtual section
+                    let section = h4.closest('div') || h4.parentElement;
+                    if (section) {
+                        departmentSections.push(section);
+                    }
+                }
+            });
+        }
+        
+        // If still no sections found, try to find all tables and work backwards
+        if (departmentSections.length === 0) {
+            console.log('No department sections found, trying table-based approach');
+            const allTables = doc.querySelectorAll('table');
+            console.log('Found tables:', allTables.length);
+            
+            allTables.forEach((table, index) => {
+                // Look for a heading before this table
+                let currentElement = table.previousElementSibling;
+                let headerFound = false;
+                
+                // Search backwards for a header
+                while (currentElement && !headerFound) {
+                    if (currentElement.tagName && currentElement.tagName.match(/^H[1-6]$/)) {
+                        const text = currentElement.textContent.trim();
+                        if (text.match(/[A-Z&]+.*Exam Allotment/i) || text.match(/^[A-Z&]+\s*-/)) {
+                            // Create a virtual section
+                            const virtualSection = document.createElement('div');
+                            virtualSection.appendChild(currentElement.cloneNode(true));
+                            virtualSection.appendChild(table.cloneNode(true));
+                            departmentSections.push(virtualSection);
+                            headerFound = true;
+                            console.log('Found department via table approach:', text);
+                        }
+                    }
+                    currentElement = currentElement.previousElementSibling;
+                }
+            });
+        }
+        
+        console.log('Found department sections:', departmentSections.length);
+        
+        departmentSections.forEach((section, index) => {
+            const headerElement = section.querySelector('h4') || section.querySelector('h3') || section.querySelector('h2');
+            if (!headerElement) {
+                console.log(`No header found in section ${index}`);
+                return;
+            }
+            
+            const headerText = headerElement.textContent.trim();
+            console.log('Processing header text:', headerText);
+            
+            // Try multiple regex patterns to extract department name
+            let deptMatch = headerText.match(/^([A-Z&]+)\s*-/);
+            if (!deptMatch) {
+                deptMatch = headerText.match(/([A-Z&]+).*Exam Allotment/i);
+            }
+            if (!deptMatch) {
+                deptMatch = headerText.match(/^([A-Z&]+)/);
+            }
+            
+            if (!deptMatch) {
+                console.log('No department match found for:', headerText);
+                return;
+            }
+            
+            const deptName = deptMatch[1].trim();
+            console.log('Processing department:', deptName);
+            
+            const table = section.querySelector('table');
+            if (!table) return;
+            
+            const rows = table.querySelectorAll('tr');
+            if (rows.length < 3) return; // Need at least header rows and one data row
+            
+            // Extract date columns from header
+            const headerRow1 = rows[0];
+            const headerRow2 = rows[1];
+            const dateColumns = [];
+            const headerCells1 = headerRow1.querySelectorAll('th');
+            const headerCells2 = headerRow2.querySelectorAll('th');
+            
+            // Skip first 6 columns (Name, Initials, Designation, Department, Phone, Email)
+            for (let i = 6; i < headerCells1.length; i++) {
+                const dateText = headerCells1[i].textContent.trim();
+                const sessionText = headerCells2[i] ? headerCells2[i].textContent.trim() : '';
+                if (dateText && dateText !== '') {
+                    dateColumns.push({
+                        date: dateText,
+                        session: sessionText,
+                        index: i
+                    });
+                }
+            }
+            
+            const professors = [];
+            const nonProfessors = [];
+            
+            // Process data rows (skip first 2 header rows)
+            for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.querySelectorAll('td');
+                
+                if (cells.length < 6) continue;
+                
+                const name = cells[0].textContent.trim();
+                const initials = cells[1].textContent.trim();
+                const designation = cells[2].textContent.trim();
+                const department = cells[3].textContent.trim();
+                const phone = cells[4].textContent.trim();
+                const email = cells[5].textContent.trim();
+                
+                if (!name || name === '') continue;
+                
+                // Extract allocated dates
+                const allocatedDates = [];
+                dateColumns.forEach(dateCol => {
+                    if (cells[dateCol.index]) {
+                        const cellText = cells[dateCol.index].textContent.trim();
+                        if (cellText && cellText !== '') {
+                            allocatedDates.push(cellText);
+                        }
+                    }
+                });
+                
+                const personData = {
+                    name: name,
+                    initials: initials,
+                    designation: designation,
+                    department: department,
+                    phone: phone,
+                    email: email,
+                    allocatedDates: allocatedDates
+                };
+                
+                // Separate professors from non-professors
+                if (designation.toLowerCase().includes('professor')) {
+                    professors.push(personData);
+                } else {
+                    nonProfessors.push(personData);
+                }
+            }
+            
+            departmentData[deptName] = {
+                professors: professors,
+                nonProfessors: nonProfessors,
+                dateColumns: dateColumns
+            };
+            
+            console.log(`Department ${deptName}: ${professors.length} professors, ${nonProfessors.length} non-professors`);
+        });
+        
+        console.log('Parsed department data:', departmentData);
+        console.log('Total departments found:', Object.keys(departmentData).length);
+        console.log('Department names:', Object.keys(departmentData));
+        
+        if (Object.keys(departmentData).length === 0) {
+            alert('No department data found in the uploaded document. Please make sure the document contains department-wise exam allotments.');
+            return;
+        }
+        
+        // Show success message with count
+        alert(`Successfully parsed ${Object.keys(departmentData).length} departments: ${Object.keys(departmentData).join(', ')}`);
+    }
+    
     // Randomize button click
     $('#randomizeBtn').on('click', function() {
         if (Object.keys(sessionData).length === 0) {
@@ -553,6 +831,50 @@ $(document).ready(function() {
             $('#processingStatus').addClass('d-none');
         }, 1000);
     });
+    
+    // Process Department button click
+    $('#processDeptBtn').on('click', function() {
+        if (Object.keys(departmentData).length === 0) {
+            alert('Please upload a department document first.');
+            return;
+        }
+        
+        $('#processingStatus').removeClass('d-none');
+        
+        setTimeout(() => {
+            showDepartmentSelection();
+            $('#processingStatus').addClass('d-none');
+        }, 500);
+    });
+    
+    function showDepartmentSelection() {
+        const deptCheckboxes = $('#deptCheckboxes');
+        deptCheckboxes.empty();
+        
+        const sortedDepartments = Object.keys(departmentData).sort();
+        
+        sortedDepartments.forEach(deptName => {
+            const deptInfo = departmentData[deptName];
+            const profCount = deptInfo.professors.length;
+            const nonProfCount = deptInfo.nonProfessors.length;
+            const totalCount = profCount + nonProfCount;
+            
+            const checkbox = `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="form-check" style="background: rgba(168, 196, 236, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(168, 196, 236, 0.3);">
+                        <input class="form-check-input" type="checkbox" value="${deptName}" id="dept_${deptName.replace(/[^a-zA-Z0-9]/g, '_')}">
+                        <label class="form-check-label" for="dept_${deptName.replace(/[^a-zA-Z0-9]/g, '_')}" style="color: #06457F; font-weight: 500;">
+                            <strong>${deptName}</strong><br>
+                            <small>Professors: ${profCount}, Others: ${nonProfCount}, Total: ${totalCount}</small>
+                        </label>
+                    </div>
+                </div>
+            `;
+            deptCheckboxes.append(checkbox);
+        });
+        
+        $('#deptSelectionSection').removeClass('d-none');
+    }
     
     function randomizeAllSessions() {
         // Predefined room list
@@ -865,6 +1187,116 @@ $(document).ready(function() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+    }
+    
+    // Export selected departments
+    $('#exportDeptBtn').on('click', function() {
+        const selectedDepartments = [];
+        $('#deptCheckboxes input[type="checkbox"]:checked').each(function() {
+            selectedDepartments.push($(this).val());
+        });
+        
+        if (selectedDepartments.length === 0) {
+            alert('Please select at least one department to export.');
+            return;
+        }
+        
+        exportSelectedDepartments(selectedDepartments);
+    });
+    
+    function exportSelectedDepartments(selectedDepartments) {
+        selectedDepartments.forEach(deptName => {
+            const deptInfo = departmentData[deptName];
+            let documentContent = '';
+            
+            // Generate document for this department
+            documentContent += `
+                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div class="department-title">${deptName} - Exam Allotment</div>
+            `;
+            
+            // Professors table
+            if (deptInfo.professors.length > 0) {
+                documentContent += `
+                    <div class="section-title">Professors</div>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Initials</th>
+                            <th>Allocated Dates</th>
+                        </tr>
+                        ${deptInfo.professors.map(prof => `
+                            <tr>
+                                <td>${prof.name}</td>
+                                <td>${prof.initials}</td>
+                                <td>${prof.allocatedDates.join(', ')}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            }
+            
+            // Non-professors table
+            if (deptInfo.nonProfessors.length > 0) {
+                documentContent += `
+                    <div class="section-title">Non-Professors</div>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Initials</th>
+                            <th>Allocated Dates</th>
+                        </tr>
+                        ${deptInfo.nonProfessors.map(person => `
+                            <tr>
+                                <td>${person.name}</td>
+                                <td>${person.initials}</td>
+                                <td>${person.allocatedDates.join(', ')}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            }
+            
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${deptName} - Exam Allotment</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                        .department-title { text-align: center; font-weight: bold; font-size: 14px; margin: 20px 0; color: #06457F; }
+                        .section-title { font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F; }
+                        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
+                        th { background-color: #f0f0f0; font-weight: bold; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                    </style>
+                </head>
+                <body>
+                    ${documentContent}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `${deptName}_Exam_Allotment_${timestamp}.doc`;
+            a.download = filename;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Small delay between downloads to avoid browser blocking
+            setTimeout(() => {}, 100);
+        });
     }
 });
 </script>

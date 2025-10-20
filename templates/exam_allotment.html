@@ -582,10 +582,15 @@
                                  </button>
                              </div>
                              <div class="col-md-4 col-lg-2">
-                                 <button type="button" id="printByDeptBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
-                                     <i class="bi bi-printer me-1"></i>Print Dept-wise
-                                 </button>
-                             </div>
+                                <button type="button" id="printByDeptBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                    <i class="bi bi-printer me-1"></i>Print Dept-wise
+                                </button>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <button type="button" id="exportDeptDocBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #e11d48 0%, #be185d 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                                    <i class="bi bi-file-earmark-word me-1"></i>Export Dept Doc
+                                </button>
+                            </div>
                              <div class="col-md-4 col-lg-2">
                                  <button type="button" id="exportAllocationBtn" class="btn w-100 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 500; border: none; border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                                      <i class="bi bi-download me-1"></i>Export
@@ -1682,6 +1687,134 @@ $(document).ready(function() {
         w.document.close();
         // Give the new window a moment to render before printing
         setTimeout(function(){ w.print(); }, 300);
+    });
+
+    // Export Dept Doc button handler - exports department-wise data as Word document
+    $('#exportDeptDocBtn').on('click', function() {
+        if ($('#professorsSection').hasClass('d-none')) {
+            alert('Please proceed to allocation to generate the table before exporting.');
+            return;
+        }
+
+        const departments = new Set();
+        $('#professorsTableBody tr').each(function() {
+            const $cells = $(this).children('td');
+            if ($cells.length === 0) return;
+            if ($(this).hasClass('faculty-separator')) return;
+            const dept = ($cells.eq(3).text() || '').trim();
+            if (dept) departments.add(dept);
+        });
+
+        if (departments.size === 0) {
+            alert('No department data found to export.');
+            return;
+        }
+
+        // Build document HTML (same structure as print but for Word export)
+        const start = $('#examStartDate').val() || '';
+        const end = $('#examEndDate').val() || '';
+        const FIXED_COLS = 7; // Name..Total Allotments
+        const baseHeaderIndices = [0,1,2,3,4,5];
+        const headerRow1 = [];
+        const headerRow2 = [];
+        const dateLabelsPerSession = [];
+        const sessionLabels = [];
+
+        baseHeaderIndices.forEach(function(idx) {
+            const headerText = ($('#tableHeader th').eq(idx).text() || '').trim();
+            headerRow1.push(headerText);
+            headerRow2.push('');
+        });
+
+        $('#tableHeader th').each(function(index) {
+            if (index >= FIXED_COLS) {
+                const label = $(this).text().trim();
+                const span = parseInt($(this).attr('colspan') || '1', 10);
+                for (let i = 0; i < span; i++) {
+                    headerRow1.push(label);
+                    dateLabelsPerSession.push(label);
+                }
+            }
+        });
+
+        $('#sessionHeader th').each(function(index) {
+            if (index === 0) return; // skip the first colspan placeholder
+            const txt = $(this).text().trim();
+            headerRow2.push(txt);
+            sessionLabels.push(txt);
+        });
+
+        let html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+            <title>Exam Allotment Department-wise</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+                .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+                .department-section { page-break-after: always; margin-bottom: 30px; }
+                .department-section:last-of-type { page-break-after: auto; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+                th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; }
+                th { background-color: #f0f0f0; font-weight: bold; }
+                h4 { color: #06457F; font-weight: bold; margin-bottom: 15px; }
+            </style>
+        </head><body>`;
+
+        departments.forEach(function(dept){
+            html += `<div class="department-section">`;
+            html += `<div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>`;
+            html += `<h4>${dept} - Exam Allotment (${start} to ${end})</h4>`;
+            html += `<table>`;
+            html += `<tr>${headerRow1.map(t=>`<th>${t}</th>`).join('')}</tr>`;
+            html += `<tr>${headerRow2.map(t=>`<th>${t}</th>`).join('')}</tr>`;
+
+            $('#professorsTableBody tr').each(function(){
+                const $row = $(this);
+                const $cells = $row.children('td');
+                if ($cells.length === 0) return;
+                if ($row.hasClass('faculty-separator')) return;
+                const rowDept = ($cells.eq(3).text() || '').trim();
+                if (rowDept !== dept) return;
+
+                let rowHtml = '<tr>';
+                // Base columns (Name..Email)
+                baseHeaderIndices.forEach(function(idx) {
+                    if (idx < $cells.length) {
+                        rowHtml += `<td>${($cells.eq(idx).text() || '').trim()}</td>`;
+                    } else {
+                        rowHtml += '<td></td>';
+                    }
+                });
+                // Remaining cells: show date & session if checked
+                for (let i = FIXED_COLS, sessionCounter = 0; i < $cells.length; i++, sessionCounter++) {
+                    const $cb = $cells.eq(i).find('input[type="checkbox"]');
+                    if ($cb.length && $cb.prop('checked')) {
+                        const dateLabel = (dateLabelsPerSession[sessionCounter] || '').trim();
+                        const sessionLabel = (sessionLabels[sessionCounter] || '').trim();
+                        const displayText = [dateLabel, sessionLabel].filter(Boolean).join(' ');
+                        rowHtml += `<td>${displayText}</td>`;
+                    } else {
+                        rowHtml += '<td></td>';
+                    }
+                }
+                rowHtml += '</tr>';
+                html += rowHtml;
+            });
+
+            html += `</table></div>`;
+        });
+
+        html += `</body></html>`;
+
+        // Create and download as Word document
+        const blob = new Blob([html], { type: 'application/msword' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const filename = `ExamAllotment_DeptWise_${start}_${end}.doc`.replace(/[:\\/\\\\]/g, '-');
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
     });
 
     // Progress bar update function
