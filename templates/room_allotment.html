@@ -376,6 +376,9 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Add jsPDF library for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 $(document).ready(function() {
     console.log('Room Allotment page loaded');
@@ -1221,6 +1224,28 @@ $(document).ready(function() {
     });
     
     function exportSelectedSessionsPDF(selectedSessions) {
+        // Create a temporary container for the content
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '-9999px';
+        tempContainer.style.width = '210mm'; // A4 width
+        tempContainer.style.backgroundColor = 'white';
+        tempContainer.style.fontFamily = 'Arial, sans-serif';
+        tempContainer.style.fontSize = '12px';
+        tempContainer.style.lineHeight = '1.4';
+        tempContainer.style.padding = '20px';
+        
+        // Add CSS for better table handling
+        const style = document.createElement('style');
+        style.textContent = `
+            table { page-break-inside: avoid !important; }
+            tr { page-break-inside: avoid !important; }
+            td, th { page-break-inside: avoid !important; }
+            .section-title { page-break-after: avoid !important; }
+        `;
+        tempContainer.appendChild(style);
+        
         let documentContent = '';
         
         selectedSessions.forEach((sessionKey, index) => {
@@ -1233,107 +1258,123 @@ $(document).ready(function() {
             const formattedDate = formatDateToFullFormat(date);
             
             documentContent += `
-                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
-                <div class="exam-info">
-                    <span><strong>Date of Exam:</strong> ${formattedDate} ${sessionCode}</span>
-                    <span><strong>Number of Rooms:</strong> ${sessionInfo.examInfo.rooms || ''}</span>
-                    <span><strong>Reliever:</strong> ${sessionInfo.examInfo.reliever || ''}</span>
-                    <span><strong>Total Invigilators:</strong> ${sessionInfo.invigilators ? sessionInfo.invigilators.length : 0}</span>
+                <div style="text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px;">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMKUR</div>
+                <div style="margin-bottom: 15px;">
+                    <span style="display: inline-block; margin-right: 30px;"><strong>Date of Exam:</strong> ${formattedDate} ${sessionCode}</span>
+                    <span style="display: inline-block; margin-right: 30px;"><strong>Number of Rooms:</strong> ${sessionInfo.examInfo.rooms || ''}</span>
+                    <span style="display: inline-block; margin-right: 30px;"><strong>Reliever:</strong> ${sessionInfo.examInfo.reliever || ''}</span>
+                    <span style="display: inline-block; margin-right: 30px;"><strong>Total Invigilators:</strong> ${sessionInfo.invigilators ? sessionInfo.invigilators.length : 0}</span>
                 </div>
-                <div class="session-title">${sessionLabel} SESSION</div>
+                <div style="font-weight: bold; font-size: 14px; margin: 20px 0 10px 0; text-align: center;">${sessionLabel} SESSION</div>
                 
-                <div class="section-title">List of Deputy Superintendents</div>
-                <table>
+                <div class="section-title" style="font-weight: bold; margin: 15px 0 5px 0;">List of Deputy Superintendents</div>
+                <table style="border-collapse: collapse; width: 100%; margin-bottom: 15px; page-break-inside: avoid;">
                     <tr>
-                        <th>Sl No</th>
-                        <th>Name</th>
-                        <th>Designation</th>
-                        <th>Initials</th>
-                        <th>Contact No</th>
-                        <th>Dept</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Sl No</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Name</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Designation</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Initials</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Contact No</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Dept</th>
                     </tr>
                     ${sessionInfo.deputies && sessionInfo.deputies.length > 0 ? 
                         sessionInfo.deputies.map(deputy => `
                             <tr>
-                                <td>${deputy.slNo}</td>
-                                <td>${deputy.name}</td>
-                                <td>${deputy.designation}</td>
-                                <td>${deputy.initials}</td>
-                                <td>${deputy.contact}</td>
-                                <td>${deputy.dept}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.slNo}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.name}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.designation}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.initials}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.contact}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${deputy.dept}</td>
                             </tr>
                         `).join('') : 
-                        '<tr><td colspan="6">No Deputy Superintendents found for this session.</td></tr>'
+                        '<tr><td colspan="6" style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">No Deputy Superintendents found for this session.</td></tr>'
                     }
                 </table>
                 
-                <div class="section-title">List of Invigilators</div>
-                <table>
+                <div class="section-title" style="font-weight: bold; margin: 15px 0 5px 0;">List of Invigilators</div>
+                <table style="border-collapse: collapse; width: 100%; margin-bottom: 15px; page-break-inside: avoid;">
                     <tr>
-                        <th>Sl No</th>
-                        <th>Name</th>
-                        <th>Designation</th>
-                        <th>Initials</th>
-                        <th>Contact No</th>
-                        <th>Dept</th>
-                        <th>Alloted Room / Relieving ( R )</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Sl No</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Name</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Designation</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Initials</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Contact No</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Dept</th>
+                        <th style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Alloted Room / Relieving ( R )</th>
                     </tr>
                     ${sessionInfo.invigilators && sessionInfo.invigilators.length > 0 ? 
                         sessionInfo.invigilators.map(invigilator => `
                             <tr>
-                                <td>${invigilator.slNo}</td>
-                                <td>${invigilator.name}</td>
-                                <td>${invigilator.designation}</td>
-                                <td>${invigilator.initials}</td>
-                                <td>${invigilator.contact}</td>
-                                <td>${invigilator.dept}</td>
-                                <td>${invigilator.room || ''}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.slNo}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.name}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.designation}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.initials}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.contact}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.dept}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">${invigilator.room || ''}</td>
                             </tr>
                         `).join('') : 
-                        '<tr><td colspan="7">No Invigilators found for this session.</td></tr>'
+                        '<tr><td colspan="7" style="border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px;">No Invigilators found for this session.</td></tr>'
                     }
                 </table>
-                <div style="page-break-after: always;"></div>
+                ${index < selectedSessions.length - 1 ? '<div style="page-break-after: always; height: 30px;"></div>' : ''}
             `;
         });
         
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Randomized Room Allotment</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
-                    .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
-                    .exam-info { margin-bottom: 15px; }
-                    .exam-info span { display: inline-block; margin-right: 30px; }
-                    .session-title { font-weight: bold; font-size: 14px; margin: 20px 0 10px 0; text-align: center; }
-                    .section-title { font-weight: bold; margin: 15px 0 5px 0; }
-                    table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
-                    th, td { border: 1px solid #000; padding: 5px; text-align: left; font-size: 12px; }
-                    th { background-color: #f0f0f0; font-weight: bold; }
-                </style>
-            </head>
-            <body>
-                ${documentContent}
-            </body>
-            </html>
-        `;
+        tempContainer.innerHTML = documentContent;
+        document.body.appendChild(tempContainer);
         
-        // Create PDF using browser's print functionality
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        
-        // Wait for content to load then trigger print dialog
-        printWindow.onload = function() {
-            printWindow.print();
-            // Close the window after printing
-            setTimeout(() => {
-                printWindow.close();
-            }, 1000);
-        };
+        // Use html2canvas to convert HTML to canvas, then jsPDF to create PDF
+        html2canvas(tempContainer, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 295; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            // Generate filename
+            const timestamp = new Date().toISOString().split('T')[0];
+            let filename;
+            if (selectedSessions.length === 1) {
+                const [date, session] = selectedSessions[0].split('|');
+                const sessionCode = session === 'morning' ? 'AM' : 'PM';
+                filename = `Randomized_Room_Allotment_${date.replace(/\//g, '-')}_${sessionCode}_${timestamp}.pdf`;
+            } else {
+                const firstSession = selectedSessions[0].split('|');
+                const lastSession = selectedSessions[selectedSessions.length - 1].split('|');
+                filename = `Randomized_Room_Allotment_${firstSession[0].replace(/\//g, '-')}_to_${lastSession[0].replace(/\//g, '-')}_${timestamp}.pdf`;
+            }
+            
+            // Download the PDF
+            pdf.save(filename);
+            
+            // Clean up
+            document.body.removeChild(tempContainer);
+        }).catch(error => {
+            console.error('Error generating PDF:', error);
+            alert('Error generating PDF. Please try again.');
+            document.body.removeChild(tempContainer);
+        });
     }
     
     // Export selected departments
@@ -1512,147 +1553,168 @@ $(document).ready(function() {
     });
     
     function exportSelectedDepartmentsPDF(selectedDepartments) {
-        selectedDepartments.forEach(deptName => {
+        selectedDepartments.forEach((deptName, deptIndex) => {
             const deptInfo = departmentData[deptName];
+            
+            // Create a temporary container for the content
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '-9999px';
+            tempContainer.style.width = '210mm'; // A4 width
+            tempContainer.style.backgroundColor = 'white';
+            tempContainer.style.fontFamily = 'Arial, sans-serif';
+            tempContainer.style.fontSize = '12px';
+            tempContainer.style.lineHeight = '1.4';
+            tempContainer.style.padding = '20px';
+            
+            // Add CSS for better table handling
+            const style = document.createElement('style');
+            style.textContent = `
+                table { page-break-inside: avoid !important; }
+                tr { page-break-inside: avoid !important; }
+                td, th { page-break-inside: avoid !important; }
+                .section-title { page-break-after: avoid !important; }
+            `;
+            tempContainer.appendChild(style);
+            
             let documentContent = '';
             
-            // Generate document for this department (same content as DOC)
+            // Generate document for this department with inline styles
             documentContent += `
-                <div class="header">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMAKURU - 572103</div>
-                <div class="sub-header">ALLOTMENT OF INVIGILATION DUTY FOR SEMESTER EXAMINATIONS</div>
-                <div class="department-title">${deptName} - Exam Allotment</div>
+                <div style="text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 10px;">SIDDAGANGA INSTITUTE OF TECHNOLOGY, TUMAKURU - 572103</div>
+                <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-decoration: underline;">ALLOTMENT OF INVIGILATION DUTY FOR SEMESTER EXAMINATIONS</div>
+                <div style="text-align: center; font-weight: bold; font-size: 14px; margin: 20px 0; color: #06457F;">${deptName} - Exam Allotment</div>
                 
-                <div class="instructions-section">
-                    <div class="instructions-title">General Instructions :</div>
-                    <ol class="instructions-list">
-                        <li>Deputy chief Supdts are requested to report to duty one hour before the schedule time of the commencement of examinations.</li>
-                        <li>Room Supdts/Relieving Supdts are requested to report to duty HALF an hour before the scheduled time of the start of the examinations.</li>
-                        <li>Request letter for mutual exchange of duty should be sent through Heads of the concerned Depts to the principal.</li>
-                        <li>Mutual exchange is permitted in the same cadre and block transfer of invigilation work is not permitted.</li>
-                        <li>Deputy Supdts/Relieving Supdts are requested to refer to the circular issued by VTU on the DUTIES and RESPONSIBILITIES and follow the same.</li>
+                <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+                    <div style="font-weight: bold; font-size: 14px; margin-bottom: 10px; text-decoration: underline;">General Instructions :</div>
+                    <ol style="margin: 10px 0; padding-left: 20px;">
+                        <li style="margin-bottom: 5px; font-size: 12px;">Deputy chief Supdts are requested to report to duty one hour before the schedule time of the commencement of examinations.</li>
+                        <li style="margin-bottom: 5px; font-size: 12px;">Room Supdts/Relieving Supdts are requested to report to duty HALF an hour before the scheduled time of the start of the examinations.</li>
+                        <li style="margin-bottom: 5px; font-size: 12px;">Request letter for mutual exchange of duty should be sent through Heads of the concerned Depts to the principal.</li>
+                        <li style="margin-bottom: 5px; font-size: 12px;">Mutual exchange is permitted in the same cadre and block transfer of invigilation work is not permitted.</li>
+                        <li style="margin-bottom: 5px; font-size: 12px;">Deputy Supdts/Relieving Supdts are requested to refer to the circular issued by VTU on the DUTIES and RESPONSIBILITIES and follow the same.</li>
                     </ol>
-                    <div class="cooperation-note">Kind cooperation & involvement of every one is solicited for the Smooth conduct of examinations.</div>
+                    <div style="font-weight: bold; text-align: center; margin-top: 15px; font-style: italic;">Kind cooperation & involvement of every one is solicited for the Smooth conduct of examinations.</div>
                 </div>
             `;
             
             // Deputy chief Suptds table
             documentContent += `
-                <div class="section-title">Deputy chief Suptds</div>
-                <table>
+                <div class="section-title" style="font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F;">Deputy chief Suptds</div>
+                <table style="border-collapse: collapse; width: 100%; margin-bottom: 20px; page-break-inside: avoid;">
                     <tr>
-                        <th>Name</th>
-                        <th>Initials</th>
-                        <th>Designation</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Name</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Initials</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Designation</th>
                         ${deptInfo.professors.length > 0 && deptInfo.professors[0].allocatedDates.length > 0 ? 
-                            deptInfo.professors[0].allocatedDates.map(() => `<th></th>`).join('') : 
-                            '<th>Allocated Dates</th>'
+                            deptInfo.professors[0].allocatedDates.map(() => `<th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;"></th>`).join('') : 
+                            '<th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Allocated Dates</th>'
                         }
                     </tr>
                     ${deptInfo.professors.length > 0 ? 
                         deptInfo.professors.map(prof => `
                             <tr>
-                                <td>${prof.name}</td>
-                                <td>${prof.initials}</td>
-                                <td>${prof.designation}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${prof.name}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${prof.initials}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${prof.designation}</td>
                                 ${prof.allocatedDates.length > 0 ? 
-                                    prof.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
-                                    '<td>No dates allocated</td>'
+                                    prof.allocatedDates.map(date => `<td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${date}</td>`).join('') : 
+                                    '<td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">No dates allocated</td>'
                                 }
                             </tr>
                         `).join('') : 
-                        '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No deputy chief superintendents found in this department</td></tr>'
+                        '<tr><td colspan="4" style="border: 1px solid #000; padding: 8px; text-align: center; font-style: italic; color: #666; font-size: 12px;">No deputy chief superintendents found in this department</td></tr>'
                     }
                 </table>
             `;
             
             // Invigilators table
             documentContent += `
-                <div class="section-title">Invigilators</div>
-                <table>
+                <div class="section-title" style="font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F;">Invigilators</div>
+                <table style="border-collapse: collapse; width: 100%; margin-bottom: 20px; page-break-inside: avoid;">
                     <tr>
-                        <th>Name</th>
-                        <th>Initials</th>
-                        <th>Designation</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Name</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Initials</th>
+                        <th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Designation</th>
                         ${deptInfo.nonProfessors.length > 0 && deptInfo.nonProfessors[0].allocatedDates.length > 0 ? 
-                            deptInfo.nonProfessors[0].allocatedDates.map(() => `<th></th>`).join('') : 
-                            '<th>Allocated Dates</th>'
+                            deptInfo.nonProfessors[0].allocatedDates.map(() => `<th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;"></th>`).join('') : 
+                            '<th style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; background-color: #f0f0f0; font-weight: bold;">Allocated Dates</th>'
                         }
                     </tr>
                     ${deptInfo.nonProfessors.length > 0 ? 
                         deptInfo.nonProfessors.map(person => `
                             <tr>
-                                <td>${person.name}</td>
-                                <td>${person.initials}</td>
-                                <td>${person.designation}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${person.name}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${person.initials}</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${person.designation}</td>
                                 ${person.allocatedDates.length > 0 ? 
-                                    person.allocatedDates.map(date => `<td>${date}</td>`).join('') : 
-                                    '<td>No dates allocated</td>'
+                                    person.allocatedDates.map(date => `<td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">${date}</td>`).join('') : 
+                                    '<td style="border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;">No dates allocated</td>'
                                 }
                             </tr>
                         `).join('') : 
-                        '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">No invigilators found in this department</td></tr>'
+                        '<tr><td colspan="4" style="border: 1px solid #000; padding: 8px; text-align: center; font-style: italic; color: #666; font-size: 12px;">No invigilators found in this department</td></tr>'
                     }
                 </table>
                 
-                <div class="footer-section">
-                    <div class="timing-info">
-                        <div>AM: 09:30 AM TO 12:30PM</div>
-                        <div>PM: 02:00 PM TO 05:00PM</div>
+                <div style="margin-top: 80px; position: relative; overflow: hidden;">
+                    <div style="font-size: 12px; font-weight: bold; float: left;">
+                        <div style="margin-bottom: 5px;">AM: 09:30 AM TO 12:30PM</div>
+                        <div style="margin-bottom: 5px;">PM: 02:00 PM TO 05:00PM</div>
                     </div>
-                    <div class="signature-text">Principal</div>
+                    <div style="font-weight: bold; font-size: 14px; float: right; text-align: right;">Principal</div>
+                    <div style="clear: both;"></div>
                 </div>
             `;
             
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${deptName} - Exam Allotment</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
-                        .header { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
-                        .sub-header { text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-decoration: underline; }
-                        .department-title { text-align: center; font-weight: bold; font-size: 14px; margin: 20px 0; color: #06457F; }
-                        .instructions-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9; }
-                        .instructions-title { font-weight: bold; font-size: 14px; margin-bottom: 10px; text-decoration: underline; }
-                        .instructions-list { margin: 10px 0; padding-left: 20px; }
-                        .instructions-list li { margin-bottom: 5px; font-size: 12px; }
-                        .cooperation-note { font-weight: bold; text-align: center; margin-top: 15px; font-style: italic; }
-                        .section-title { font-weight: bold; margin: 20px 0 10px 0; font-size: 14px; color: #06457F; }
-                        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-                        th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
-                        th { background-color: #f0f0f0; font-weight: bold; }
-                        tr:nth-child(even) { background-color: #f9f9f9; }
-                        .footer-section { margin-top: 80px; position: relative; overflow: hidden; }
-                        .timing-info { font-size: 12px; font-weight: bold; float: left; }
-                        .timing-info div { margin-bottom: 5px; }
-                        .signature-text { font-weight: bold; font-size: 14px; float: right; text-align: right; }
-                        .footer-section::after { content: ""; display: table; clear: both; }
-                    </style>
-                </head>
-                <body>
-                    ${documentContent}
-                </body>
-                </html>
-            `;
+            tempContainer.innerHTML = documentContent;
+            document.body.appendChild(tempContainer);
             
-            // Create PDF using browser's print functionality
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
+            // Use html2canvas to convert HTML to canvas, then jsPDF to create PDF
+            html2canvas(tempContainer, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Generate filename
+                const timestamp = new Date().toISOString().split('T')[0];
+                const filename = `${deptName}_Exam_Allotment_${timestamp}.pdf`;
+                
+                // Download the PDF
+                pdf.save(filename);
+                
+                // Clean up
+                document.body.removeChild(tempContainer);
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                alert(`Error generating PDF for ${deptName}. Please try again.`);
+                document.body.removeChild(tempContainer);
+            });
             
-            // Wait for content to load then trigger print dialog
-            printWindow.onload = function() {
-                printWindow.print();
-                // Close the window after printing
-                setTimeout(() => {
-                    printWindow.close();
-                }, 1000);
-            };
-            
-            // Small delay between windows to avoid browser blocking
-            setTimeout(() => {}, 500);
+            // Small delay between departments to avoid browser blocking
+            setTimeout(() => {}, 500 * (deptIndex + 1));
         });
     }
 });
