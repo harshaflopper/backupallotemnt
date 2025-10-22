@@ -1,14 +1,15 @@
 [
     {
         "Name": "Dr.H.M.SureshKumar",
+        "Initials": "HMS",
         "Designation": "Professor",
         "Phone": "9341243791",
         "Email": "sureshkumarhm@rediffmail.com",
         "isActive": true
     },
     {
-        "Name": "Assistant Professor",
-        "Initials": "AP",
+        "Name": "C.N.Manjunatha",
+        "Initials": "CNM",
         "Designation": "Assistant Professor",
         "Phone": "9886033360",
         "Email": "cnm@sit.ac.in",
@@ -16,7 +17,7 @@
     },
     {
         "Name": "Dr. Manohar S. R.",
-        "Initials": "DMS",
+        "Initials": "MSR",
         "Designation": "Associate Professor",
         "Phone": "9513335571",
         "Email": "manoharasr@sit.ac.in",

@@ -1,7 +1,7 @@
 [
     {
         "Name": "Dr. Jagadeesh P. Ganjigatti",
-        "Initials": "DJP",
+        "Initials": "JPG",
         "Designation": "Professor",
         "Phone": "9964313284",
         "Email": "jpganjigatti@sit.ac.in",
@@ -9,6 +9,7 @@
     },
     {
         "Name": "Dr.G.V.Prabhushankar",
+        "Initials": "GVP",
         "Designation": "Professor",
         "Phone": "9845430739",
         "Email": "gvpshankar@sit.ac.in",
@@ -16,6 +17,7 @@
     },
     {
         "Name": "Dr.B.Adaveesh",
+        "Initials": "BA",
         "Designation": "Associate Professor",
         "Phone": "9964388174",
         "Email": "badaveesh@sit.ac.in",
@@ -23,6 +25,7 @@
     },
     {
         "Name": "Dr.B.Lathashankar",
+        "Initials": "BLS",
         "Designation": "Associate Professor",
         "Phone": "9964505469",
         "Email": "blshankar@sit.ac.in",
@@ -30,7 +33,7 @@
     },
     {
         "Name": "Dr. T. R. Veena",
-        "Initials": "DTR",
+        "Initials": "TRV",
         "Designation": "Assistant Professor",
         "Phone": "9844274363",
         "Email": "trveena@sit.ac.in",
@@ -38,6 +41,7 @@
     },
     {
         "Name": "Dr.K.V.Manjunath",
+        "Initials": "KVM",
         "Designation": "Assistant Professor",
         "Phone": "9916308766",
         "Email": "kvmanju@sit.ac.in",
@@ -45,7 +49,7 @@
     },
     {
         "Name": "Dr. P. M. Nagaraj",
-        "Initials": "DPM",
+        "Initials": "NPM",
         "Designation": "Assistant Professor",
         "Phone": "9886515821",
         "Email": "nagarajpm@sit.ac.in",
@@ -53,7 +57,7 @@
     },
     {
         "Name": "Dr. M. Vishwas",
-        "Initials": "DMV",
+        "Initials": "MV",
         "Designation": "Assistant Professor",
         "Phone": "9986644944",
         "Email": "vishwasm@sit.ac.in",
@@ -61,7 +65,7 @@
     },
     {
         "Name": "Dr. T. S. Mohan Kumar",
-        "Initials": "DTS",
+        "Initials": "TSM",
         "Designation": "Assistant Professor",
         "Phone": "9964107757",
         "Email": "mohankumarts@sit.ac.in",
@@ -69,7 +73,7 @@
     },
     {
         "Name": "Dr. K. C. Anil",
-        "Initials": "DKC",
+        "Initials": "KCA",
         "Designation": "Assistant Professor",
         "Phone": "9986900982",
         "Email": "anilkc@sit.ac.in",

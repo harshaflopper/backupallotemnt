@@ -1,6 +1,7 @@
 [
     {
         "Name": "Dr.B.G.Premasudha",
+        "Initials": "PBG",
         "Designation": "Professor",
         "Phone": "9845238744",
         "Email": "bgpremasudha@sit.ac.in",
@@ -8,7 +9,7 @@
     },
     {
         "Name": "Dr.Asha Gowda Karegowda",
-        "Initials": "DAG",
+        "Initials": "AGK",
         "Designation": "Associate Professor",
         "Phone": "9844327268",
         "Email": "asha_gowda@sit.ac.in",
@@ -16,7 +17,7 @@
     },
     {
         "Name": "Dr. H.S.Vijay Kumar",
-        "Initials": "DHS",
+        "Initials": "HSV",
         "Designation": "Assistant Professor",
         "Phone": "9844521479",
         "Email": "vijayakumar@sit.ac.in",
@@ -24,7 +25,7 @@
     },
     {
         "Name": "Dr. Bhanuprakash C",
-        "Initials": "DBC",
+        "Initials": "CBP",
         "Designation": "Assistant Professor",
         "Phone": "9844418422",
         "Email": "bc_prakash@hotmail.com",
@@ -40,7 +41,7 @@
     },
     {
         "Name": "Dr. Prashanth G.K.",
-        "Initials": "DPG",
+        "Initials": "PGK",
         "Designation": "Assistant Professor",
         "Phone": "9980933552",
         "Email": "prashanthgk@sit.ac.in",

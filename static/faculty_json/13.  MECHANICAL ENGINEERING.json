@@ -1,6 +1,7 @@
 [
     {
         "Name": "Dr.U.S.Mallikarjun",
+        "Initials": "USM",
         "Designation": "Professor",
         "Phone": "9448166621",
         "Email": "usm@sit.ac.in",
@@ -8,7 +9,7 @@
     },
     {
         "Name": "Dr. C.Shashishekar",
-        "Initials": "DCS",
+        "Initials": "CSS",
         "Designation": "Associate Professor",
         "Phone": "9844356911",
         "Email": "csshek@sit.ac.in",
@@ -16,6 +17,7 @@
     },
     {
         "Name": "Dr.B.Vasudeva",
+        "Initials": "BV",
         "Designation": "Associate Professor",
         "Phone": "7619178168",
         "Email": "bva@sit.ac.in",
@@ -23,7 +25,7 @@
     },
     {
         "Name": "Dr.Virupaxi Auradi",
-        "Initials": "DVA",
+        "Initials": "VSA",
         "Designation": "Professor",
         "Phone": "9844386037",
         "Email": "vsauradi@sit.ac.in",
@@ -31,6 +33,7 @@
     },
     {
         "Name": "Dr.H.S.Shivashankar",
+        "Initials": "HSS",
         "Designation": "Associate Professor",
         "Phone": "9901245082",
         "Email": "hssmed@sit.ac.in",
@@ -38,7 +41,7 @@
     },
     {
         "Name": "Dr. C.P.Lohith",
-        "Initials": "DCP",
+        "Initials": "CPL",
         "Designation": "Assistant Professor",
         "Phone": "9342227158",
         "Email": "lohithcp@sit.ac.in",
@@ -46,7 +49,7 @@
     },
     {
         "Name": "Dr. Nagaraju",
-        "Initials": "DN",
+        "Initials": "NAG",
         "Designation": "Assistant Professor",
         "Phone": "9986078536",
         "Email": "nagaraju@sit.ac.in",
@@ -54,7 +57,7 @@
     },
     {
         "Name": "Dr. Manjunath H.",
-        "Initials": "DMH",
+        "Initials": "MH",
         "Designation": "Assistant Professor",
         "Phone": "9448808299",
         "Email": "hmanjunath@sit.ac.in",
@@ -62,7 +65,7 @@
     },
     {
         "Name": "Dr. N.Shanmugapriya",
-        "Initials": "DNS",
+        "Initials": "NSP",
         "Designation": "Assistant Professor",
         "Phone": "9739930913",
         "Email": "nspriya@sit.ac.in",
@@ -70,7 +73,7 @@
     },
     {
         "Name": "Dr. Prashantha S.",
-        "Initials": "DPS",
+        "Initials": "PS",
         "Designation": "Assistant Professor",
         "Phone": "9448728954",
         "Email": "sprasantha@sit.ac.in",
@@ -78,7 +81,7 @@
     },
     {
         "Name": "Dr. Tharakeshwar.T.K",
-        "Initials": "DTT",
+        "Initials": "TKT",
         "Designation": "Assistant Professor",
         "Phone": "9343001494",
         "Email": "tktharakesh@sit.ac.in",
@@ -86,7 +89,7 @@
     },
     {
         "Name": "Dr. A. G. Shivasiddaramaiah",
-        "Initials": "DAG",
+        "Initials": "AGS",
         "Designation": "Assistant Professor",
         "Phone": "9448175427",
         "Email": "agshivasiddaramaiah@sit.ac.in",
@@ -94,7 +97,7 @@
     },
     {
         "Name": "Dr. M. G. Gautham",
-        "Initials": "DMG",
+        "Initials": "MGG",
         "Designation": "Assistant Professor",
         "Phone": "9740771357",
         "Email": "gauthammg@sit.ac.in",
@@ -102,7 +105,7 @@
     },
     {
         "Name": "Dr. C. T. Manjunath",
-        "Initials": "DCT",
+        "Initials": "CTM",
         "Designation": "Assistant Professor",
         "Phone": "9449009911",
         "Email": "ctmanjunath@sit.ac.in",
@@ -110,7 +113,7 @@
     },
     {
         "Name": "Dr. Adarsh.S.H",
-        "Initials": "DAS",
+        "Initials": "HSA",
         "Designation": "Assistant Professor",
         "Phone": "9886992078",
         "Email": "shadarsh@sit.ac.in",
@@ -126,15 +129,15 @@
     },
     {
         "Name": "Dr. Arun.S.B",
-        "Initials": "DAS",
+        "Initials": "ASB",
         "Designation": "Assistant Professor",
         "Phone": "9731104711",
         "Email": "arunsb2012@gmail.com",
         "isActive": true
     },
     {
-        "Name": "Assistant Professor",
-        "Initials": "AP",
+        "Name": "Ekanthappa J",
+        "Initials": "EJ",
         "Designation": "Assistant Professor",
         "Phone": "9964562177",
         "Email": "ekanthappaj@sit.ac.in",
@@ -142,7 +145,7 @@
     },
     {
         "Name": "Dr. Omkaresh.B.R",
-        "Initials": "DOB",
+        "Initials": "OBR",
         "Designation": "Assistant Professor",
         "Phone": "8904202538",
         "Email": "omkar@sit.ac.in",
@@ -150,7 +153,7 @@
     },
     {
         "Name": "Dr. Vineeth Kumar T.V",
-        "Initials": "DVK",
+        "Initials": "VTV",
         "Designation": "Assistant Professor",
         "Phone": "9738213995",
         "Email": "vineethkumartv@sit.ac.in",
@@ -166,7 +169,7 @@
     },
     {
         "Name": "Dr. Bharath H.S.",
-        "Initials": "DBH",
+        "Initials": "BHS",
         "Designation": "Assistant Professor",
         "Phone": "8904318630",
         "Email": "bharaths@sit.ac.in",
@@ -174,7 +177,7 @@
     },
     {
         "Name": "Dr.Nithesh K.G",
-        "Initials": "DNK",
+        "Initials": "NKG",
         "Designation": "Assistant Professor",
         "Phone": "9606836255",
         "Email": "niteshkg@sit.ac.in",
@@ -182,7 +185,7 @@
     },
     {
         "Name": "Dr. Sunil B",
-        "Initials": "DSB",
+        "Initials": "SB",
         "Designation": "Assistant Professor",
         "Phone": "9964011547",
         "Email": "sunilb@sit.ac.in",
@@ -190,7 +193,7 @@
     },
     {
         "Name": "Dr. Naresh H",
-        "Initials": "DNH",
+        "Initials": "NH",
         "Designation": "Assistant Professor",
         "Phone": "9008489027",
         "Email": "nareshh@sit.ac.in",
@@ -198,7 +201,7 @@
     },
     {
         "Name": "Dr.Madhu H C",
-        "Initials": "DMH",
+        "Initials": "MHC",
         "Designation": "Assistant Professor",
         "Phone": "9611270525",
         "Email": "hcmadu@sit.ac.in",
@@ -206,7 +209,7 @@
     },
     {
         "Name": "Dr. Sudeep Kumar T",
-        "Initials": "DSK",
+        "Initials": "SKT",
         "Designation": "Assistant Professor",
         "Phone": "9900446028",
         "Email": "sudeepkumart@sit.ac.in",

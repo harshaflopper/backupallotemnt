@@ -1,6 +1,7 @@
 [
     {
         "Name": "Dr.K.Viswanath",
+        "Initials": "KV",
         "Designation": "Professor",
         "Phone": "8310412273",
         "Email": "vishwanath@sit.ac.in",
@@ -8,6 +9,7 @@
     },
     {
         "Name": "Dr.K.C.Narasimhamurthy",
+        "Initials": "KCN",
         "Designation": "Professor",
         "Phone": "9620243260",
         "Email": "kcnmurthy@sit.ac.in",
@@ -15,7 +17,7 @@
     },
     {
         "Name": "Dr. M.N.Sujatha",
-        "Initials": "DMN",
+        "Initials": "MNSU",
         "Designation": "Associate Professor",
         "Phone": "9880145094",
         "Email": "mnsujatha@sit.ac.in",
@@ -23,6 +25,7 @@
     },
     {
         "Name": "Dr.H.M.Chandrashekar",
+        "Initials": "HMC",
         "Designation": "Assistant Professor",
         "Phone": "9964529852",
         "Email": "hmchandrashekar@sit.ac.in",
@@ -30,7 +33,7 @@
     },
     {
         "Name": "Dr. R. N. Sathisha",
-        "Initials": "DRN",
+        "Initials": "RNS",
         "Designation": "Assistant Professor",
         "Phone": "9738766635",
         "Email": "satisharyan@sit.ac.in",
@@ -38,7 +41,7 @@
     },
     {
         "Name": "Dr. T.N.Chandrika",
-        "Initials": "DTN",
+        "Initials": "TNC",
         "Designation": "Associate Professor",
         "Phone": "9880122944",
         "Email": "tnchandrika@sit.ac.in",
@@ -46,7 +49,7 @@
     },
     {
         "Name": "Dr. D.K.Kumuda",
-        "Initials": "DDK",
+        "Initials": "DKK",
         "Designation": "Assistant Professor",
         "Phone": "9886330082",
         "Email": "kumuda@sit.ac.in",
@@ -54,7 +57,7 @@
     },
     {
         "Name": "Dr. L Usha",
-        "Initials": "DLU",
+        "Initials": "LU",
         "Designation": "Assistant Professor",
         "Phone": "9886424946",
         "Email": "ushal@sit.ac.in",
@@ -62,7 +65,7 @@
     },
     {
         "Name": "Dr. Mallikarjun B. C.",
-        "Initials": "DMB",
+        "Initials": "MBC",
         "Designation": "Associate Professor",
         "Phone": "9980680753",
         "Email": "mallikarjun_bc@sit.ac.in",
@@ -70,7 +73,7 @@
     },
     {
         "Name": "Dr. Puneeth Kumar T R",
-        "Initials": "DPK",
+        "Initials": "PTR",
         "Designation": "Assistant Professor",
         "Phone": "8904685053",
         "Email": "punithkumar@sit.ac.in",
@@ -78,7 +81,7 @@
     },
     {
         "Name": "Suchitra V",
-        "Initials": "SV",
+        "Initials": "SUV",
         "Designation": "Assistant Professor",
         "Phone": "8762530997",
         "Email": "suchitrav@sit.ac.in",

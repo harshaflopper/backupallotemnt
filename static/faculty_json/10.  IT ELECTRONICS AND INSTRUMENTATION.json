@@ -1,7 +1,7 @@
 [
     {
         "Name": "Dr.V.Siddeswara Prasad",
-        "Initials": "DVS",
+        "Initials": "VSP",
         "Designation": "Professor",
         "Phone": "9480030333",
         "Email": "vsiddesh@sit.ac.in",
@@ -9,7 +9,7 @@
     },
     {
         "Name": "Dr. G.R.Kiranmayi",
-        "Initials": "DGR",
+        "Initials": "GRK",
         "Designation": "Associate Professor",
         "Phone": "9880890246",
         "Email": "kiranmayi@sit.ac.in",
@@ -17,7 +17,7 @@
     },
     {
         "Name": "Dr. H.M.Kalpana",
-        "Initials": "DHM",
+        "Initials": "HMK",
         "Designation": "Professor",
         "Phone": "9480784395",
         "Email": "kalpanahm@sit.ac.in",
@@ -25,7 +25,7 @@
     },
     {
         "Name": "Dr. H.K.E.Latha",
-        "Initials": "DHK",
+        "Initials": "HKEL",
         "Designation": "Professor",
         "Phone": "9449852696",
         "Email": "lathahke@sit.ac.in",
@@ -33,7 +33,7 @@
     },
     {
         "Name": "Dr. G.N.Keshava Murthy",
-        "Initials": "DGN",
+        "Initials": "GNK",
         "Designation": "Associate Professor",
         "Phone": "9845657064",
         "Email": "gnk@sit.ac.in",
@@ -41,7 +41,7 @@
     },
     {
         "Name": "Dr. H. K. Ravi",
-        "Initials": "DHK",
+        "Initials": "HKR",
         "Designation": "Assistant Professor",
         "Phone": "9972912920",
         "Email": "ravihk@sit.ac.in",
@@ -49,7 +49,7 @@
     },
     {
         "Name": "Dr.D. Savitha",
-        "Initials": "DDS",
+        "Initials": "DS",
         "Designation": "Assistant Professor",
         "Phone": "9916430457",
         "Email": "savithad@sit.ac.in",
@@ -57,7 +57,7 @@
     },
     {
         "Name": "Dr. Chaitra C.",
-        "Initials": "DCC",
+        "Initials": "CC",
         "Designation": "Assistant Professor",
         "Phone": "9686468926",
         "Email": "chaitrac@sit.ac.in",
@@ -65,7 +65,7 @@
     },
     {
         "Name": "Dr. Basavaraju K. S.",
-        "Initials": "DBK",
+        "Initials": "BKS",
         "Designation": "Assistant Professor",
         "Phone": "9902966841",
         "Email": "ksbasavaraju@sit.ac.in",
@@ -73,7 +73,7 @@
     },
     {
         "Name": "Dr Panwala Fenil Chetankumar",
-        "Initials": "DPF",
+        "Initials": "PFC",
         "Designation": "Assistant Professor",
         "Phone": "9790717226",
         "Email": "panwalafenil@sit.ac.in",
@@ -81,7 +81,7 @@
     },
     {
         "Name": "Dr. Rajeshwari B. S.",
-        "Initials": "DRB",
+        "Initials": "RBS",
         "Designation": "Assistant Professor",
         "Phone": "8105063720",
         "Email": "rajeshwari@sit.ac.in",
@@ -89,7 +89,7 @@
     },
     {
         "Name": "Ramesha K. S.",
-        "Initials": "RKS",
+        "Initials": "IERKS",
         "Designation": "Assistant Professor",
         "Phone": "9845020784",
         "Email": "rameshaks@sit.ac.in",

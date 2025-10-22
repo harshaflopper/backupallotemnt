@@ -1,6 +1,7 @@
 [
     {
         "Name": "Dr.B.S.Gowrishankar",
+        "Initials": "BSG",
         "Designation": "Professor",
         "Phone": "7975433788",
         "Email": "hodbiotechnology@sit.ac.in",
@@ -8,7 +9,7 @@
     },
     {
         "Name": "Dr. K.B.Roopa",
-        "Initials": "DKB",
+        "Initials": "KBR",
         "Designation": "Assistant Professor",
         "Phone": "7892875295",
         "Email": "roopabk@sit.ac.in",
@@ -16,7 +17,7 @@
     },
     {
         "Name": "Dr. C. Anupama",
-        "Initials": "DCA",
+        "Initials": "CA",
         "Designation": "Assistant Professor",
         "Phone": "9886027774",
         "Email": "anupama83@sit.ac.in",
@@ -24,7 +25,7 @@
     },
     {
         "Name": "Dr. D.R.Prasanna",
-        "Initials": "DDR",
+        "Initials": "DRP",
         "Designation": "Associate Professor",
         "Phone": "9980032244",
         "Email": "adveirprasanna@sit.ac.in",
@@ -32,7 +33,7 @@
     },
     {
         "Name": "Dr. Akhela Umapathi",
-        "Initials": "DAU",
+        "Initials": "AU",
         "Designation": "Assistant Professor",
         "Phone": "9538847045",
         "Email": "akhela@sit.ac.in",

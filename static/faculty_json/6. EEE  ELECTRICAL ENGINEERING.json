@@ -1,15 +1,15 @@
 [
     {
         "Name": "K.M.Chandrasekhar Swamy",
-        "Initials": "KMC",
+        "Initials": "KMCS",
         "Designation": "Assistant Professor",
         "Phone": "9886883488",
         "Email": "kmcswamy@sit.ac.in",
         "isActive": true
     },
     {
-        "Name": "Associate Professor",
-        "Initials": "AP",
+        "Name": "B.A.Sridhar",
+        "Initials": "BAS",
         "Designation": "Associate Professor",
         "Phone": "9243185619",
         "Email": "sridharaba@sit.ac.in",
@@ -17,14 +17,15 @@
     },
     {
         "Name": "Dr.Rashmi",
+        "Initials": "RASH",
         "Designation": "Professor",
         "Phone": "9740110576",
         "Email": "rash_mysore@sit.ac.in",
         "isActive": true
     },
     {
-        "Name": "Assistant Professor",
-        "Initials": "AP",
+        "Name": "K.C.Rupesh",
+        "Initials": "KCR",
         "Designation": "Assistant Professor",
         "Phone": "8073876247",
         "Email": "rupeshkc@sit.ac.in",
@@ -32,7 +33,7 @@
     },
     {
         "Name": "Naveen Kumar S.B.",
-        "Initials": "NKS",
+        "Initials": "NSB",
         "Designation": "Assistant Professor",
         "Phone": "9886456965",
         "Email": "sbnaveen@sit.ac.in",
@@ -40,7 +41,7 @@
     },
     {
         "Name": "Dr. Madhu.B.M",
-        "Initials": "DMB",
+        "Initials": "MBM",
         "Designation": "Assistant Professor",
         "Phone": "9986163831",
         "Email": "madhubm@sit.ac.in",
@@ -48,7 +49,7 @@
     },
     {
         "Name": "Dr. H. S. Sridhar",
-        "Initials": "DHS",
+        "Initials": "HSS",
         "Designation": "Assistant Professor",
         "Phone": "9886356950",
         "Email": "sri054@gmail.com",
@@ -56,7 +57,7 @@
     },
     {
         "Name": "Dr. Vinayaka K.U.",
-        "Initials": "DVK",
+        "Initials": "VKU",
         "Designation": "Assistant Professor",
         "Phone": "9538539591",
         "Email": "vinayka@sit.ac.in",
@@ -72,7 +73,7 @@
     },
     {
         "Name": "Dr. Jayanendra Kumar",
-        "Initials": "DJK",
+        "Initials": "JK",
         "Designation": "Assistant Professor",
         "Phone": "7985555946",
         "Email": "jayanendrakumar@sit.ac.in",
@@ -80,7 +81,7 @@
     },
     {
         "Name": "Priya S",
-        "Initials": "PS",
+        "Initials": "PRS",
         "Designation": "Assistant Professor",
         "Phone": "9986434716",
         "Email": "priyas@sit.ac.in",

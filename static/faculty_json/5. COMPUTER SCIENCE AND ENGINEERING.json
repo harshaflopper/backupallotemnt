@@ -1,6 +1,7 @@
 [
     {
         "Name": "Dr.Y.S.Nijagunarya",
+        "Initials": "YSN",
         "Designation": "Professor",
         "Phone": "9844453688",
         "Email": "nijagunarya@sit.ac.in",
@@ -8,6 +9,7 @@
     },
     {
         "Name": "Dr.N.R.Sunitha",
+        "Initials": "NRS",
         "Designation": "Professor",
         "Phone": "9986276851",
         "Email": "nrsunitha@sit.ac.in",
@@ -15,6 +17,7 @@
     },
     {
         "Name": "Dr.R.Sumathi",
+        "Initials": "RS",
         "Designation": "Professor",
         "Phone": "9972131024",
         "Email": "rsumathi@sit.ac.in",
@@ -22,7 +25,7 @@
     },
     {
         "Name": "Dr. M.B.Nirmala",
-        "Initials": "DMB",
+        "Initials": "MBN",
         "Designation": "Associate Professor",
         "Phone": "9739302826",
         "Email": "mbnirmala@sit.ac.in",
@@ -30,7 +33,7 @@
     },
     {
         "Name": "Dr. K.N.Shreenath",
-        "Initials": "DKN",
+        "Initials": "KNS",
         "Designation": "Associate Professor",
         "Phone": "9844321171",
         "Email": "shreenathk_n@sit.ac.in",
@@ -38,7 +41,7 @@
     },
     {
         "Name": "Dr. K.G.Manjunath",
-        "Initials": "DKG",
+        "Initials": "KGM",
         "Designation": "Assistant Professor",
         "Phone": "8884155795",
         "Email": "kgmanjunath@sit.ac.in",
@@ -46,15 +49,15 @@
     },
     {
         "Name": "Dr. A.H.Shanthakumara",
-        "Initials": "DAH",
+        "Initials": "AHS",
         "Designation": "Assistant Professor",
         "Phone": "9886589750",
         "Email": "shanthakumara@sit.ac.in",
         "isActive": true
     },
     {
-        "Name": "Assistant Professor",
-        "Initials": "AP",
+        "Name": "A.V.Krishnamohan",
+        "Initials": "AVK",
         "Designation": "Assistant Professor",
         "Phone": "9980577442",
         "Email": "krishnamohan_av@sit.ac.in",
@@ -62,7 +65,7 @@
     },
     {
         "Name": "Dr. Srinivasa K",
-        "Initials": "DSK",
+        "Initials": "SK",
         "Designation": "Assistant Professor",
         "Phone": "9845399083",
         "Email": "srinivasa@sit.ac.in",
@@ -70,7 +73,7 @@
     },
     {
         "Name": "Dr. R.M.Savithramma",
-        "Initials": "DRM",
+        "Initials": "RMS",
         "Designation": "Assistant Professor",
         "Phone": "8495822888",
         "Email": "savirmrl@sit.ac.in",
@@ -86,7 +89,7 @@
     },
     {
         "Name": "Dr. H. D. Kallinath",
-        "Initials": "DHD",
+        "Initials": "HDK",
         "Designation": "Assistant Professor",
         "Phone": "9986295070",
         "Email": "hdk@sit.ac.in",
@@ -94,7 +97,7 @@
     },
     {
         "Name": "Dr. Ashwini B.P.",
-        "Initials": "DAB",
+        "Initials": "ABP",
         "Designation": "Assistant Professor",
         "Phone": "9900567454",
         "Email": "ashwinibp@sit.ac.in",
@@ -102,7 +105,7 @@
     },
     {
         "Name": "Dr. K Bhargavi",
-        "Initials": "DKB",
+        "Initials": "KB",
         "Designation": "Associate Professor",
         "Phone": "9886280931",
         "Email": "bhargavik@sit.ac.in",
@@ -118,6 +121,7 @@
     },
     {
         "Name": "Dr.SumalathaAaradhya",
+        "Initials": "SAR",
         "Designation": "Assistant Professor",
         "Phone": "9900609254",
         "Email": "sumalatah@sit.ac.in",
@@ -125,7 +129,7 @@
     },
     {
         "Name": "Dr. Shobha K",
-        "Initials": "DSK",
+        "Initials": "SK",
         "Designation": "Assistant Professor",
         "Phone": "7760434039",
         "Email": "shobhak@sit.ac.in",
@@ -133,7 +137,7 @@
     },
     {
         "Name": "Dr. Pramod T C",
-        "Initials": "DPT",
+        "Initials": "PTC",
         "Designation": "Assistant Professor",
         "Phone": "8123432938",
         "Email": "pramodhtc@sit.ac.in",
@@ -141,7 +145,7 @@
     },
     {
         "Name": "Dr. Kiran Kumar T M",
-        "Initials": "DKK",
+        "Initials": "KTM",
         "Designation": "Assistant Professor",
         "Phone": "9844379612",
         "Email": "tmkiran@sit.ac.in",
@@ -149,7 +153,7 @@
     },
     {
         "Name": "Dr. Bharathi P T",
-        "Initials": "DBP",
+        "Initials": "BTP",
         "Designation": "Assistant Professor",
         "Phone": "9480030582",
         "Email": "bharathi_pt@sit.ac.in",
@@ -157,7 +161,7 @@
     },
     {
         "Name": "Sowmya M N",
-        "Initials": "SMN",
+        "Initials": "CSSMN",
         "Designation": "Assistant Professor",
         "Phone": "9986617496",
         "Email": "sowmyamn@sit.ac.in",
@@ -173,7 +177,7 @@
     },
     {
         "Name": "Dr. Akshatha Y",
-        "Initials": "DAY",
+        "Initials": "AY",
         "Designation": "Assistant Professor",
         "Phone": "7411438641",
         "Email": "akshathay@sit.ac.in",
@@ -205,7 +209,7 @@
     },
     {
         "Name": "Dr.Prasannakumar K R",
-        "Initials": "DPK",
+        "Initials": "PKR",
         "Designation": "Assistant Professor",
         "Phone": "9880771132",
         "Email": "prasanna.kghatta@sit.ac.in",
@@ -229,7 +233,7 @@
     },
     {
         "Name": "Dr. Anupama T A",
-        "Initials": "DAT",
+        "Initials": "ATA",
         "Designation": "Assistant Professor",
         "Phone": "9900398122",
         "Email": "anupamata@sit.ac.in",

@@ -1,7 +1,7 @@
 [
     {
         "Name": "Dr. M.S.Rudramurthy",
-        "Initials": "DMS",
+        "Initials": "MSR",
         "Designation": "Associate Professor",
         "Phone": "9482572737",
         "Email": "rudrams@sit.ac.in",
@@ -9,7 +9,7 @@
     },
     {
         "Name": "Dr. H.Kavitha",
-        "Initials": "DHK",
+        "Initials": "HK",
         "Designation": "Associate Professor",
         "Phone": "9980168806",
         "Email": "hkavitha@sit.ac.in",
@@ -17,7 +17,7 @@
     },
     {
         "Name": "Dr. Nagarathna B.Chittaragi",
-        "Initials": "DNB",
+        "Initials": "NBC",
         "Designation": "Assistant Professor",
         "Phone": "9449303604",
         "Email": "chittaragi@sit.ac.in",
@@ -25,6 +25,7 @@
     },
     {
         "Name": "Dr.R.Aparna",
+        "Initials": "RA",
         "Designation": "Professor",
         "Phone": "9480408455",
         "Email": "raparna@sit.ac.in",
@@ -32,7 +33,7 @@
     },
     {
         "Name": "Dr. Sharath Kumar S",
-        "Initials": "DSK",
+        "Initials": "SKS",
         "Designation": "Assistant Professor",
         "Phone": "9535321023",
         "Email": "skumars@sit.ac.in",
@@ -48,7 +49,7 @@
     },
     {
         "Name": "Dr. Hemavati",
-        "Initials": "DH",
+        "Initials": "ISH",
         "Designation": "Assistant Professor",
         "Phone": "8792540845",
         "Email": "hemavd@sit.ac.in",
@@ -64,7 +65,7 @@
     },
     {
         "Name": "Vidhya Shree N S",
-        "Initials": "VSN",
+        "Initials": "VNS",
         "Designation": "Assistant Professor",
         "Phone": "7760889930",
         "Email": "vidhyashreens@sit.ac.in",
@@ -95,8 +96,8 @@
         "isActive": true
     },
     {
-        "Name": "Assistant Professor",
-        "Initials": "AP",
+        "Name": "Vishala",
+        "Initials": "ISV",
         "Designation": "Assistant Professor",
         "Phone": "8123676795",
         "Email": "vishalag@sit.ac.in",

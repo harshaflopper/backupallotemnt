@@ -1,7 +1,7 @@
 [
     {
         "Name": "Dr. M.Ajoy Kumar",
-        "Initials": "DMA",
+        "Initials": "MAK",
         "Designation": "Professor",
         "Phone": "9886145620",
         "Email": "ajoy@sit.ac.in",
@@ -17,7 +17,7 @@
     },
     {
         "Name": "Dr. C.Somashekar",
-        "Initials": "DCS",
+        "Initials": "CSK",
         "Designation": "Associate Professor",
         "Phone": "9844420529",
         "Email": "csomashekar@sit.ac.in",
@@ -25,7 +25,7 @@
     },
     {
         "Name": "Mahantesh Jakaty",
-        "Initials": "MJ",
+        "Initials": "MSJ",
         "Designation": "Assistant Professor",
         "Phone": "9886634895",
         "Email": "mahamathj@sit.ac.in",
@@ -33,7 +33,7 @@
     },
     {
         "Name": "Dr. Manu T U",
-        "Initials": "DMT",
+        "Initials": "MTU",
         "Designation": "Assistant Professor",
         "Phone": "9886345863",
         "Email": "manu@sit.ac.in",
@@ -41,7 +41,7 @@
     },
     {
         "Name": "Dr. Preeti.S.Desai",
-        "Initials": "DPS",
+        "Initials": "PSD",
         "Designation": "Assistant Professor",
         "Phone": "9008977611",
         "Email": "preeti@sit.ac.in",
@@ -49,7 +49,7 @@
     },
     {
         "Name": "Aishwarya M R",
-        "Initials": "AMR",
+        "Initials": "IMR",
         "Designation": "Assistant Professor",
         "Phone": "9945917991",
         "Email": "ishwaryamr@sit.ac.in",

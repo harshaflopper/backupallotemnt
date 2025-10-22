@@ -1,7 +1,7 @@
 [
     {
-        "Name": "Associate Professor",
-        "Initials": "AP",
+        "Name": "K.R.Shadaksharamurthy",
+        "Initials": "KRS",
         "Designation": "Associate Professor",
         "Phone": "7019007472",
         "Email": "krsmurthy@sit.ac.in",
@@ -9,6 +9,7 @@
     },
     {
         "Name": "Dr.G.R.Suma",
+        "Initials": "GRS",
         "Designation": "Assistant Professor",
         "Phone": "9632251017",
         "Email": "gr_suma@sit.ac.in",
@@ -16,7 +17,7 @@
     },
     {
         "Name": "Dr. Rajashekara S",
-        "Initials": "DRS",
+        "Initials": "RS",
         "Designation": "Assistant Professor",
         "Phone": "9742872266",
         "Email": "rs@sit.ac.in",
@@ -24,7 +25,7 @@
     },
     {
         "Name": "Dr. Harish Phattepur",
-        "Initials": "DHP",
+        "Initials": "HP",
         "Designation": "Assistant Professor",
         "Phone": "9916125550",
         "Email": "hdp@sit.ac.in",
@@ -32,7 +33,7 @@
     },
     {
         "Name": "Dr. Poornima.G.Hiremath",
-        "Initials": "DPG",
+        "Initials": "PGH",
         "Designation": "Associate Professor",
         "Phone": "8892660422",
         "Email": "pgh@sit.ac.in",
@@ -40,7 +41,7 @@
     },
     {
         "Name": "Dr. Suman Pawar",
-        "Initials": "DSP",
+        "Initials": "SP",
         "Designation": "Assistant Professor",
         "Phone": "9880575855",
         "Email": "svp@sit.ac.in",
@@ -48,7 +49,7 @@
     },
     {
         "Name": "Dr. Prakash Binnal",
-        "Initials": "DPB",
+        "Initials": "PB",
         "Designation": "Assistant Professor",
         "Phone": "6360242352",
         "Email": "pb@sit.ac.in",
@@ -56,7 +57,7 @@
     },
     {
         "Name": "Dr. Sudhir.H.Ranganath",
-        "Initials": "DSH",
+        "Initials": "SHR",
         "Designation": "Professor",
         "Phone": "9901699216",
         "Email": "sudhirh@sit.ac.in",
